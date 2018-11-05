@@ -84,7 +84,15 @@
                         Πατήστε εδώ για να κατεβάσετε τα σχετικά αρχεία
                       </a>
                     </div>
-
+                    <div *ngIf="(currentRequest.type === 'trip') && currentRequest.trip" class="uk-width-1-1@l uk-grid uk-margin-auto-vertical">
+                      <div class="uk-text-bold uk-inline">Λεπτομέρειες ταξιδίου:</div>
+                      <div class="uk-inline">
+                        <span class="uk-display-block" *ngIf="currentRequest.trip.email !== currentRequest.user.email">
+                          <u>Ονοματεπώνυμο:</u> {{ currentRequest.trip.firstname }} {{ currentRequest.trip.lastname }}
+                        </span>
+                        <span><u>Προορισμός:</u> {{ currentRequest.trip.destination }}</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
 

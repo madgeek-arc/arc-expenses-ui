@@ -148,7 +148,7 @@ export class ManageRequestsService {
         type.forEach( x => typesList = typesList + '&type=' + x );
         let stagesList = '';
         stage.forEach( x => stagesList = stagesList + '&stage=' + x );
-        let url = `${this.apiUrl}getAll?from=${from}&quantity=${quantity}${statusList}${stagesList}${typesList}`;
+        let url = `${this.apiUrl}getAll?from=${from}&quantity=${quantity}${statusList}${typesList}${stagesList}`;
         url = url + `&order=${order}&orderField=${orderField}&email=${encodeURIComponent(email)}&searchField=${searchField}`;
 
         console.log(`calling ${url}`);
