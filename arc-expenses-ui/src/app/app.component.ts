@@ -13,6 +13,10 @@ export class AppComponent implements OnInit, OnDestroy {
 
   constructor(private router: Router,
               private authService: AuthenticationService) {
+
+    // TODO: DON'T FORGET TO UPDATE BEFORE COMMIT!!!
+    console.log('committed on: 7-11-2018 10:57 am');
+
     // TODO: hide console logs
     /*if ( (environment.production === true) &&
          !window.location.origin.includes('aleka') ) {
