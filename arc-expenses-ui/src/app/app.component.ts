@@ -18,10 +18,11 @@ export class AppComponent implements OnInit, OnDestroy {
     console.log('committed on: 7-11-2018 10:57 am');
 
     // TODO: hide console logs
-    /*if ( (environment.production === true) &&
-         !window.location.origin.includes('aleka') ) {
+    if ( (environment.production === true) &&
+         !window.location.origin.includes('aleka') &&
+         !window.location.origin.includes('beta')) {
         console.log = function () {};
-    }*/
+    }
 
       this.authService.tryLogin();
   }
