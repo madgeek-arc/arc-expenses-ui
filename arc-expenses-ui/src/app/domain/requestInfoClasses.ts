@@ -89,13 +89,10 @@ export class RequestInfo {
 
     constructor(phaseId: string, requestId: string, requester: User, project: Project, isTrip: boolean) {
 
-        console.log(`initializing requestInfo`);
-        console.log('isTrip is', isTrip);
-
         this.phaseId = phaseId;
         this.requestId = requestId;
         this.requester = requester;
-        this.initiateStagesInfo(project, isTrip);
+        this.initiateStagesInfo(project);
 
         if (isTrip) {
             (this['7']).stagePOIs = [];
@@ -115,7 +112,7 @@ export class RequestInfo {
 
     }
 
-    initiateStagesInfo(project: Project, isTrip: boolean) {
+    initiateStagesInfo(project: Project) {
         this['2'] = new StageInfo(
             stageTitles['2'],
             ['1'],

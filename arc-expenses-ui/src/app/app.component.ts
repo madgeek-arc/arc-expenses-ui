@@ -1,7 +1,7 @@
 import { Component, isDevMode, OnDestroy, OnInit } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { AuthenticationService } from './services/authentication.service';
-import { isNullOrUndefined } from 'util';
+import { environment } from '../environments/environment';
 
 @Component({
   selector: 'app-root',
@@ -13,6 +13,11 @@ export class AppComponent implements OnInit, OnDestroy {
 
   constructor(private router: Router,
               private authService: AuthenticationService) {
+    // TODO: hide console logs
+    /*if ( (environment.production === true) &&
+         !window.location.origin.includes('aleka') ) {
+        console.log = function () {};
+    }*/
 
       this.authService.tryLogin();
   }

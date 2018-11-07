@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { BaseInfo, Request, RequestPayment, RequestSummary, Stage5b } from '../../domain/operation';
+import { BaseInfo, Request, RequestPayment, RequestSummary } from '../../domain/operation';
 import { paymentStages, requestTypes, stageIds } from '../../domain/stageDescriptions';
 import { RequestInfo } from '../../domain/requestInfoClasses';
 import { AnchorItem } from '../../shared/dynamic-loader-anchor-components/anchor-item';
@@ -10,7 +10,6 @@ import { concatMap, mergeMap, tap } from 'rxjs/operators';
 import { HttpErrorResponse, HttpEventType, HttpResponse } from '@angular/common/http';
 import { isNullOrUndefined, isUndefined } from 'util';
 import { printRequestPage } from '../print-request-function';
-import { forkJoin } from 'rxjs/observable/forkJoin';
 
 @Component({
     selector: 'request-stage-payment',
@@ -33,7 +32,7 @@ export class RequestStagePaymentComponent implements OnInit {
     currentRequest: Request;
     currentRequestPayment: RequestPayment;
     currentStageName: string;
-    canEdit: boolean = false;
+    canEdit = false;
     wentBackOneStage: boolean;
     requestNeedsUpdate: boolean;
     stages: string[];
@@ -319,7 +318,7 @@ export class RequestStagePaymentComponent implements OnInit {
         if ( (stage === this.currentRequestPayment.stage) &&
             (this.currentRequestPayment.status !== 'rejected') &&
             (this.currentRequestPayment.status !== 'accepted') &&
-            ( (this.authService.getUserRole() === 'ROLE_ADMIN') || (this.canEdit === true) || (stage === '7') ) ) {
+            ( (this.authService.getUserRole() === 'ROLE_ADMIN') || (this.canEdit === true) ) ) {
 
             this.stageLoaderItemList = [
                 new AnchorItem(

@@ -10,7 +10,6 @@ import { ManageProjectService } from '../services/manage-project.service';
 import { isNullOrUndefined, isUndefined } from 'util';
 import { HttpEventType, HttpResponse } from '@angular/common/http';
 import { requestTypes, supplierSelectionMethodsMap } from '../domain/stageDescriptions';
-import { mergeMap, concatMap, tap } from 'rxjs/operators';
 
 declare const UIkit: any;
 
@@ -135,9 +134,6 @@ export class NewRequestComponent implements OnInit {
         this.newRequestForm.get('name').disable();
 
         if (this.requestType === 'trip') {
-            /*this.newRequestForm.get('trip_firstname').setValue(this.currentUser.firstname);
-            this.newRequestForm.get('trip_lastname').setValue(this.currentUser.lastname);
-            this.newRequestForm.get('trip_email').setValue(this.currentUser.email);*/
             this.newRequestForm.get('trip_firstname').setValidators([Validators.required]);
             this.newRequestForm.get('trip_lastname').setValidators([Validators.required]);
             this.newRequestForm.get('trip_email').setValidators([Validators.required]);
@@ -226,8 +222,8 @@ export class NewRequestComponent implements OnInit {
                 this.requestApproval.stage3 = new Stage3();
                 this.requestApproval.stage4 = new Stage4();
 
-                // TODO: Uncomment when back end decides if the stage needs initializing
-                /* if (this.request.stage1.amountInEuros > this.lowAmount) {
+                // TODO: Uncomment when we configure the case when scientific coordinator becomes diataktis
+                /* if (this.request.stage1.amountInEuros <= this.lowAmount) {
                     this.requestApproval.stage5a = new Stage5a();
                 } */
                 this.requestApproval.stage5a = new Stage5a();

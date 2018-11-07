@@ -211,7 +211,9 @@ export class StageComponent implements OnInit {
 
     createUser(): User {
         const tempUser: User = new User();
-        if (this.authService.getUserRole() === 'ROLE_ADMIN') {
+        if ( (this.authService.getUserRole() === 'ROLE_ADMIN') &&
+	         ((this.stageId !== '7') ||
+             (this.authService.getUserProp('email') !== this.currentRequestInfo.requester.email)) ) {
             tempUser.id = this.authService.getUserProp('id');
             tempUser.email = this.currentPOI.email;
             tempUser.firstname = this.currentPOI.firstname;
