@@ -554,8 +554,9 @@ export class RequestsComponent implements OnInit {
     getIfUserCanEdit(id: string, requestId: string, requester: User, project: Project, stage: string, type: string) {
         const newRequestInfo = new RequestInfo(id, requestId, requester, project, (type === 'trip'));
         return (( this.authService.getUserRole() === 'ROLE_ADMIN' ) ||
-                ( this.isSimpleUser && ((stage === '1') || (stage === '7')) ) ||
-                ( newRequestInfo[stage].stagePOIs.some(
+                ( ((stage === '1') || (stage === '7')) && (this.authService.getUserProp('email') === newRequestInfo.requester.email) ) ||
+                ((stage !== '1') &&
+                 newRequestInfo[stage].stagePOIs.some(
                         x => ( (x.email === this.authService.getUserProp('email')) ||
                                         x.delegates.some(y => y.email === this.authService.getUserProp('email')) )
                     )

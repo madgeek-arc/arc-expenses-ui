@@ -40,8 +40,7 @@
                           (canEdit === true || canEdit === false)">
 
                 <!--1st stage-->
-
-                <div *ngIf="(currentRequestApproval.stage !== '1') || (canEdit) === false" class="submittedRequest">
+                <div *ngIf="willShowStage('1') === 2" class="submittedRequest">
                   <div class="uk-margin-bottom uk-width-1-1 uk-grid">
                     <div class="uk-width-1-2@l">
                       <span class="uk-text-bold uk-margin-small-right">Πρόγραμμα: </span>
