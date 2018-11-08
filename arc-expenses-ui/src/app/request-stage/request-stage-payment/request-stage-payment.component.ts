@@ -27,6 +27,8 @@ export class RequestStagePaymentComponent implements OnInit {
     uploadedFile: File;
     uploadedFileURL: string;
 
+    updatedFinalAmount: number;
+
     isSimpleUser: boolean;
     requestId: string;
     currentRequest: Request;
@@ -166,7 +168,8 @@ export class RequestStagePaymentComponent implements OnInit {
 
     getFinalAmount(newVals: string[]) {
         if (newVals && newVals.length === 1) {
-            this.currentRequest.stage1.finalAmount = +newVals[0];
+            this.updatedFinalAmount = +newVals[0];
+            // this.currentRequest.stage1.finalAmount = +newVals[0];
             this.requestNeedsUpdate = true;
         }
     }
@@ -294,6 +297,11 @@ export class RequestStagePaymentComponent implements OnInit {
             this.currentRequestPayment[this.currentStageName]['attachment']['url'] = this.uploadedFileURL;
             this.uploadedFileURL = '';
             this.uploadedFile = null;
+        }
+
+        if (!isNullOrUndefined(this.updatedFinalAmount)) {
+            this.currentRequest.stage1.finalAmount = this.updatedFinalAmount;
+            this.updatedFinalAmount = null;
         }
 
         this.requestService.updateRequest(this.currentRequest, this.authService.getUserProp('email')).pipe(

@@ -475,6 +475,7 @@ export class RequestStageComponent implements OnInit {
         if (newVals && newVals.length === 2) {
             this.currentRequest.stage1.supplier = newVals[0];
             this.currentRequest.stage1.amountInEuros = +newVals[1];
+            this.currentRequest.stage1.finalAmount = +newVals[1];
             this.requestNeedsUpdate = true;
         }
     }
