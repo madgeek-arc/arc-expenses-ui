@@ -190,8 +190,10 @@ export class RequestStagePaymentComponent implements OnInit {
                  (newStage['approved'] === true) ) {
 
                 this.currentRequestPayment.status = 'accepted';
-                this.currentRequest.requestStatus = 'accepted';
-                this.requestNeedsUpdate = true;
+                if (this.currentRequest.type !== 'services_contract') {
+                    this.currentRequest.requestStatus = 'accepted';
+                    this.requestNeedsUpdate = true;
+                }
             } else {
 
                 this.currentRequestPayment.status = 'rejected';
@@ -278,6 +280,7 @@ export class RequestStagePaymentComponent implements OnInit {
                 () => {
                     console.log('ready to update RequestPayment');
                     if (this.requestNeedsUpdate) {
+                        this.requestNeedsUpdate = false;
                         this.submitRequestAndPayment();
                     } else {
                         this.submitRequestPayment();
