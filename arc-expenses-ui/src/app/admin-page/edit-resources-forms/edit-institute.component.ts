@@ -1,7 +1,7 @@
-import {Component, OnInit} from '@angular/core';
-import {EditResourcesComponent} from './edit-resources.components';
-import {instituteFormDefinition} from './edit-resources-form-definitions';
-import {Delegate} from '../../domain/operation';
+import { Component, OnInit } from '@angular/core';
+import { EditResourcesComponent } from './edit-resources.components';
+import { instituteFormDefinition } from './edit-resources-form-definitions';
+import { Delegate } from '../../domain/operation';
 
 @Component({
     selector: 'app-edit-institute',

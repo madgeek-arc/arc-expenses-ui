@@ -69,7 +69,8 @@ export class Institute {
     diaugeia: PersonOfInterest;
     suppliesOffice: PersonOfInterest;
     travelManager: PersonOfInterest;
-    diataktis: PersonOfInterest;}
+    diataktis: PersonOfInterest;
+}
 
 export class Organization {
     id: string;
@@ -99,6 +100,7 @@ export class Project {
     startDate: string;
     endDate: string;
     totalCost: number;
+    scientificCoordinatorAsDiataktis: boolean;
 }
 
 export class Request {

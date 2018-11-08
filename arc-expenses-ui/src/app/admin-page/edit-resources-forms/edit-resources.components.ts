@@ -30,6 +30,12 @@ export class EditResourcesComponent implements OnInit {
         }
     }
 
+    getProjectNames() {}
+
+    getResourcesList() {}
+
+    getResourceById() {}
+
     addResource() {}
 
     updateResource() {}

@@ -212,7 +212,7 @@ export class StageComponent implements OnInit {
     createUser(): User {
         const tempUser: User = new User();
         if ( (this.authService.getUserRole() === 'ROLE_ADMIN') &&
-	         ((this.stageId !== '7') ||
+             ((this.stageId !== '7') ||
              (this.authService.getUserProp('email') !== this.currentRequestInfo.requester.email)) ) {
             tempUser.id = this.authService.getUserProp('id');
             tempUser.email = this.currentPOI.email;
@@ -237,14 +237,35 @@ export class StageComponent implements OnInit {
 
     /* display full name of the submitted stage's editor */
     getDelegateName() {
+        /* stage 7 can also be completed by the user */
         if (this.stageId === '7') {
-            return this.currentStage['user']['firstname'] + ' ' + this.currentStage['user']['lastname'];
-        } else {
-            if ( this.getIsDelegateHidden() ) {
-                return this.currentPOI.firstname + ' ' + this.currentPOI.lastname;
+            /* if a delegate has completed the stage and check if his/her name should be hidden*/
+            if (this.currentRequestInfo['7'].stagePOIs.some(x => x.delegates.some(y => y.email === this.currentStage['user']['email']))) {
+                if (this.getIsDelegateHidden()) {
+                    return ' (' + this.currentPOI.firstname + ' ' + this.currentPOI.lastname + ')';
+                } else {
+                    return ' (' + this.currentStage['user']['firstname'] + ' ' + this.currentStage['user']['lastname'] + ')';
+                }
             } else {
-                return this.currentStage['user']['firstname'] + ' ' + this.currentStage['user']['lastname'];
+                return ' (' + this.currentStage['user']['firstname'] + ' ' + this.currentStage['user']['lastname'] + ')';
             }
+
+        /* in stages 4 and 9 the name will always be hidden */
+        } else if ( (this.stageId !== '4') && (this.stageId !== '9') ) {
+
+            /* the name of the Inspection Team member that editted stage8 will only be shown to the POY and the Admins */
+            if ((this.stageId !== '8') ||
+                ((this.stageId === '8') &&
+                 ((this.authService.getUserRole() === 'ROLE_ADMIN') ||
+                  this.currentRequestInfo['4'].stagePOIs.some(x => x.email === this.authService.getUserProp('email'))) )) {
+
+                if ( this.getIsDelegateHidden() ) {
+                    return ' (' + this.currentPOI.firstname + ' ' + this.currentPOI.lastname + ')';
+                } else {
+                    return ' (' + this.currentStage['user']['firstname'] + ' ' + this.currentStage['user']['lastname'] + ')';
+                }
+            }
+
         }
     }
 

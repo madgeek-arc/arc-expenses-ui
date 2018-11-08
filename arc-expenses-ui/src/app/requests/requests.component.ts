@@ -11,7 +11,6 @@ import { printRequestPage } from '../request-stage/print-request-function';
 import { ManageResourcesService } from '../services/manage-resources.service';
 import { ManageProjectService } from '../services/manage-project.service';
 import { RequestInfo } from '../domain/requestInfoClasses';
-import { forkJoin } from 'rxjs/observable/forkJoin';
 
 @Component({
     selector: 'app-requests',
@@ -480,29 +479,6 @@ export class RequestsComponent implements OnInit {
         this.errorMessage = '';
         this.projects = [];
 
-        /*forkJoin(this.projectService.getAllProjectsNames(),
-                 this.resourceService.getInstituteNames)
-            .subscribe(
-                res => {
-                    this.projects = res[0];
-                    this.institutes = res[1];
-                },
-                error => {
-                    console.log(error);
-                    this.showSpinner = false;
-                    this.errorMessage = 'Παρουσιάστηκε πρόβλημα με την ανάκτηση των απαραίτητων πληροφοριών.';
-                },
-                () => {
-                    this.showSpinner = false;
-                    this.errorMessage = '';
-                    if ( (isNullOrUndefined(this.projects) || (this.projects.length === 0)) ||
-                         isNullOrUndefined(this.institutes) ) {
-                        this.errorMessage = 'Παρουσιάστηκε πρόβλημα με την ανάκτηση των απαραίτητων πληροφοριών.';
-                    } else {
-                        this.initializeParams();
-                    }
-                }
-            );*/
         this.projectService.getAllProjectsNames().subscribe(
             res => this.projects = res,
             error => {
