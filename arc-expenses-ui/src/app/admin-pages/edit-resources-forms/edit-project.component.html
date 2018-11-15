@@ -1,0 +1,178 @@
+<div *ngIf="resourceForm" class="uk-width-1-1 uk-margin-bottom">
+    <div [formGroup]="resourceForm" class="uk-form-horizontal">
+        <div class="uk-margin">
+            <label class="uk-form-label" for="id_{{ id }}">Id</label>
+            <div class="uk-form-controls">
+                <div class="uk-width-1-1">
+                    <input type="text" id="id_{{ id }}" class="uk-input" formControlName="id"/>
+                </div>
+            </div>
+        </div>
+        <div class="uk-margin">
+            <label class="uk-form-label" for="name_{{ id }}">Όνομα</label>
+            <div class="uk-form-controls">
+                <div class="uk-width-1-1">
+                    <input type="text" id="name_{{ id }}" class="uk-input" formControlName="name"/>
+                </div>
+            </div>
+        </div>
+        <div class="uk-margin">
+            <label class="uk-form-label" for="acronym_{{ id }}">Ακρώνυμο</label>
+            <div class="uk-form-controls">
+                <div class="uk-width-1-1">
+                    <input type="text" id="acronym_{{ id }}" class="uk-input" formControlName="acronym"/>
+                </div>
+            </div>
+        </div>
+        <div class="uk-margin">
+            <label class="uk-form-label" for="parentProj_{{ id }}">Υποέργο του</label>
+            <div class="uk-form-controls">
+                <div class="uk-width-1-1">
+                    <input type="text" id="parentProj_{{ id }}" class="uk-input" formControlName="parentProject"/>
+                </div>
+            </div>
+        </div>
+        <div class="uk-margin">
+            <label class="uk-form-label" for="startDate_{{ id }}">Ημ/νία έναρξης</label>
+            <div class="uk-form-controls">
+                <div class="uk-width-1-1">
+                    <input type="text" id="startDate_{{ id }}" class="uk-input" formControlName="startDate"/>
+                </div>
+            </div>
+        </div>
+        <div class="uk-margin">
+            <label class="uk-form-label" for="startDate_{{ id }}">Ημ/νία ολοκλήρωσης</label>
+            <div class="uk-form-controls">
+                <div class="uk-width-1-1">
+                    <input type="text" id="endDate_{{ id }}" class="uk-input" formControlName="endDate"/>
+                </div>
+            </div>
+        </div>
+        <div class="uk-margin">
+            <label class="uk-form-label" for="totalCost_{{ id }}">Συνολικό κόστος</label>
+            <div class="uk-form-controls">
+                <div class="uk-width-1-1">
+                    <div class="uk-width-small">
+                        <input class="uk-input" type="text" id="totalCost_{{ id }}"
+                               formControlName="totalCost" placeholder="0" (keyup)="showAmount()"
+                               (focus)="resourceForm.get('totalCost').markAsUntouched()">
+                    </div>
+                    <div class="uk-comment-body uk-text-small uk-text-muted">
+                        <i>Ο δεκαδικός αριθμός θα πρέπει να είναι της μορφής: <b>1111.11</b></i>
+                    </div>
+                    <div *ngIf="resourceForm.get('totalCost').invalid &&
+                                resourceForm.get('totalCost').touched &&
+                                resourceForm.get('totalCost').dirty"
+                         class="uk-comment-body uk-text-small uk-text-danger">
+                        Ο αριθμός δεν είναι έγκυρος.
+                    </div>
+                    <div *ngIf="totalCostAmount && resourceForm.get('totalCost').valid"
+                         class="uk-comment-body uk-text-small uk-text-muted">
+                        Το ποσό είναι: {{ totalCostAmount | currency: 'EUR': 'symbol-narrow' }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="uk-margin">
+            <label class="uk-form-label">Ινστιτούτο/Μονάδα</label>
+            <div class="uk-form-controls">
+                <div class="uk-width-1-1 uk-grid">
+                    <div class="uk-form-controls uk-width-1-2">
+                        <input class="uk-input" type="text" (keyup)="updateSearchTerm($event, 'searchForInstitute')">
+                        <div class="uk-comment-body uk-text-small uk-text-muted">
+                            <i>Ξεκινήστε να γράφετε το όνομα και επιλέξτε το από την λίστα που θα εμφανιστεί.</i>
+                        </div>
+                        <div *ngIf="searchForInstitute" class="uk-nav uk-padding-small uk-width-large uk-position-absolute" style="background-color: white">
+                            <ul>
+                                <li *ngFor="let inst of institutes | filterByTerm: searchForInstitute: 'name'">
+                                    <a (click)="addInstitute(inst)">
+                                        {{ inst.name }}</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="uk-form-controls uk-width-1-2">
+                        ή
+                        <button class="uk-button-small uk-margin-small-left" (click)="addInstitute()">
+                            Προσθέστε νέο
+                        </button>
+                    </div>
+                </div>
+                <div *ngIf="instituteFormData" class="uk-width-1-1">
+                    <div>
+                        <app-edit-institute #instituteForm [id]="id + '_inst'" [data]="instituteFormData"></app-edit-institute>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="uk-margin">
+            <label class="uk-form-label">Επιστημονικός Υπεύθυνος</label>
+            <div class="uk-form-controls">
+                <div class="uk-width-1-1 uk-grid">
+                    <div class="uk-form-controls uk-width-1-2">
+                        <input class="uk-input" type="text" (keyup)="updateSearchTerm($event, 'searchForScientificCoordinator')">
+                        <div class="uk-comment-body uk-text-small uk-text-muted">
+                            <i>Ξεκινήστε να γράφετε το email και επιλέξτε από την λίστα που θα εμφανιστεί.</i>
+                        </div>
+                        <div *ngIf="searchForScientificCoordinator" class="uk-nav uk-padding-small uk-width-large uk-position-absolute" style="background-color: white">
+                            <ul>
+                                <li *ngFor="let poi of pois | filterByTerm: searchForScientificCoordinator: 'email'">
+                                    <a (click)="addPOI(poi)">
+                                        {{ poi.firstname + ' ' + poi.lastname + ' (' + poi.email + ')' }}</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="uk-form-controls uk-width-1-2">
+                        ή
+                        <button class="uk-button-small uk-margin-small-left" (click)="addPOI()">
+                            Προσθέστε νέο
+                        </button>
+                    </div>
+                </div>
+                <div *ngIf="scientificCoordinatorFormData" class="uk-width-1-1">
+                    <div>
+                        <app-edit-poi #scientificCoordinatorForm [id]="id + '_sciCoord'" [data]="scientificCoordinatorFormData"></app-edit-poi>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="uk-margin">
+            <label class="uk-form-label">Χειριστές</label>
+            <div class="uk-form-controls">
+                <div class="uk-width-1-1 uk-grid">
+                    <div class="uk-form-controls uk-width-1-2">
+                        <input class="uk-input" type="text" (keyup)="updateSearchTerm($event, 'searchForOperator')">
+                        <div class="uk-comment-body uk-text-small uk-text-muted">
+                            <i>Ξεκινήστε να γράφετε το email και επιλέξτε από την λίστα που θα εμφανιστεί.</i>
+                        </div>
+                        <div *ngIf="searchForOperator"
+                             class="uk-nav uk-padding-small uk-width-large uk-position-absolute" style="background-color: white">
+                            <ul>
+                                <li *ngFor="let poi of pois | filterByTerm: searchForOperator: 'email'">
+                                    <a (click)="addPOIToList(poi)">
+                                        {{ poi.firstname + ' ' + poi.lastname + ' (' + poi.email + ')' }}</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="uk-form-controls uk-width-1-2">
+                        ή
+                        <a class="uk-link uk-margin-small-left"
+                                (click)="addPOIToList()">
+                            Προσθέστε νέο
+                        </a>
+                    </div>
+                </div>
+                <div *ngIf="operatorFormsData.length > 0" class="uk-width-1-1">
+                    <div>
+                        <app-edit-poi #inspectionTeamForms
+                                      *ngFor="let op of operatorFormsData; let i = index;"
+                                      [id]="id + '_operator_' + i" [data]="op"></app-edit-poi>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

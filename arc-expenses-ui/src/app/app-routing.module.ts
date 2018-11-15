@@ -8,7 +8,7 @@ import {SignUpComponent} from './sign-up/sign-up.component';
 import {RequestStageComponent} from './request-stage/request-stage.component';
 import {AuthGuardService} from './services/auth-guard.service';
 import { ForbiddenPageComponent } from './shared/403-forbidden-page.component';
-import {AdminPageComponent} from './admin-page/admin-page.component';
+import {AdminPageComponent} from './admin-pages/admin-page.component';
 import { RequestStagePaymentComponent } from './request-stage/request-stage-payment/request-stage-payment.component';
 
 const appRoutes: Routes = [
@@ -63,7 +63,7 @@ const appRoutes: Routes = [
     path: 'admin',
     canActivate: [AuthGuardService],
     canLoad: [AuthGuardService],
-    component: AdminPageComponent
+    loadChildren: './admin-pages/admin.module#AdminModule'
   },
   {
       path: '403-forbidden',

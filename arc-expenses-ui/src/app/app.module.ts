@@ -20,14 +20,12 @@ import {
     Stage12Component, Stage5aComponent, Stage5bComponent, Stage13Component
 } from './request-stage/stages-components';
 import { ManageRequestsService } from './services/manage-requests.service';
-import {AuthenticationService} from './services/authentication.service';
-import {AuthGuardService} from './services/auth-guard.service';
-import {ManageProjectService} from './services/manage-project.service';
-
-import {LOCALE_ID} from '@angular/core';
-import { CommonModule, registerLocaleData } from '@angular/common';
+import { AuthenticationService } from './services/authentication.service';
+import { AuthGuardService } from './services/auth-guard.service';
+import { ManageProjectService } from './services/manage-project.service';
+import { LOCALE_ID } from '@angular/core';
+import { registerLocaleData } from '@angular/common';
 import localeEL from '@angular/common/locales/el';
-import { FilterByTerm } from './shared/search-term.pipe';
 import { Stage1FormComponent } from './request-stage/stage1-form/stage1-form.component';
 import { AnchorDirective } from './shared/dynamic-loader-anchor-components/anchor.directive';
 import { StagesLoaderComponent } from './request-stage/stages-dynamic-load/stages-loader.component';
@@ -35,13 +33,7 @@ import { SharedComponentsModule } from './shared/shared-components.module';
 import { AuthenticationInterceptor } from './services/authentication-interceptor';
 import { ForbiddenPageComponent } from './shared/403-forbidden-page.component';
 import { ManageUserService } from './services/manage-user.service';
-import {AdminPageComponent} from './admin-page/admin-page.component';
-import {ManageResourcesService} from './services/manage-resources.service';
-import {EditProjectComponent} from './admin-page/edit-resources-forms/edit-project.component';
-import {EditInstituteComponent} from './admin-page/edit-resources-forms/edit-institute.component';
-import {EditOrganizationComponent} from './admin-page/edit-resources-forms/edit-organization.component';
-import {EditPersonComponent} from './admin-page/edit-resources-forms/edit-person.component';
-import {EditResourcesComponent} from './admin-page/edit-resources-forms/edit-resources.components';
+import { ManageResourcesService } from './services/manage-resources.service';
 import { RequestStagePaymentComponent } from './request-stage/request-stage-payment/request-stage-payment.component';
 
 registerLocaleData(localeEL);
@@ -63,19 +55,10 @@ const stagesList = [
     Stage13Component
 ];
 
-const editResourcesForms = [
-    EditResourcesComponent,
-    EditProjectComponent,
-    EditInstituteComponent,
-    EditOrganizationComponent,
-    EditPersonComponent
-];
-
 @NgModule({
     declarations: [
         AppComponent,
         TopMenuComponent,
-        AdminPageComponent,
         NewRequestComponent,
         HomeComponent,
         RequestsComponent,
@@ -86,15 +69,11 @@ const editResourcesForms = [
         RequestStageComponent,
         RequestStagePaymentComponent,
         Stage1FormComponent,
-        FilterByTerm,
-        AnchorDirective,
         StagesLoaderComponent,
         ForbiddenPageComponent,
-        ...stagesList,
-        ...editResourcesForms
+        ...stagesList
     ],
     imports: [
-        CommonModule,
         BrowserModule,
         AppRoutingModule,
         ReactiveFormsModule,
@@ -117,8 +96,7 @@ const editResourcesForms = [
         AuthGuardService
     ],
     entryComponents: [
-        ...stagesList,
-        ...editResourcesForms
+        ...stagesList
     ],
     bootstrap: [AppComponent]
 })

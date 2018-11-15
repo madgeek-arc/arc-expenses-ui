@@ -99,7 +99,7 @@ export class Project {
     operator: PersonOfInterest[];
     startDate: string;
     endDate: string;
-    totalCost: number;
+    totalCost: string;
     scientificCoordinatorAsDiataktis: boolean;
 }
 

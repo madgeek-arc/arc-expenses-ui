@@ -19,8 +19,8 @@ export class AuthGuardService implements CanActivate, CanLoad {
 
             return true;
         }
-        //console.log('searching for cookie and checking if user is null');
-        //if ( getCookie('arc_currentUser') && !this.authenticationService.getUserProp('email') ) { return false; }
+        // console.log('searching for cookie and checking if user is null');
+        // if ( getCookie('arc_currentUser') && !this.authenticationService.getUserProp('email') ) { return false; }
 
         if ( getCookie('arc_currentUser') ) { return true; }
 
@@ -36,7 +36,7 @@ export class AuthGuardService implements CanActivate, CanLoad {
     }
 
     canLoad () {
-
+        // TODO:: ALSO CHECK IF IS PROJECT OPERATOR
         if ( this.authenticationService.getUserRole() === 'ROLE_ADMIN' ) {
 
             return true;

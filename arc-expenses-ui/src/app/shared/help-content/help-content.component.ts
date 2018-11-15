@@ -25,7 +25,9 @@ export class HelpContentComponent implements OnInit {
     contents: Content[];
     errorMessage: string = null;
 
-    constructor(private _helpContentService: HelpContentService, private route: ActivatedRoute, private router: Router) {
+    constructor(private _helpContentService: HelpContentService,
+                private route: ActivatedRoute,
+                private router: Router) {
     }
 
     ngOnInit() {
@@ -35,8 +37,6 @@ export class HelpContentComponent implements OnInit {
         /*this._helpContentService.getActivePageContent(this.router.url).subscribe(
             pageContent => this.shiftThroughContent(pageContent),
             error => this.handleError(<any>error));*/
-
-       console.log('called help service');
     }
 
     shiftThroughContent(pageContent: PageContent) {

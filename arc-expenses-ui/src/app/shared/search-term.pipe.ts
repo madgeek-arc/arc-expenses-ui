@@ -3,7 +3,7 @@ import { Vocabulary } from '../domain/operation';
 
 @Pipe ({ name: 'filterByTerm' })
 export class FilterByTerm implements PipeTransform {
-    transform (items: Vocabulary[], searchTerm: string, fieldName: string): any[] {
+    transform (items: any[], searchTerm: string, fieldName: string): any[] {
         if (!items) { return []; }
         if (!searchTerm) { return items; }
 

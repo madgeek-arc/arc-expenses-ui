@@ -1,0 +1,61 @@
+<div *ngIf="resourceForm" class="uk-width-1-1 uk-margin-bottom">
+    <div [formGroup]="resourceForm" class="uk-form-horizontal">
+        <div class="uk-margin">
+            <label class="uk-form-label" for="email_{{ id }}">Email</label>
+            <div class="uk-form-controls">
+                <div class="uk-width-1-1">
+                    <input type="email" id="email_{{ id }}" class="uk-input" formControlName="email"/>
+                </div>
+            </div>
+        </div>
+        <div class="uk-margin">
+            <label class="uk-form-label" for="firstname_{{ id }}">Όνομα</label>
+            <div class="uk-form-controls">
+                <div class="uk-width-1-1">
+                    <input type="text" id="firstname_{{ id }}" class="uk-input" formControlName="firstname"/>
+                </div>
+            </div>
+        </div>
+        <div class="uk-margin">
+            <label class="uk-form-label" for="lastname_{{ id }}">Επώνυμο</label>
+            <div class="uk-form-controls">
+                <div class="uk-width-1-1">
+                    <input type="text" id="lastname_{{ id }}" class="uk-input" formControlName="lastname"/>
+                </div>
+            </div>
+        </div>
+        <div class="uk-margin">
+            <label class="uk-form-label">Εκπρόσωποι</label>
+            <div class="uk-form-controls">
+                <div class="uk-width-1-1 uk-grid">
+                    <div class="uk-form-controls uk-width-1-2">
+                        <input class="uk-input" type="text" (keyup)="updateSearchTerm($event)">
+                        <div class="uk-comment-body uk-text-small uk-text-muted">
+                            <i>Ξεκινήστε να γράφετε το email του εκπροσώπου και επιλέξτε τον από την λίστα που θα εμφανιστεί.</i>
+                        </div>
+                        <div *ngIf="searchTerm" class="uk-nav uk-padding-small uk-width-large uk-position-absolute" style="background-color: white">
+                            <ul>
+                                <li *ngFor="let delegate of delegates | filterByTerm: searchTerm: 'email'">
+                                    <a (click)="addDelegate(delegate)">
+                                        {{ delegate.firstname + ' ' + delegate.lastname + ' (' + delegate.email + ')' }}</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="uk-form-controls uk-width-1-2">
+                        ή
+                        <button class="uk-button-small uk-margin-small-left" (click)="addDelegate()">
+                            Προσθέστε νέο
+                        </button>
+                    </div>
+                </div>
+                <div *ngIf="delegateFormsData.length > 0" class="uk-width-1-1">
+                    <div>
+                        <app-edit-delegate #delegateForms *ngFor="let delData of delegateFormsData; let i = index;"
+                                           [id]="id +'delegates_' + i" [data]="delData"></app-edit-delegate>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,36 @@
+<div *ngIf="resourceForm" class="uk-width-1-1 uk-margin-bottom">
+    <div [formGroup]="resourceForm" class="uk-form uk-grid">
+        <div class="uk-margin uk-width-1-2">
+            <label class="uk-form-label" for="firstname_{{ id }}">Όνομα</label>
+            <div class="uk-form-controls">
+                <div class="uk-width-1-1">
+                    <input type="text" id="firstname_{{ id }}" class="uk-input" formControlName="firstname"/>
+                </div>
+            </div>
+        </div>
+        <div class="uk-margin uk-width-1-2">
+            <label class="uk-form-label" for="lastname_{{ id }}">Επώνυμο</label>
+            <div class="uk-form-controls">
+                <div class="uk-width-1-1">
+                    <input type="text" id="lastname_{{ id }}" class="uk-input" formControlName="lastname"/>
+                </div>
+            </div>
+        </div>
+        <div class="uk-margin uk-width-1-2">
+            <label class="uk-form-label" for="email_{{ id }}">Email (*)</label>
+            <div class="uk-form-controls">
+                <div class="uk-width-1-1">
+                    <input type="email" id="email_{{ id }}" class="uk-input" formControlName="email"/>
+                </div>
+            </div>
+        </div>
+        <div class="uk-margin uk-width-1-2">
+            <label class="uk-form-label" for="hidden_{{ id }}">Απόκρυψη ονόματος</label>
+            <div class="uk-form-controls">
+                <div class="uk-width-1-1">
+                    <input type="checkbox" id="hidden_{{ id }}" class="uk-checkbox" formControlName="hidden"/>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
