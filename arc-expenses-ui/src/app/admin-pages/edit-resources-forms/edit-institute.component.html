@@ -1,5 +1,5 @@
 <div *ngIf="resourceForm" class="uk-width-1-1 uk-margin-bottom">
-    <div [formGroup]="resourceForm" class="uk-form-horizontal">
+    <div [formGroup]="resourceForm">
         <div class="uk-margin">
             <label class="uk-form-label" for="id_{{ id }}">Id</label>
             <div class="uk-form-controls">
@@ -17,46 +17,16 @@
             </div>
         </div>
         <div class="uk-margin">
-            <label class="uk-form-label">Οργανισμός</label>
-            <div class="uk-form-controls">
-                <div class="uk-width-1-1 uk-grid">
-                    <div class="uk-form-controls uk-width-1-2">
-                        <input class="uk-input" type="text" (keyup)="updateSearchTerm($event, 'searchForOrganization')">
-                        <div class="uk-comment-body uk-text-small uk-text-muted">
-                            <i>Ξεκινήστε να γράφετε το όνομα του οργανισμού και επιλέξτε τον από την λίστα που θα εμφανιστεί.</i>
-                        </div>
-                        <div *ngIf="searchForOrganization" class="uk-nav uk-padding-small uk-width-large uk-position-absolute" style="background-color: white">
-                            <ul>
-                                <li *ngFor="let org of organizations | filterByTerm: searchForOrganization: 'name'">
-                                    <a (click)="addOrganization(org)">
-                                        {{ org.name }}</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="uk-form-controls uk-width-1-2">
-                        ή
-                        <button class="uk-button-small uk-margin-small-left" (click)="addOrganization()">
-                            Προσθέστε νέο
-                        </button>
-                    </div>
-                </div>
-                <div *ngIf="organizationFormData" class="uk-width-1-1">
-                    <div>
-                        <app-edit-organization #organizationForm [id]="id + '_org'" [data]="organizationFormData"></app-edit-organization>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="uk-margin">
             <label class="uk-form-label">Πρόεδρος</label>
             <div class="uk-form-controls">
                 <div class="uk-width-1-1 uk-grid">
-                    <div class="uk-form-controls uk-width-1-2">
-                        <input class="uk-input" type="text" (keyup)="updateSearchTerm($event, 'searchForDirector')">
-                        <div class="uk-comment-body uk-text-small uk-text-muted">
+                    <div class="uk-width-expand">
+                        <input class="uk-input" value="{{ searchForInstDirector }}"
+                               placeholder="Αναζήτηση με βάση το email" type="text"
+                               (keyup)="updateSearchTerm($event, 'searchForDirector')">
+                        <!--<div class="uk-comment-body uk-text-small uk-text-muted">
                             <i>Ξεκινήστε να γράφετε το email και επιλέξτε από την λίστα που θα εμφανιστεί.</i>
-                        </div>
+                        </div>-->
                         <div *ngIf="searchForInstDirector" class="uk-nav uk-padding-small uk-width-large uk-position-absolute" style="background-color: white">
                             <ul>
                                 <li *ngFor="let poi of pois | filterByTerm: searchForInstDirector: 'email'">
@@ -66,30 +36,37 @@
                             </ul>
                         </div>
                     </div>
-                    <div class="uk-form-controls uk-width-1-2">
-                        ή
-                        <button class="uk-button-small uk-margin-small-left" (click)="addPOI('searchForInstDirector', 'instDirectorFormData')">
-                            Προσθέστε νέο
-                        </button>
+                    <div class="uk-inline">
+                        <a class="uk-button-small" (click)="addPOI('searchForInstDirector', 'instDirectorFormData')">
+                            Δημιουργία νέου υπευθύνου
+                        </a>
                     </div>
                 </div>
                 <div *ngIf="instDirectorFormData" class="uk-width-1-1">
                     <div>
-                        <app-edit-poi #instDirectorForm [id]="id + '_instDirector'" [data]="instDirectorFormData"></app-edit-poi>
+                        <app-edit-poi #instDirectorForm
+                                      [id]="id + '_instDirector'"
+                                      [data]="instDirectorFormData"></app-edit-poi>
                     </div>
                 </div>
             </div>
         </div>
+        <hr>
         <div class="uk-margin">
-            <label class="uk-form-label">Λογιστήριο</label>
+            <label class="uk-form-label uk-text-uppercase">Λογιστηριο</label>
+            <div class="uk-form-controls">&nbsp;&nbsp;&nbsp;</div>
+        </div>
+        <div class="uk-margin">
+            <label class="uk-form-label">Διευθυντής</label>
             <div class="uk-form-controls">
-                <h5>Διευθυντής</h5>
                 <div class="uk-width-1-1 uk-grid">
-                    <div class="uk-form-controls uk-width-1-2">
-                        <input class="uk-input" type="text" (keyup)="updateSearchTerm($event, 'searchForAccountingDirector')">
-                        <div class="uk-comment-body uk-text-small uk-text-muted">
+                    <div class="uk-width-expand">
+                        <input class="uk-input" value="{{ searchForAccountingDirector }}"
+                               placeholder="Αναζήτηση με βάση το email" type="text"
+                               (keyup)="updateSearchTerm($event, 'searchForAccountingDirector')">
+                        <!--<div class="uk-comment-body uk-text-small uk-text-muted">
                             <i>Ξεκινήστε να γράφετε το email και επιλέξτε από την λίστα που θα εμφανιστεί.</i>
-                        </div>
+                        </div>-->
                         <div *ngIf="searchForAccountingDirector"
                              class="uk-nav uk-padding-small uk-width-large uk-position-absolute" style="background-color: white">
                             <ul>
@@ -100,28 +77,33 @@
                             </ul>
                         </div>
                     </div>
-                    <div class="uk-form-controls uk-width-1-2">
-                        ή
-                        <button class="uk-button-small uk-margin-small-left"
+                    <div class="uk-inline">
+                        <a class="uk-button-small"
                                 (click)="addPOI('searchForAccountingDirector', 'accountingDirectorFormData')">
-                            Προσθέστε νέο
-                        </button>
+                            Δημιουργία νέου υπευθύνου
+                        </a>
                     </div>
                 </div>
                 <div *ngIf="accountingDirectorFormData" class="uk-width-1-1">
                     <div>
-                        <app-edit-poi #accountingDirectorForm [id]="id + '_accDirector'" [data]="accountingDirectorFormData"></app-edit-poi>
+                        <app-edit-poi #accountingDirectorForm
+                                      [id]="id + '_accDirector'"
+                                      [data]="accountingDirectorFormData"></app-edit-poi>
                     </div>
                 </div>
             </div>
+        </div>
+        <div class="uk-margin">
+            <label class="uk-form-label">Υπεύθυνος Καταχώρησης</label>
             <div class="uk-form-controls">
-                <h5>Υπεύθυνος Καταχώρησης</h5>
                 <div class="uk-width-1-1 uk-grid">
-                    <div class="uk-form-controls uk-width-1-2">
-                        <input class="uk-input" type="text" (keyup)="updateSearchTerm($event, 'searchForAccountingRegistration')">
-                        <div class="uk-comment-body uk-text-small uk-text-muted">
+                    <div class="uk-width-expand">
+                        <input class="uk-input" value="{{ searchForAccountingRegistration }}"
+                               placeholder="Αναζήτηση με βάση το email" type="text"
+                               (keyup)="updateSearchTerm($event, 'searchForAccountingRegistration')">
+                        <!--<div class="uk-comment-body uk-text-small uk-text-muted">
                             <i>Ξεκινήστε να γράφετε το email και επιλέξτε από την λίστα που θα εμφανιστεί.</i>
-                        </div>
+                        </div>-->
                         <div *ngIf="searchForAccountingRegistration"
                              class="uk-nav uk-padding-small uk-width-large uk-position-absolute" style="background-color: white">
                             <ul>
@@ -132,28 +114,33 @@
                             </ul>
                         </div>
                     </div>
-                    <div class="uk-form-controls uk-width-1-2">
-                        ή
-                        <button class="uk-button-small uk-margin-small-left"
+                    <div class="uk-inline">
+                        <a class="uk-button-small"
                                 (click)="addPOI('searchForAccountingRegistration', 'accountingRegistrationFormData')">
-                            Προσθέστε νέο
-                        </button>
+                            Δημιουργία νέου υπευθύνου
+                        </a>
                     </div>
                 </div>
                 <div *ngIf="accountingRegistrationFormData" class="uk-width-1-1">
                     <div>
-                        <app-edit-poi #accountingRegistrationForm [id]="id + '_accRegistration'" [data]="accountingRegistrationFormData"></app-edit-poi>
+                        <app-edit-poi #accountingRegistrationForm
+                                      [id]="id + '_accRegistration'"
+                                      [data]="accountingRegistrationFormData"></app-edit-poi>
                     </div>
                 </div>
             </div>
+        </div>
+        <div class="uk-margin">
+            <label class="uk-form-label">Υπεύθυνος Πληρωμών</label>
             <div class="uk-form-controls">
-                <h5>Υπεύθυνος Πληρωμών</h5>
                 <div class="uk-width-1-1 uk-grid">
-                    <div class="uk-form-controls uk-width-1-2">
-                        <input class="uk-input" type="text" (keyup)="updateSearchTerm($event, 'searchForAccountingPayment')">
-                        <div class="uk-comment-body uk-text-small uk-text-muted">
+                    <div class="uk-width-expand">
+                        <input class="uk-input" value="{{ searchForAccountingPayment }}"
+                               placeholder="Αναζήτηση με βάση το email" type="text"
+                               (keyup)="updateSearchTerm($event, 'searchForAccountingPayment')">
+                        <!--<div class="uk-comment-body uk-text-small uk-text-muted">
                             <i>Ξεκινήστε να γράφετε το email και επιλέξτε από την λίστα που θα εμφανιστεί.</i>
-                        </div>
+                        </div>-->
                         <div *ngIf="searchForAccountingPayment"
                              class="uk-nav uk-padding-small uk-width-large uk-position-absolute" style="background-color: white">
                             <ul>
@@ -164,30 +151,33 @@
                             </ul>
                         </div>
                     </div>
-                    <div class="uk-form-controls uk-width-1-2">
-                        ή
-                        <button class="uk-button-small uk-margin-small-left"
+                    <div class="uk-inline">
+                        <a class="uk-button-small"
                                 (click)="addPOI('searchForAccountingPayment', 'accountingPaymentFormData')">
-                            Προσθέστε νέο
-                        </button>
+                            Δημιουργία νέου υπευθύνου
+                        </a>
                     </div>
                 </div>
                 <div *ngIf="accountingPaymentFormData" class="uk-width-1-1">
                     <div>
-                        <app-edit-poi #accountingPaymentForm [id]="id + '_accPayment'" [data]="accountingPaymentFormData"></app-edit-poi>
+                        <app-edit-poi #accountingPaymentForm [id]="id + '_accPayment'"
+                                      [data]="accountingPaymentFormData"></app-edit-poi>
                     </div>
                 </div>
             </div>
         </div>
+        <hr>
         <div class="uk-margin">
             <label class="uk-form-label">Υπεύθυνος Διαύγειας</label>
             <div class="uk-form-controls">
                 <div class="uk-width-1-1 uk-grid">
-                    <div class="uk-form-controls uk-width-1-2">
-                        <input class="uk-input" type="text" (keyup)="updateSearchTerm($event, 'searchForDiaugeia')">
-                        <div class="uk-comment-body uk-text-small uk-text-muted">
+                    <div class="uk-width-expand">
+                        <input class="uk-input" value="{{ searchForDiaugeia }}"
+                               placeholder="Αναζήτηση με βάση το email" type="text"
+                               (keyup)="updateSearchTerm($event, 'searchForDiaugeia')">
+                        <!--<div class="uk-comment-body uk-text-small uk-text-muted">
                             <i>Ξεκινήστε να γράφετε το email και επιλέξτε από την λίστα που θα εμφανιστεί.</i>
-                        </div>
+                        </div>-->
                         <div *ngIf="searchForDiaugeia"
                              class="uk-nav uk-padding-small uk-width-large uk-position-absolute" style="background-color: white">
                             <ul>
@@ -198,12 +188,11 @@
                             </ul>
                         </div>
                     </div>
-                    <div class="uk-form-controls uk-width-1-2">
-                        ή
-                        <button class="uk-button-small uk-margin-small-left"
+                    <div class="uk-inline">
+                        <a class="uk-button-small"
                                 (click)="addPOI('searchForDiaugeia', 'diaugeiaFormData')">
-                            Προσθέστε νέο
-                        </button>
+                            Δημιουργία νέου υπευθύνου
+                        </a>
                     </div>
                 </div>
                 <div *ngIf="diaugeiaFormData" class="uk-width-1-1">
@@ -218,11 +207,13 @@
             <label class="uk-form-label">Υπεύθυνος Γραφείου Προμηθειών</label>
             <div class="uk-form-controls">
                 <div class="uk-width-1-1 uk-grid">
-                    <div class="uk-form-controls uk-width-1-2">
-                        <input class="uk-input" type="text" (keyup)="updateSearchTerm($event, 'searchForSuppliesOffice')">
-                        <div class="uk-comment-body uk-text-small uk-text-muted">
+                    <div class="uk-width-expand">
+                        <input class="uk-input" value="{{ searchForSuppliesOffice }}"
+                               placeholder="Αναζήτηση με βάση το email" type="text"
+                               (keyup)="updateSearchTerm($event, 'searchForSuppliesOffice')">
+                        <!--<div class="uk-comment-body uk-text-small uk-text-muted">
                             <i>Ξεκινήστε να γράφετε το email και επιλέξτε από την λίστα που θα εμφανιστεί.</i>
-                        </div>
+                        </div>-->
                         <div *ngIf="searchForSuppliesOffice"
                              class="uk-nav uk-padding-small uk-width-large uk-position-absolute" style="background-color: white">
                             <ul>
@@ -233,18 +224,17 @@
                             </ul>
                         </div>
                     </div>
-                    <div class="uk-form-controls uk-width-1-2">
-                        ή
-                        <button class="uk-button-small uk-margin-small-left"
+                    <div class="uk-inline">
+                        <a class="uk-button-small"
                                 (click)="addPOI('searchForSuppliesOffice', 'suppliesOfficeFormData')">
-                            Προσθέστε νέο
-                        </button>
+                            Δημιουργία νέου υπευθύνου
+                        </a>
                     </div>
                 </div>
                 <div *ngIf="suppliesOfficeFormData" class="uk-width-1-1">
                     <div>
-                        <app-edit-poi #suppliesOfficeForm
-                                      [id]="id + '_supplies'" [data]="suppliesOfficeFormData"></app-edit-poi>
+                        <app-edit-poi #suppliesOfficeForm [id]="id + '_supplies'"
+                                      [data]="suppliesOfficeFormData"></app-edit-poi>
                     </div>
                 </div>
             </div>
@@ -253,11 +243,13 @@
             <label class="uk-form-label">Υπεύθυνος Ταξιδίων</label>
             <div class="uk-form-controls">
                 <div class="uk-width-1-1 uk-grid">
-                    <div class="uk-form-controls uk-width-1-2">
-                        <input class="uk-input" type="text" (keyup)="updateSearchTerm($event, 'searchForTravelManager')">
-                        <div class="uk-comment-body uk-text-small uk-text-muted">
+                    <div class="uk-width-expand">
+                        <input class="uk-input" value="{{ searchForTravelManager }}"
+                               placeholder="Αναζήτηση με βάση το email" type="text"
+                               (keyup)="updateSearchTerm($event, 'searchForTravelManager')">
+                        <!--<div class="uk-comment-body uk-text-small uk-text-muted">
                             <i>Ξεκινήστε να γράφετε το email και επιλέξτε από την λίστα που θα εμφανιστεί.</i>
-                        </div>
+                        </div>-->
                         <div *ngIf="searchForTravelManager"
                              class="uk-nav uk-padding-small uk-width-large uk-position-absolute" style="background-color: white">
                             <ul>
@@ -268,12 +260,11 @@
                             </ul>
                         </div>
                     </div>
-                    <div class="uk-form-controls uk-width-1-2">
-                        ή
-                        <button class="uk-button-small uk-margin-small-left"
+                    <div class="uk-inline">
+                        <a class="uk-button-small"
                                 (click)="addPOI('searchForTravelManager', 'travelManagerFormData')">
-                            Προσθέστε νέο
-                        </button>
+                            Δημιουργία νέου υπευθύνου
+                        </a>
                     </div>
                 </div>
                 <div *ngIf="travelManagerFormData" class="uk-width-1-1">
@@ -288,11 +279,13 @@
             <label class="uk-form-label">Διατάκτης</label>
             <div class="uk-form-controls">
                 <div class="uk-width-1-1 uk-grid">
-                    <div class="uk-form-controls uk-width-1-2">
-                        <input class="uk-input" type="text" (keyup)="updateSearchTerm($event, 'searchForDiataktis')">
-                        <div class="uk-comment-body uk-text-small uk-text-muted">
+                    <div class="uk-width-expand">
+                        <input class="uk-input" value="{{ searchForDiataktis }}"
+                               placeholder="Αναζήτηση με βάση το email" type="text"
+                               (keyup)="updateSearchTerm($event, 'searchForDiataktis')">
+                        <!--<div class="uk-comment-body uk-text-small uk-text-muted">
                             <i>Ξεκινήστε να γράφετε το email και επιλέξτε από την λίστα που θα εμφανιστεί.</i>
-                        </div>
+                        </div>-->
                         <div *ngIf="searchForDiataktis"
                              class="uk-nav uk-padding-small uk-width-large uk-position-absolute" style="background-color: white">
                             <ul>
@@ -303,18 +296,50 @@
                             </ul>
                         </div>
                     </div>
-                    <div class="uk-form-controls uk-width-1-2">
-                        ή
-                        <button class="uk-button-secondary uk-margin-small-left"
-                                (click)="addPOI('searchForDiataktis', 'diataktisFormData')">
-                            Προσθέστε νέο
-                        </button>
+                    <div class="uk-inline">
+                        <a class="uk-button-small" (click)="addPOI('searchForDiataktis', 'diataktisFormData')">
+                            Δημιουργία νέου υπευθύνου
+                        </a>
                     </div>
                 </div>
                 <div *ngIf="diataktisFormData" class="uk-width-1-1">
                     <div>
-                        <app-edit-poi #diataktisForm
-                                      [id]="id + '_diataktis'" [data]="diataktisFormData"></app-edit-poi>
+                        <app-edit-poi #diataktisForm [id]="id + '_diataktis'"
+                                      [data]="diataktisFormData"></app-edit-poi>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="uk-margin">
+            <label class="uk-form-label">Οργανισμός</label>
+            <div class="uk-form-controls">
+                <div class="uk-width-1-1 uk-grid">
+                    <div class="uk-width-expand">
+                        <input class="uk-input" value="{{ searchForOrganization }}"
+                               placeholder="Αναζήτηση με βάση το όνομα του οργανισμού" type="text"
+                               (keyup)="updateSearchTerm($event, 'searchForOrganization')">
+                        <!--<div class="uk-comment-body uk-text-small uk-text-muted">
+                            <i>Ξεκινήστε να γράφετε το όνομα του οργανισμού και επιλέξτε τον από την λίστα που θα εμφανιστεί.</i>
+                        </div>-->
+                        <div *ngIf="searchForOrganization" class="uk-nav uk-padding-small uk-width-large uk-position-absolute" style="background-color: white">
+                            <ul>
+                                <li *ngFor="let org of organizations | filterByTerm: searchForOrganization: 'name'">
+                                    <a (click)="addOrganization(org)">
+                                        {{ org.name }}</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="uk-inline">
+                        <a class="uk-button-small" (click)="addOrganization()">
+                            Δημιουργία νέου οργανισμού
+                        </a>
+                    </div>
+                </div>
+                <div *ngIf="organizationFormData">
+                    <div>
+                        <app-edit-organization #organizationForm [id]="id + '_org'"
+                                               [data]="organizationFormData"></app-edit-organization>
                     </div>
                 </div>
             </div>

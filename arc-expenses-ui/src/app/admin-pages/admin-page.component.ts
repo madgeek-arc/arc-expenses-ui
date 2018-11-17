@@ -4,6 +4,8 @@ import { AnchorItem } from '../shared/dynamic-loader-anchor-components/anchor-it
 import { ManageProjectService } from '../services/manage-project.service';
 import { delegates, institutes, organizations, pois, project } from '../domain/mock_data';
 import { EditProjectComponent } from './edit-resources-forms/edit-project.component';
+import { EditInstituteComponent } from './edit-resources-forms/edit-institute.component';
+import { EditOrganizationComponent } from './edit-resources-forms/edit-organization.component';
 
 @Component({
     selector: 'app-admin-page',
@@ -24,7 +26,7 @@ export class AdminPageComponent implements OnInit {
 
     ngOnInit() {
         this.resource = new AnchorItem(
-            EditProjectComponent, [this.currentProject, this.delegates, this.pois, this.organizations, this.institutes] );
+            EditOrganizationComponent, [this.organizations[0], this.delegates, this.pois] );
     }
 
     selectType(resourceType: string) {

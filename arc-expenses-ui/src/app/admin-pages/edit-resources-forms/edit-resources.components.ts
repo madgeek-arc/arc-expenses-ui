@@ -48,6 +48,13 @@ export class EditResourcesComponent implements OnInit {
                              (this.resourceForm.get(key).value !== [])));
     }
 
+    removeForm(i: number, dataArrayName: string) {
+        const tempArray = this[dataArrayName];
+        this[dataArrayName] = [];
+        tempArray.splice(i, 1);
+        this[dataArrayName] = tempArray;
+    }
+
     /* this function is overloaded by the class descendants */
     /*exportFormValue() {
         if (this.resourceForm.valid) {

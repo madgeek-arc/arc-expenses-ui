@@ -1,4 +1,4 @@
-import { Component, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { Component, OnChanges, OnInit, QueryList, SimpleChanges, ViewChild, ViewChildren } from '@angular/core';
 import { Delegate, Institute, Organization, PersonOfInterest, Project } from '../../domain/operation';
 import { isNullOrUndefined } from 'util';
 import { EditResourcesComponent } from './edit-resources.components';
@@ -10,7 +10,7 @@ import { EditPoiComponent } from './edit-poi.component';
     selector: 'app-edit-project',
     templateUrl: './edit-project.component.html'
 })
-export class EditProjectComponent extends EditResourcesComponent implements OnInit {
+export class EditProjectComponent extends EditResourcesComponent implements OnInit, OnChanges {
     totalCostAmount: string;
 
     delegates: Delegate[] = [];
@@ -47,9 +47,20 @@ export class EditProjectComponent extends EditResourcesComponent implements OnIn
         this.parseData();
     }
 
+    ngOnChanges(changes: SimpleChanges) {
+        if (!isNullOrUndefined(this.resourceForm) &&
+            (changes['data'].currentValue !== changes['data'].previousValue)) {
+
+            this.parseData();
+        }
+    }
+
     parseData() {
         if (!isNullOrUndefined(this.data) && (this.data.length === 5)) {
-            this.resourceForm.setValue(this.data[0]);
+            Object.keys(this.resourceFormDefinition).forEach(
+                key => this.resourceForm
+                    .patchValue({ [key]: this.data[0][key] })
+            );
             this.delegates = this.data[1];
             this.pois = this.data[2];
             this.organizations = this.data[3];

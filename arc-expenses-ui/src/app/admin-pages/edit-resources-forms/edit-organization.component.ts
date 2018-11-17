@@ -1,4 +1,4 @@
-import { Component, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { Component, OnChanges, OnInit, QueryList, SimpleChanges, ViewChild, ViewChildren } from '@angular/core';
 import { EditResourcesComponent } from './edit-resources.components';
 import { Validators } from '@angular/forms';
 import { isNullOrUndefined } from 'util';
@@ -9,7 +9,7 @@ import { EditPoiComponent } from './edit-poi.component';
     selector: 'app-edit-organization',
     templateUrl: './edit-organization.component.html'
 })
-export class EditOrganizationComponent extends EditResourcesComponent implements OnInit {
+export class EditOrganizationComponent extends EditResourcesComponent implements OnInit, OnChanges {
     delegates: Delegate[] = [];
     pois: PersonOfInterest[] = [];
 
@@ -44,9 +44,20 @@ export class EditOrganizationComponent extends EditResourcesComponent implements
         this.parseData();
     }
 
+    ngOnChanges(changes: SimpleChanges) {
+        if (!isNullOrUndefined(this.resourceForm) &&
+            (changes['data'].currentValue !== changes['data'].previousValue)) {
+
+            this.parseData();
+        }
+    }
+
     parseData() {
         if (!isNullOrUndefined(this.data) && (this.data.length === 3)) {
-            this.resourceForm.setValue(this.data[0]);
+            Object.keys(this.resourceFormDefinition).forEach(
+                key => this.resourceForm
+                    .patchValue({ [key]: this.data[0][key] })
+            );
             this.delegates = this.data[1];
             this.pois = this.data[2];
             if (!isNullOrUndefined(this.data[0].poy)) {

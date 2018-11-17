@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, QueryList, ViewChildren } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
 import { EditResourcesComponent } from './edit-resources.components';
 import { Validators } from '@angular/forms';
 import { Delegate, PersonOfInterest } from '../../domain/operation';
@@ -9,7 +9,7 @@ import { isNullOrUndefined } from 'util';
     selector: 'app-edit-poi',
     templateUrl: './edit-poi.component.html'
 })
-export class EditPoiComponent extends EditResourcesComponent implements OnInit {
+export class EditPoiComponent extends EditResourcesComponent implements OnInit, OnChanges {
     delegates: Delegate[] = [];
     delegateFormsData: any[] = [];
     @ViewChildren('delegateForms') delegateForms: QueryList<EditDelegateComponent>;
@@ -27,15 +27,28 @@ export class EditPoiComponent extends EditResourcesComponent implements OnInit {
         this.parseData();
     }
 
+    ngOnChanges(changes: SimpleChanges) {
+        if (!isNullOrUndefined(this.resourceForm) &&
+            (changes['data'].currentValue !== changes['data'].previousValue)) {
+
+            this.parseData();
+        }
+    }
+
     /* expects to receive one Person Of Interest and a list of delegates from the input data */
     parseData() {
+        this.resourceForm.reset();
         if (!isNullOrUndefined(this.data) && (this.data.length === 2)) {
-            this.resourceForm.setValue(this.data[0]);
+            Object.keys(this.resourceFormDefinition).forEach(
+                key => this.resourceForm
+                    .patchValue({ [key]: this.data[0][key] })
+            );
             this.delegates = this.data[1];
             if (!isNullOrUndefined(this.data[0].delegates)) {
                 this.delegateFormsData = this.data[0].delegates;
             }
         }
+        this.resourceForm.updateValueAndValidity();
     }
 
     updateSearchTerm(event: any) {
