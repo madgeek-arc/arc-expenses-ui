@@ -7,8 +7,7 @@
 
 export const requestTypes = {regular: 'Προμήθεια', trip: 'Ταξίδι', contract: 'Σύμβαση Έργου', services_contract: 'Σύμβαση Υπηρεσίας'};
 
-export const statesList = ['all', 'accepted', 'pending', 'under_review', 'rejected'];
-/*export const statesList = ['all', 'accepted', 'pending', 'rejected'];*/
+export const statesList = ['all', 'accepted', 'pending', 'under_review', 'rejected', 'cancelled'];
 
 export const supplierSelectionMethods = ['Απ\' ευθείας ανάθεση', 'Έρευνα αγοράς', 'Διαγωνισμός'];
 export const supplierSelectionMethodsMap = {

@@ -28,10 +28,15 @@ export class EditPoiComponent extends EditResourcesComponent implements OnInit, 
     }
 
     ngOnChanges(changes: SimpleChanges) {
-        if (!isNullOrUndefined(this.resourceForm) &&
-            (changes['data'].currentValue !== changes['data'].previousValue)) {
+        if (!isNullOrUndefined(changes) &&
+            !isNullOrUndefined(changes['data']) &&
+            !isNullOrUndefined((changes['data'].currentValue))) {
 
-            this.parseData();
+            if (!isNullOrUndefined(this.resourceForm) &&
+                (changes[ 'data' ].currentValue !== changes[ 'data' ].previousValue)) {
+
+                this.parseData();
+            }
         }
     }
 
@@ -46,6 +51,7 @@ export class EditPoiComponent extends EditResourcesComponent implements OnInit, 
             this.delegates = this.data[1];
             if (!isNullOrUndefined(this.data[0].delegates)) {
                 this.delegateFormsData = this.data[0].delegates;
+                this.resourceForm.get('delegates').setValue(['']);
             }
         }
         this.resourceForm.updateValueAndValidity();
@@ -64,7 +70,6 @@ export class EditPoiComponent extends EditResourcesComponent implements OnInit, 
         }
 
     }
-
 
     exportFormValue() {
         const delegateFormArrayValue = [];

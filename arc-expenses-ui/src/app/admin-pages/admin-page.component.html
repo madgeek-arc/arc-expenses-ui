@@ -24,26 +24,11 @@
 
                             <div>Coming soon...</div>
                             <!--<div class="uk-margin uk-form-horizontal">
-                                <app-resource-loader [id]="organizations[0].id" [resource]=resource></app-resource-loader>
-                            </div>-->
-                            <!--<h5 *ngIf="!selectedResourceType || (selectedResourceType === '')">Επεξεργασία/Προσθήκη</h5>
-                            <div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
-                                <label class="uk-margin-small-right" for="project">
-                                    Έργου&nbsp;
-                                    <input id="project" class="uk-radio" type="radio" name="radio2" (click)="selectType('project')">
-                                </label>
-                                <label class="uk-margin-small-right" for="institute">
-                                    Ινστιτούτου&nbsp;
-                                    <input id="institute" class="uk-radio" type="radio" name="radio2" (click)="selectType('institute')">
-                                </label>
-                                <label class="uk-margin-small-right" for="organization">
-                                    Οργανισμού&nbsp;
-                                    <input id="organization" class="uk-radio" type="radio" name="radio2" (click)="selectType('organization')">
-                                </label>
+                                <app-resource-loader #editResourceForm
+                                                     [id]="currentProject.id" [resource]=resource></app-resource-loader>
                             </div>
-                            <div *ngIf="selectedResourceType !== ''">
-                                &lt;!&ndash;<div>{{ selectedResourceType }}</div>&ndash;&gt;
-                                <app-edit-institute [currentResource]=""></app-edit-institute>
+                            <div>
+                                <button class="uk-button uk-button-primary" (click)="submitChanges()">Αποθήκευση</button>
                             </div>-->
 
                         </div>

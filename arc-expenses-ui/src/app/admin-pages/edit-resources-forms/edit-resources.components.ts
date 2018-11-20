@@ -53,6 +53,8 @@ export class EditResourcesComponent implements OnInit {
         this[dataArrayName] = [];
         tempArray.splice(i, 1);
         this[dataArrayName] = tempArray;
+        /*this[dataArrayName].splice(i, 1);*/
+        console.log(JSON.stringify(this[dataArrayName]));
     }
 
     /* this function is overloaded by the class descendants */

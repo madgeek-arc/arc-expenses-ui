@@ -18,8 +18,8 @@ export class EditProjectComponent extends EditResourcesComponent implements OnIn
     organizations: Organization[] = [];
     institutes: Institute[] = [];
 
-    @ViewChild('instituteForm') instituteForm: EditInstituteComponent;
-    instituteFormData: any[] = [];
+    /*@ViewChild('instituteForm') instituteForm: EditInstituteComponent;
+    instituteFormData: any[] = [];*/
     @ViewChild('scientificCoordinatorForm') scientificCoordinatorForm: EditPoiComponent;
     scientificCoordinatorFormData: any[] = [];
     @ViewChildren('operatorForms') operatorForms: QueryList<EditPoiComponent>;
@@ -48,10 +48,15 @@ export class EditProjectComponent extends EditResourcesComponent implements OnIn
     }
 
     ngOnChanges(changes: SimpleChanges) {
-        if (!isNullOrUndefined(this.resourceForm) &&
-            (changes['data'].currentValue !== changes['data'].previousValue)) {
+        if (!isNullOrUndefined(changes) &&
+            !isNullOrUndefined(changes['data']) &&
+            !isNullOrUndefined((changes['data'].currentValue))) {
 
-            this.parseData();
+            if (!isNullOrUndefined(this.resourceForm) &&
+                (changes[ 'data' ].currentValue !== changes[ 'data' ].previousValue)) {
+
+                this.parseData();
+            }
         }
     }
 
@@ -66,15 +71,18 @@ export class EditProjectComponent extends EditResourcesComponent implements OnIn
             this.organizations = this.data[3];
             this.institutes = this.data[4];
             if (!isNullOrUndefined(this.data[0].institute)) {
-                this.instituteFormData = [this.data[0].institute, this.delegates, this.pois, this.organizations];
+                /*this.instituteFormData = [this.data[0].institute, this.delegates, this.pois, this.organizations];*/
+                this.resourceForm.patchValue({institute: this.data[0].institute.id})
             }
             if (!isNullOrUndefined(this.data[0].scientificCoordinator)) {
                 this.scientificCoordinatorFormData = [this.data[0].scientificCoordinator, this.delegates];
+                this.resourceForm.get('scientificCoordinator').setValue('');
             }
             if (!isNullOrUndefined(this.data[0].operator)) {
                 this.data[0].operator.forEach(
                     op => this.operatorFormsData.push([op, this.delegates])
                 );
+                this.resourceForm.get('operator').setValue(['']);
             }
         }
     }
@@ -101,17 +109,18 @@ export class EditProjectComponent extends EditResourcesComponent implements OnIn
         }
     }
 
-    addInstitute(institute?: any) {
+    /*addInstitute(institute?: any) {
         this.searchForInstitute = '';
         if (!isNullOrUndefined(institute)) {
             this.instituteFormData = [institute, this.delegates, this.pois, this.organizations];
         } else {
             this.instituteFormData = [new Institute(), this.delegates, this.pois, this.organizations];
         }
-    }
+    }*/
 
     exportFormValue() {
-        this.resourceForm.patchValue({institute: this.instituteForm.exportFormValue()});
+        // this.resourceForm.patchValue({institute: this.instituteForm.exportFormValue()});
+        this.resourceForm.patchValue({institute: this.institutes.filter(i => i.id === this.resourceForm.get('institute').value )[0]});
         this.resourceForm.patchValue({scientificCoordinator: this.scientificCoordinatorForm.exportFormValue()});
         const operators = [];
         for (const op of this.operatorForms.toArray()) {

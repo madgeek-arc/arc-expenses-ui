@@ -115,6 +115,13 @@
                                    &nbsp;{{ stateNames['accepted'] }}
                                </label>
                            </div>
+                           <div [formGroupName]="'3'">
+                               <label for="cancelled">
+                                   <input class="uk-checkbox" type="checkbox" formControlName="status" id="cancelled"
+                                          (change)="chooseState()">
+                                   &nbsp;{{ stateNames['cancelled'] }}
+                               </label>
+                           </div>
                        </div>
                    </div>
                </div>
@@ -158,14 +165,6 @@
 
               <!-- MIDDLE -->
             <div class=" uk-width-expand@m">
-
-                <!--<div class="uk-form-horizontal uk-margin-large">-->
-                    <!--<div [formGroup]="keywordField" class="uk-width-1-2 uk-align-center uk-margin-top">-->
-                        <!--<input class="uk-input uk-width-2-3 uk-search-field"-->
-                               <!--placeholder="αιτών, χειριστής, υπεύθυνος, έργο, ινστιτούτο" formControlName="keyword">-->
-                        <!--<button class="uk-button-medium uk-button-secondary uk-padding-small" (click)="getSearchByKeywordResults()">Αναζήτηση</button>-->
-                    <!--</div>-->
-                <!--</div>-->
                 <div>
                     <div *ngIf="errorMessage" class="uk-alert uk-alert-warning">{{errorMessage}}</div>
                     <div *ngIf="showSpinner" class="uk-inline uk-position-center uk-padding-large-top">

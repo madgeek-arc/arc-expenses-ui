@@ -39,7 +39,8 @@
                             </div>
                         </li>
                         <li class="uk-parent" [routerLinkActive]="['uk-active']">
-                            <a [routerLink]="['requests']">
+                            <a [routerLink]="['requests']"
+                                [queryParams] = "{ status: ['pending','under_review'], stage: ['all'], phase: 0, type: ['all'], itemsPerPage: 10, orderField: 'creation_date', order: 'DESC', searchTerm: '' }" >
                                 Αιτήματα
                             </a>
                         </li>

@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { BaseInfo, Project, Request, RequestSummary, User, Vocabulary } from '../domain/operation';
 import { ManageRequestsService } from '../services/manage-requests.service';
 import { AuthenticationService } from '../services/authentication.service';
-import { Paging } from '../domain/extraClasses';
-import {Router} from '@angular/router';
+import { Paging, SearchParams } from '../domain/extraClasses';
+import { ActivatedRoute, Router } from '@angular/router';
 import { isNull, isNullOrUndefined } from 'util';
 import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
 import { approvalStages, paymentStages, requestTypes, stageIds, stageTitles, statesList } from '../domain/stageDescriptions';
@@ -27,14 +27,15 @@ export class RequestsComponent implements OnInit {
     noRequests: string;
 
     /* data */
-    stateNames = { all: 'Όλα', pending: 'Σε εξέλιξη', under_review: 'Σε εξέλιξη', rejected: 'Απορριφθέντα', accepted: 'Ολοκληρωθέντα'};
+    stateNames = { all: 'Όλα', pending: 'Σε εξέλιξη', under_review: 'Σε εξέλιξη',
+                   rejected: 'Απορριφθέντα', accepted: 'Ολοκληρωθέντα', cancelled: 'Ακυρωθέντα'};
     stages: string[] = [];
     stagesMap = stageTitles;
     requestTypeIds = ['regular', 'contract', 'services_contract', 'trip'];
     reqTypes = requestTypes;
-    projects: Vocabulary[] = [];
     institutes: Map<string, string> = new Map<string, string>();
     instituteIds: string[] = [];
+    projects: Vocabulary[] = [];
 
     /* flags */
     isSimpleUser: boolean;
@@ -42,7 +43,6 @@ export class RequestsComponent implements OnInit {
     allStagesSelected: boolean;
     allPhasesSelected: boolean;
     allTypesSelected: boolean;
-    allProjectsSelected: boolean;
     allInstitutesSelected: boolean;
 
     /* search params and relevant vars */
@@ -51,7 +51,6 @@ export class RequestsComponent implements OnInit {
     statusesChoice: string[] = [];
     stagesChoice: string[] = [];
     typesChoice: string[] = [];
-    projectsChoice: string[] = [];
     institutesChoice: string[] = [];
     order: string;
     orderField: string;
@@ -67,18 +66,24 @@ export class RequestsComponent implements OnInit {
     searchResults: Paging<RequestSummary>;
     listOfRequests: RequestSummary[] = [];
 
+    /* searchParams object */
+    currentSearchParams: SearchParams;
+
     constructor(private requestService: ManageRequestsService,
                 private resourceService: ManageResourcesService,
                 private projectService: ManageProjectService,
                 private authService: AuthenticationService,
+                private router: Router,
+                private route: ActivatedRoute,
                 private fb: FormBuilder) {}
 
     ngOnInit() {
         this.isSimpleUser = (this.authService.getUserRole() === 'ROLE_USER');
 
         /* TODO: remove when projects and institutes are added */
-        this.initializeParams();
-        // this.getProjectsAndInstitutes();
+        // this.initializeParams();
+        // this.getInstitutes();
+        this.readParams();
     }
 
     initializeParams() {
@@ -89,7 +94,6 @@ export class RequestsComponent implements OnInit {
         this.statusesChoice.push('all');
         this.stagesChoice.push('all');
         this.typesChoice.push('all');
-        this.projectsChoice.push('all');
         this.institutesChoice.push('all');
         this.phaseId = 0;
         this.currentPage = 0;
@@ -101,15 +105,149 @@ export class RequestsComponent implements OnInit {
         this.getListOfRequests();
     }
 
+    readParams() {
+        this.statusesChoice = ['all'];
+        this.stagesChoice = ['all'];
+        this.typesChoice = ['all'];
+        this.institutesChoice = ['all'];
+
+        this.searchTerm = '';
+        this.keywordField = this.fb.group({ keyword: [''] });
+
+        this.phaseId = 0;
+        this.stages = approvalStages.concat(paymentStages);
+
+        this.currentPage = 0;
+        this.itemsPerPage = 10;
+
+        this.order = 'DESC';
+        this.orderField = 'creation_date';
+        this.totalPages = 0;
+
+        this.route.queryParamMap.subscribe(
+            params => {
+                // console.log(JSON.stringify(params, null, 2));
+                if ( params.has('status') ) { this.statusesChoice = params.getAll('status'); }
+                if ( params.has('stage') ) { this.stagesChoice = params.getAll('stage'); }
+                if ( params.has('phase') && !isNaN(+params.get('phase')) ) {
+                    this.phaseId = +params.get('phase');
+                    if (this.phaseId === 0) {
+                        this.stages = approvalStages.concat(paymentStages);
+                    } else if (this.phaseId === 1) {
+                        this.stages = approvalStages;
+                        if (this.stagesChoice[0] && this.stagesChoice[0] === 'all') {
+                            this.stagesChoice = this.stages;
+                        }
+                    } else {
+                        this.stages = paymentStages;
+                        if (this.stagesChoice[0] && this.stagesChoice[0] === 'all') {
+                            this.stagesChoice = this.stages;
+                        }
+                    }
+                }
+                if ( params.has('type') ) { this.typesChoice = params.getAll('type'); }
+                if ( params.has('institute') ) { this.institutesChoice = params.getAll('institute'); }
+                if ( params.has('searchTerm') ) {
+                    this.searchTerm = params.get('searchTerm');
+                    this.keywordField.get('keyword').setValue(this.searchTerm);
+                }
+                if ( params.has('itemsPerPage') && !isNaN(+params.get('itemsPerPage'))) {
+                    this.itemsPerPage = +params.get('itemsPerPage');
+                }
+                if ( params.has('orderField') ) { this.orderField = params.get('orderField'); }
+                if ( params.has('order') ) { this.order = params.get('order'); }
+            }
+        );
+
+        this.initializeFiltersForm();
+        this.getListOfRequests();
+    }
+
     initializeFiltersForm() {
         this.filtersForm = this.fb.group({
             phases: this.createFormArray({phase: [false]}, 2),
-            statusChoices: this.createFormArray({status: [false]}, 3),
+            statusChoices: this.createFormArray({status: [false]}, 4),
             stageChoices: this.createFormArray({stage: [false]}, this.stages.length),
             typeChoices: this.createFormArray({type: [false]}, this.requestTypeIds.length)
         });
-        // projectChoices: this.createFormArray({project: [false]}, this.projects.length),
         // instituteChoices: this.createFormArray({institute: [false]}, this.instituteIds.length)
+    }
+
+    setFormValues() {
+        console.log('trying to set filterValues');
+        if (this.phaseId !== 0) {
+            this.setValueOfFormArrayControl('phases', this.phaseId-1, 'phase', true);
+        } else {
+            if (this.allPhasesSelected) {
+                this.setValueOfFormArrayControl('phases', 0, 'phase', true);
+                this.setValueOfFormArrayControl('phases', 1, 'phase', true);
+            }
+        }
+        if ( !isNullOrUndefined(this.statusesChoice[0]) ) {
+          if (this.statusesChoice[0] !== 'all') {
+                this.statusesChoice.forEach(
+                    st => {
+                        let i: number;
+                        if ( (st === 'pending') || (st === 'under_review') ) { i = 0; }
+                        else if ( st === 'rejected' ) { i = 1; }
+                        else if ( st === 'accepted' ) { i = 2; }
+                        else { i = 3; }
+
+                        this.setValueOfFormArrayControl('statusChoices', i, 'status', true);
+                    }
+                );
+            }/* else {
+                if (this.allStatusSelected) {
+                    for (let i=0; i<4; i++) {
+                        this.setValueOfFormArrayControl('statusChoices', i, 'status', true);
+                    }
+                }
+            }*/
+        }
+        if ( !isNullOrUndefined(this.stagesChoice[0]) ) {
+            if ((this.stagesChoice[0] !== 'all') && (this.stagesChoice.length !== this.stages.length)) {
+                this.stagesChoice.forEach(
+                    st => {
+                        let i = this.stages.indexOf(st);
+                        if ( i > -1 ) {
+                            this.setValueOfFormArrayControl('stageChoices', i, 'stage', true);
+                        }
+                    }
+                );
+            }/* else {
+                if (this.allStagesSelected) {
+                    for (let i=0; i<this.stages.length; i++) {
+                        this.setValueOfFormArrayControl('stageChoices', i, 'stage', true);
+                    }
+                }
+            }*/
+        }
+        if ( !isNullOrUndefined(this.typesChoice[0]) ) {
+            if (this.typesChoice[0] !== 'all') {
+                this.typesChoice.forEach(
+                    t => {
+                        let i = this.requestTypeIds.indexOf(t);
+                        if ( i > -1 ) {
+                            this.setValueOfFormArrayControl('typeChoices', i, 'type', true);
+                        }
+                    }
+                );
+            }/* else {
+                if (this.allTypesSelected) {
+                    for (let i=0; i<this.requestTypeIds.length; i++) {
+                        this.setValueOfFormArrayControl('typeChoices', i, 'type', true);
+                    }
+                }
+            }*/
+        }
+
+    }
+
+    setValueOfFormArrayControl(formArrayName: string, index: number, fieldName: string, val: any) {
+        const tempFormArray = this.filtersForm.get(formArrayName) as FormArray;
+        /*if (tempFormArray.controls.length <= (index+1)) {*/
+            tempFormArray.at(index).get(fieldName).setValue(val);
+        /*}*/
     }
 
     createFormArray(def: any, length: number) {
@@ -127,6 +265,7 @@ export class RequestsComponent implements OnInit {
         this.listOfRequests = [];
         this.showSpinner = true;
         const currentOffset = this.currentPage * this.itemsPerPage;
+
         this.requestService.searchAllRequestSummaries(this.searchTerm,
             this.statusesChoice,
             this.typesChoice,
@@ -163,6 +302,7 @@ export class RequestsComponent implements OnInit {
                 if (this.listOfRequests.length === 0) {
                     this.noRequests = 'Δεν βρέθηκαν σχετικά αιτήματα.';
                 }
+                this.setFormValues();
             }
         );
     }
@@ -175,7 +315,8 @@ export class RequestsComponent implements OnInit {
             this.orderField = category;
         }
         this.currentPage = 0;
-        this.getListOfRequests();
+        // this.getListOfRequests();
+        this.createSearchUrl();
     }
 
     toggleOrder() {
@@ -212,7 +353,8 @@ export class RequestsComponent implements OnInit {
     getItemsPerPage(event: any) {
         this.itemsPerPage = event.target.value;
         this.currentPage = 0;
-        this.getListOfRequests();
+        // this.getListOfRequests();
+        this.createSearchUrl();
     }
 
     choosePhase() {
@@ -229,7 +371,8 @@ export class RequestsComponent implements OnInit {
         this.setAllStageValues(false);
         this.initFormArray('stageChoices', { stage: [false] }, this.stages.length);
         this.currentPage = 0;
-        this.getListOfRequests();
+        // this.getListOfRequests();
+        this.createSearchUrl();
     }
 
     initFormArray(arrayName: string, definition: any, length: number) {
@@ -247,7 +390,8 @@ export class RequestsComponent implements OnInit {
             this.getStageChoices();
             console.log('after getStageChoices list is', JSON.stringify(this.stagesChoice));
             this.currentPage = 0;
-            this.getListOfRequests();
+            // this.getListOfRequests();
+            this.createSearchUrl();
         }
     }
 
@@ -255,35 +399,32 @@ export class RequestsComponent implements OnInit {
         this.getStatusChoices();
         console.log('after getStatusChoices list is', JSON.stringify(this.statusesChoice));
         this.currentPage = 0;
-        this.getListOfRequests();
+        // this.getListOfRequests();
+        this.createSearchUrl();
     }
 
     chooseType() {
         this.getTypeChoices();
         console.log('after getTypeChoices list is', JSON.stringify(this.typesChoice));
         this.currentPage = 0;
-        this.getListOfRequests();
-    }
-
-    chooseProject() {
-        this.getProjectChoices();
-        console.log('after getProjectChoices list is', JSON.stringify(this.projectsChoice));
-        this.currentPage = 0;
-        this.getListOfRequests();
+        // this.getListOfRequests();
+        this.createSearchUrl();
     }
 
     chooseInstitute() {
         this.getInstituteChoices();
         console.log('after getInstituteChoices list is', JSON.stringify(this.institutesChoice));
         this.currentPage = 0;
-        this.getListOfRequests();
+        // this.getListOfRequests();
+        this.createSearchUrl();
     }
 
     getSearchByKeywordResults() {
         this.searchTerm = this.keywordField.get('keyword').value;
         console.log('this.searchTerm is', this.searchTerm);
         this.currentPage = 0;
-        this.getListOfRequests();
+        // this.getListOfRequests();
+        this.createSearchUrl();
     }
 
     toggleSearchAllPhases(event: any) {
@@ -293,19 +434,22 @@ export class RequestsComponent implements OnInit {
         this.stages = approvalStages.concat(paymentStages);
         this.initFormArray('stageChoices', { stage: [false]}, this.stages.length);
         this.currentPage = 0;
-        this.getListOfRequests();
+        // this.getListOfRequests();
+        this.createSearchUrl();
     }
 
     toggleSearchAllStages(event: any) {
         this.setAllStageValues(event.target.checked);
         this.currentPage = 0;
-        this.getListOfRequests();
+        // this.getListOfRequests();
+        this.createSearchUrl();
     }
 
     toggleSearchAllStatuses(event: any) {
         this.setAllStatusValues(event.target.checked);
         this.currentPage = 0;
-        this.getListOfRequests();
+        // this.getListOfRequests();
+        this.createSearchUrl();
     }
 
     toggleSearchAllTypes(event: any) {
@@ -314,17 +458,10 @@ export class RequestsComponent implements OnInit {
         this.typesChoice = [];
         this.typesChoice.push('all');
         this.currentPage = 0;
-        this.getListOfRequests();
+        // this.getListOfRequests();
+        this.createSearchUrl();
     }
 
-    toggleSearchAllProjects(event: any) {
-        this.allProjectsSelected = event.target.checked;
-        this.setChoices(event.target.checked, 'projectChoices', 'project');
-        this.projectsChoice = [];
-        this.projectsChoice.push('all');
-        this.currentPage = 0;
-        this.getListOfRequests();
-    }
 
     toggleSearchAllInstitutes(event: any) {
         this.allInstitutesSelected = event.target.checked;
@@ -348,18 +485,16 @@ export class RequestsComponent implements OnInit {
     }
 
     setAllStageValues(val: boolean) {
-        // if ( !this.isSimpleUser ) {
-            this.allStagesSelected = val;
-            this.setChoices(val, 'stageChoices', 'stage');
-            this.stagesChoice = [];
-            if (this.phaseId === 0) {
-                this.stagesChoice.push('all');
-            } else if (this.phaseId === 1) {
-                this.stagesChoice = approvalStages;
-            } else {
-                this.stagesChoice = paymentStages;
-            }
-        // }
+        this.allStagesSelected = val;
+        this.setChoices(val, 'stageChoices', 'stage');
+        this.stagesChoice = [];
+        if (this.phaseId === 0) {
+            this.stagesChoice.push('all');
+        } else if (this.phaseId === 1) {
+            this.stagesChoice = approvalStages;
+        } else {
+            this.stagesChoice = paymentStages;
+        }
     }
 
     setAllStatusValues(val: boolean) {
@@ -429,8 +564,11 @@ export class RequestsComponent implements OnInit {
         if ( statusChoices.at(2).get('status').value ) {
             this.statusesChoice.push('accepted');
         }
-        if ((this.statusesChoice.length === 0) || (this.statusesChoice.length === 4) ) {
-            this.allStatusSelected = (this.statusesChoice.length === 4);
+        if ( statusChoices.at(3).get('status').value ) {
+            this.statusesChoice.push('cancelled');
+        }
+        if ((this.statusesChoice.length === 0) || (this.statusesChoice.length === 5) ) {
+            this.allStatusSelected = (this.statusesChoice.length === 5);
             this.statusesChoice = [];
             this.statusesChoice.push('all');
             console.log(this.allStatusSelected);
@@ -441,23 +579,11 @@ export class RequestsComponent implements OnInit {
         this.allTypesSelected = null;
         this.typesChoice = [];
         const typeChoicesIndices = this.getChoicesIndices('typeChoices', 'type');
-        if ((typeChoicesIndices.length === 0) || (typeChoicesIndices.length === this.projects.length)) {
+        if ((typeChoicesIndices.length === 0) || (typeChoicesIndices.length === this.requestTypeIds.length)) {
             this.allTypesSelected = (typeChoicesIndices.length === this.requestTypeIds.length);
             this.typesChoice.push('all');
         } else {
             typeChoicesIndices.forEach( x => this.typesChoice.push(this.requestTypeIds[x]) );
-        }
-    }
-
-    getProjectChoices() {
-        this.allProjectsSelected = null;
-        this.projectsChoice = [];
-        const projectChoicesIndices = this.getChoicesIndices('projectChoices', 'project');
-        if ((projectChoicesIndices.length === 0) || (projectChoicesIndices.length === this.projects.length)) {
-            this.allProjectsSelected = (projectChoicesIndices.length === this.projects.length);
-            this.projectsChoice.push('all');
-        } else {
-            projectChoicesIndices.forEach( x => this.projectsChoice.push(this.projects[x].projectID) );
         }
     }
 
@@ -466,7 +592,7 @@ export class RequestsComponent implements OnInit {
         this.institutesChoice = [];
         const instituteChoicesIndices = this.getChoicesIndices('instituteChoices', 'institute');
         if ((instituteChoicesIndices.length === 0) || (instituteChoicesIndices.length === this.instituteIds.length)) {
-            this.allProjectsSelected = (instituteChoicesIndices.length === this.instituteIds.length);
+            this.allInstitutesSelected = (instituteChoicesIndices.length === this.instituteIds.length);
             this.institutesChoice.push('all');
         } else {
             instituteChoicesIndices.forEach( x => this.institutesChoice.push(this.instituteIds[x]) );
@@ -474,7 +600,7 @@ export class RequestsComponent implements OnInit {
     }
 
 
-    getProjectsAndInstitutes() {
+    getInstitutes() {
         this.showSpinner = true;
         this.errorMessage = '';
         this.projects = [];
@@ -512,8 +638,10 @@ export class RequestsComponent implements OnInit {
             return 'σε εξέλιξη';
         } else if (status === 'accepted') {
             return 'ολοκληρωθηκε';
-        } else {
+        } else if (status === 'rejected') {
             return 'απορρίφθηκε';
+        } else {
+            return 'ακυρώθηκε';
         }
     }
 
@@ -541,6 +669,26 @@ export class RequestsComponent implements OnInit {
 
     printRequest(): void {
         printRequestPage();
+    }
+
+    createSearchUrl() {
+        let url = new URLSearchParams();
+        this.statusesChoice.forEach( st => url.append('status', st) );
+        this.stagesChoice.forEach( st => url.append('stage', st) );
+        url.set('phase', this.phaseId.toString());
+        this.typesChoice.forEach( t => url.append('type', t) );
+        // this.institutesChoice.forEach( inst => url.append('institute', inst) );
+        url.set('searchTerm', this.searchTerm);
+        url.set('itemsPerPage', this.itemsPerPage.toString());
+        url.set('orderField', this.orderField);
+        url.set('order', this.order);
+
+        // this.router.navigateByUrl(`/requests?${url.toString()}`);
+        /*this.router.navigate([],{ relativeTo: this.route, queryParams: url });
+        this.readParams();*/
+        /*window.location.search = url.toString();*/
+        window.location.href = window.location.origin + window.location.pathname + '?' + url.toString();
+        /*setTimeout(() => {this.readParams();}, 500);*/
     }
 
 }

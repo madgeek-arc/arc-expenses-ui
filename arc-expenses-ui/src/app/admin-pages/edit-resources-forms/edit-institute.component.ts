@@ -15,8 +15,8 @@ export class EditInstituteComponent extends EditResourcesComponent implements On
     pois: PersonOfInterest[] = [];
     organizations: Organization[] = [];
 
-    @ViewChild('organizationForm') organizationForm: EditOrganizationComponent;
-    organizationFormData: any[] = [];
+    /*@ViewChild('organizationForm') organizationForm: EditOrganizationComponent;
+    organizationFormData: any[] = [];*/
     @ViewChild('instDirectorForm') instDirectorForm: EditPoiComponent;
     instDirectorFormData: any[] = [];
     @ViewChild('accountingRegistrationForm') accountingRegistrationForm: EditPoiComponent;
@@ -63,10 +63,15 @@ export class EditInstituteComponent extends EditResourcesComponent implements On
     }
 
     ngOnChanges(changes: SimpleChanges) {
-        if (!isNullOrUndefined(this.resourceForm) &&
-            (changes['data'].currentValue !== changes['data'].previousValue)) {
+        if (!isNullOrUndefined(changes) &&
+            !isNullOrUndefined(changes['data']) &&
+            !isNullOrUndefined((changes['data'].currentValue))) {
 
-            this.parseData();
+            if (!isNullOrUndefined(this.resourceForm) &&
+                (changes[ 'data' ].currentValue !== changes[ 'data' ].previousValue)) {
+
+                this.parseData();
+            }
         }
     }
 
@@ -80,31 +85,40 @@ export class EditInstituteComponent extends EditResourcesComponent implements On
             this.pois = this.data[2];
             this.organizations = this.data[3];
             if (!isNullOrUndefined(this.data[0].organization)) {
-                this.organizationFormData = [this.data[0].organization, this.delegates, this.pois];
+                // this.organizationFormData = [this.data[0].organization, this.delegates, this.pois];
+                this.resourceForm.patchValue({organization: this.data[0].organization.id});
             }
             if (!isNullOrUndefined(this.data[0].director)) {
                 this.instDirectorFormData = [this.data[0].director, this.delegates];
+                this.resourceForm.get('director').setValue('');
             }
             if (!isNullOrUndefined(this.data[0].accountingRegistration)) {
                 this.accountingRegistrationFormData = [this.data[0].accountingRegistration, this.delegates];
+                this.resourceForm.get('accountingRegistration').setValue('');
             }
             if (!isNullOrUndefined(this.data[0].accountingPayment)) {
                 this.accountingPaymentFormData = [this.data[0].accountingPayment, this.delegates];
+                this.resourceForm.get('accountingPayment').setValue('');
             }
             if (!isNullOrUndefined(this.data[0].accountingDirector)) {
                 this.accountingDirectorFormData = [this.data[0].accountingDirector, this.delegates];
+                this.resourceForm.get('accountingDirector').setValue('');
             }
             if (!isNullOrUndefined(this.data[0].diaugeia)) {
                 this.diaugeiaFormData = [this.data[0].diaugeia, this.delegates];
+                this.resourceForm.get('diaugeia').setValue('');
             }
             if (!isNullOrUndefined(this.data[0].suppliesOffice)) {
                 this.suppliesOfficeFormData = [this.data[0].suppliesOffice, this.delegates];
+                this.resourceForm.get('suppliesOffice').setValue('');
             }
             if (!isNullOrUndefined(this.data[0].travelManager)) {
                 this.travelManagerFormData = [this.data[0].travelManager, this.delegates];
+                this.resourceForm.get('travelManager').setValue('');
             }
             if (!isNullOrUndefined(this.data[0].diataktis)) {
                 this.diataktisFormData = [this.data[0].diataktis, this.delegates];
+                this.resourceForm.get('diataktis').setValue('');
             }
         }
     }
@@ -122,18 +136,19 @@ export class EditInstituteComponent extends EditResourcesComponent implements On
         }
     }
 
-    addOrganization(organization?: any) {
+    /*addOrganization(organization?: any) {
         this.searchForOrganization = '';
         if (!isNullOrUndefined(organization)) {
             this.organizationFormData = [organization, this.delegates, this.pois];
         } else {
             this.organizationFormData = [new Organization(), this.delegates, this.pois];
         }
-    }
+    }*/
 
 
     exportFormValue() {
-        this.resourceForm.patchValue({organization: this.organizationForm.exportFormValue()});
+        /*this.resourceForm.patchValue({organization: this.organizationForm.exportFormValue()});*/
+        this.resourceForm.patchValue({organization: this.organizations.filter(i => i.id === this.resourceForm.get('organization').value )[0]});
         this.resourceForm.patchValue({director: this.instDirectorForm.exportFormValue()});
         this.resourceForm.patchValue({accountingRegistration: this.accountingRegistrationForm.exportFormValue()});
         this.resourceForm.patchValue({accountingPayment: this.accountingPaymentForm.exportFormValue()});

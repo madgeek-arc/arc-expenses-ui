@@ -9,7 +9,7 @@
           Αίτημα {{currentRequest ? currentRequest.id : ''}}
           <span *ngIf="currentRequest" class="uk-text-small">[{{ reqTypes[currentRequest.type] }}]</span></h1>
 
-        <!-- TODO: activate printing functionality -->
+        <!-- TODO: activate printing -->
         <!--<button class="uk-button uk-button-small" (click)="printRequest()">Εκτύπωση</button>-->
 
         <!-- TOP HELP CONTENT -->
@@ -104,6 +104,9 @@
 
 
                 <!--end of 1st stage-->
+                <div *ngIf="userIsAdmin() || userIsRequester()" class="uk-align-right">
+                  <button class="uk-button uk-button-primary" (click)="cancelRequest()">Απόρριψη Αιτήματος</button>
+                </div>
 
 
                 <!-- Submitted stages display -->

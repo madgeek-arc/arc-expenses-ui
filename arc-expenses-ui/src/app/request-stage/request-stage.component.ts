@@ -43,7 +43,7 @@ export class RequestStageComponent implements OnInit {
     stages: string[];
     stagesMap = stageTitles;
     stateNames = {
-        pending: 'βρίσκεται σε εξέλιξη', under_review: 'βρίσκεται σε εξέλιξη', rejected: 'έχει απορριφθεί', accepted: 'έχει ολοκληρωθεί'
+        pending: 'βρίσκεται σε εξέλιξη', under_review: 'βρίσκεται σε εξέλιξη', rejected: 'έχει απορριφθεί', accepted: 'έχει ολοκληρωθεί', cancelled: 'έχει ακυρωθεί'
     };
     reqTypes = requestTypes;
 
@@ -524,6 +524,16 @@ export class RequestStageComponent implements OnInit {
 
     userIsAdmin() {
         return (this.authService.getUserRole() === 'ROLE_ADMIN');
+    }
+
+    userIsRequester() {
+        return (this.authService.getUserProp('email') === this.currentRequest.user.email);
+    }
+
+    cancelRequest() {
+        this.currentRequestApproval.status = 'cancelled';
+        this.currentRequest.requestStatus = 'cancelled';
+        this.updateRequestAndApproval();
     }
 
 }

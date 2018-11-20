@@ -222,7 +222,8 @@ export class NewRequestComponent implements OnInit {
                 this.requestApproval.stage3 = new Stage3();
                 this.requestApproval.stage4 = new Stage4();
 
-                // TODO: Uncomment when we configure the case when scientific coordinator becomes diataktis
+                /*TODO: Uncomment this and remove the line below when we configure
+                        the case when the scientific coordinator becoming diataktis*/
                 /* if (this.request.stage1.amountInEuros <= this.lowAmount) {
                     this.requestApproval.stage5a = new Stage5a();
                 } */

@@ -39,7 +39,7 @@ export class RequestStagePaymentComponent implements OnInit {
     requestNeedsUpdate: boolean;
     stages: string[];
     stateNames = {
-        pending: 'βρίσκεται σε εξέλιξη', under_review: 'βρίσκεται σε εξέλιξη', rejected: 'έχει απορριφθεί', accepted: 'έχει ολοκληρωθεί'
+        pending: 'βρίσκεται σε εξέλιξη', under_review: 'βρίσκεται σε εξέλιξη', rejected: 'έχει απορριφθεί', accepted: 'έχει ολοκληρωθεί', cancelled: 'έχει ακυρωθεί'
     };
     reqTypes = requestTypes;
 

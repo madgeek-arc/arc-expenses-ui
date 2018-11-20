@@ -97,7 +97,7 @@ export class AuthenticationService {
                         console.log(JSON.stringify(userInfo));
                         if ( !isNullOrUndefined(userInfo) ) {
                             this.isLoggedIn = true;
-                            // TODO: RESTORE READING ROLE ON LOGIN !!!
+                            // TODO: ALWAYS RESTORE ΒEFORE COMMIT!!
                             sessionStorage.setItem('role', userInfo['role']);
                             // sessionStorage.setItem('role', 'ROLE_ADMIN');
                             this.setUserProperties(userInfo['user']);
@@ -133,7 +133,7 @@ export class AuthenticationService {
                                     state = sessionStorage.getItem('state.location');
                                     sessionStorage.removeItem('state.location');
                                     console.log(`cleared state.location - returning to state: ${state}`);
-                                    this.router.navigate([state]);
+                                    this.router.navigateByUrl(state);
                                 }
                             }
                         }

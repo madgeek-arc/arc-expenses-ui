@@ -45,10 +45,15 @@ export class EditOrganizationComponent extends EditResourcesComponent implements
     }
 
     ngOnChanges(changes: SimpleChanges) {
-        if (!isNullOrUndefined(this.resourceForm) &&
-            (changes['data'].currentValue !== changes['data'].previousValue)) {
+        if (!isNullOrUndefined(changes) &&
+            !isNullOrUndefined(changes['data']) &&
+            !isNullOrUndefined((changes['data'].currentValue))) {
 
-            this.parseData();
+            if (!isNullOrUndefined(this.resourceForm) &&
+                (changes[ 'data' ].currentValue !== changes[ 'data' ].previousValue)) {
+
+                this.parseData();
+            }
         }
     }
 
@@ -73,6 +78,7 @@ export class EditOrganizationComponent extends EditResourcesComponent implements
                 this.data[0].inspectionTeam.forEach(
                     insp => this.inspectionTeamFormsData.push([insp, this.delegates])
                 );
+                this.resourceForm.get('inspectionTeam').setValue(['']);
             }
             if (!isNullOrUndefined(this.data[0].dioikitikoSumvoulio)) {
                 this.dioikitikoSumvoulioFormData = [this.data[0].dioikitikoSumvoulio, this.delegates];

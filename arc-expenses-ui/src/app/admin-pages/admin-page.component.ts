@@ -6,13 +6,14 @@ import { delegates, institutes, organizations, pois, project } from '../domain/m
 import { EditProjectComponent } from './edit-resources-forms/edit-project.component';
 import { EditInstituteComponent } from './edit-resources-forms/edit-institute.component';
 import { EditOrganizationComponent } from './edit-resources-forms/edit-organization.component';
+import { Project } from '../domain/operation';
 
 @Component({
     selector: 'app-admin-page',
     templateUrl: './admin-page.component.html'
 })
 export class AdminPageComponent implements OnInit {
-    title = 'Επεξεργασία/Προσθήκη εγγραφών στην βάση';
+    title = 'Επεξεργασία/Προσθήκη έργων';
     selectedResourceType = 'project';
     resource: any;
 
@@ -22,15 +23,22 @@ export class AdminPageComponent implements OnInit {
     organizations = organizations;
     institutes = institutes;
 
+    @ViewChild('editResourceForm') editResourceForm: ResourcesLoaderComponent;
+
     constructor(projectService: ManageProjectService) {}
 
     ngOnInit() {
         this.resource = new AnchorItem(
-            EditOrganizationComponent, [this.organizations[0], this.delegates, this.pois] );
+            EditProjectComponent, [this.currentProject, this.delegates, this.pois, this.organizations, this.institutes] );
     }
 
     selectType(resourceType: string) {
         this.selectedResourceType = resourceType;
+    }
+
+    submitChanges() {
+        const submittedProj: Project = this.editResourceForm.getComponentFormValue();
+        console.log(JSON.stringify(submittedProj, null, 2));
     }
 
     getProjects() {}
@@ -50,4 +58,5 @@ export class AdminPageComponent implements OnInit {
     addOrganization() {}
 
     updateOrganization() {}
+
 }

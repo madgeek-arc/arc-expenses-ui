@@ -21,10 +21,15 @@ export class EditDelegateComponent extends EditResourcesComponent implements OnI
     }
 
     ngOnChanges(changes: SimpleChanges) {
-        if (!isNullOrUndefined(this.resourceForm) &&
-            (changes['data'].currentValue !== changes['data'].previousValue)) {
+        if (!isNullOrUndefined(changes) &&
+            !isNullOrUndefined(changes['data']) &&
+            !isNullOrUndefined((changes['data'].currentValue))) {
 
-            this.parseData();
+            if (!isNullOrUndefined(this.resourceForm) &&
+                (changes[ 'data' ].currentValue !== changes[ 'data' ].previousValue)) {
+
+                this.parseData();
+            }
         }
     }
 

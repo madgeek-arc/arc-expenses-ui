@@ -53,11 +53,11 @@ export class SearchParams {
     requestTypes: string[];
     statuses: string[];
     stages: string[];
-    projects: string[];
+    types: string[];
     institutes: string[];
 
     constructor(email: string, from: string, quantity: string, order: string, orderField: string,
-                searchField: string, statuses: string[], stages: string[], projects: string[], institutes: string[]) {
+                searchField: string, statuses: string[], stages: string[], types: string[], institutes: string[]) {
         this.email = email;
         this.from = from;
         this.quantity = quantity;
@@ -66,7 +66,7 @@ export class SearchParams {
         this.searchField = searchField;
         this.statuses = statuses;
         this.stages = stages;
-        this.projects = projects;
+        this.types = types;
         this.institutes = institutes;
     }
 }

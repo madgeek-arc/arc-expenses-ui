@@ -17,6 +17,46 @@
             </div>
         </div>
         <div class="uk-margin">
+            <label class="uk-form-label" for="{{id}}_org">Οργανισμός</label>
+            <div class="uk-form-controls">
+                <div class="uk-width-1-1">
+                    <select class="uk-select" id="{{id}}_org" formControlName="organization">
+                        <option value="">-- επιλέξτε οργανισμό --</option>
+                        <option *ngFor="let org of organizations" value="{{org.id}}">{{ org.name }}</option>
+                    </select>
+                </div>
+                <!--<div class="uk-width-1-1 uk-grid">
+                    <div class="uk-width-expand">
+                        <input class="uk-input" value="{{ searchForOrganization }}"
+                               placeholder="Αναζήτηση με βάση το όνομα του οργανισμού" type="text"
+                               (keyup)="updateSearchTerm($event, 'searchForOrganization')">
+                        &lt;!&ndash;<div class="uk-comment-body uk-text-small uk-text-muted">
+                            <i>Ξεκινήστε να γράφετε το όνομα του οργανισμού και επιλέξτε τον από την λίστα που θα εμφανιστεί.</i>
+                        </div>&ndash;&gt;
+                        <div *ngIf="searchForOrganization" class="uk-nav uk-padding-small uk-width-large uk-position-absolute" style="background-color: white">
+                            <ul>
+                                <li *ngFor="let org of organizations | filterByTerm: searchForOrganization: 'name'">
+                                    <a (click)="addOrganization(org)">
+                                        {{ org.name }}</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="uk-inline">
+                        <a class="uk-button-small" (click)="addOrganization()">
+                            Δημιουργία νέου οργανισμού
+                        </a>
+                    </div>
+                </div>
+                <div *ngIf="organizationFormData">
+                    <div>
+                        <app-edit-organization #organizationForm [id]="id + '_org'"
+                                               [data]="organizationFormData"></app-edit-organization>
+                    </div>
+                </div>-->
+            </div>
+        </div>
+        <div class="uk-margin">
             <label class="uk-form-label">Πρόεδρος</label>
             <div class="uk-form-controls">
                 <div class="uk-width-1-1 uk-grid">
@@ -306,40 +346,6 @@
                     <div>
                         <app-edit-poi #diataktisForm [id]="id + '_diataktis'"
                                       [data]="diataktisFormData"></app-edit-poi>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="uk-margin">
-            <label class="uk-form-label">Οργανισμός</label>
-            <div class="uk-form-controls">
-                <div class="uk-width-1-1 uk-grid">
-                    <div class="uk-width-expand">
-                        <input class="uk-input" value="{{ searchForOrganization }}"
-                               placeholder="Αναζήτηση με βάση το όνομα του οργανισμού" type="text"
-                               (keyup)="updateSearchTerm($event, 'searchForOrganization')">
-                        <!--<div class="uk-comment-body uk-text-small uk-text-muted">
-                            <i>Ξεκινήστε να γράφετε το όνομα του οργανισμού και επιλέξτε τον από την λίστα που θα εμφανιστεί.</i>
-                        </div>-->
-                        <div *ngIf="searchForOrganization" class="uk-nav uk-padding-small uk-width-large uk-position-absolute" style="background-color: white">
-                            <ul>
-                                <li *ngFor="let org of organizations | filterByTerm: searchForOrganization: 'name'">
-                                    <a (click)="addOrganization(org)">
-                                        {{ org.name }}</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="uk-inline">
-                        <a class="uk-button-small" (click)="addOrganization()">
-                            Δημιουργία νέου οργανισμού
-                        </a>
-                    </div>
-                </div>
-                <div *ngIf="organizationFormData">
-                    <div>
-                        <app-edit-organization #organizationForm [id]="id + '_org'"
-                                               [data]="organizationFormData"></app-edit-organization>
                     </div>
                 </div>
             </div>
