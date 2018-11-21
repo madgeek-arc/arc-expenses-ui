@@ -13,6 +13,8 @@ import { AnchorItem } from '../shared/dynamic-loader-anchor-components/anchor-it
 import { RequestInfo } from '../domain/requestInfoClasses';
 import { concatMap, mergeMap, tap } from 'rxjs/operators';
 
+declare var UIkit: any;
+
 @Component({
     selector: 'app-request-stage',
     templateUrl: './request-stage.component.html',
@@ -43,7 +45,8 @@ export class RequestStageComponent implements OnInit {
     stages: string[];
     stagesMap = stageTitles;
     stateNames = {
-        pending: 'βρίσκεται σε εξέλιξη', under_review: 'βρίσκεται σε εξέλιξη', rejected: 'έχει απορριφθεί', accepted: 'έχει ολοκληρωθεί', cancelled: 'έχει ακυρωθεί'
+        pending: 'βρίσκεται σε εξέλιξη', under_review: 'βρίσκεται σε εξέλιξη',
+        rejected: 'έχει απορριφθεί', accepted: 'έχει ολοκληρωθεί', cancelled: 'έχει ακυρωθεί'
     };
     reqTypes = requestTypes;
 
@@ -531,9 +534,33 @@ export class RequestStageComponent implements OnInit {
     }
 
     cancelRequest() {
+        // UIkit.modal('#cancellationModal').show();
+    }
+
+    confirmedCancel() {
         this.currentRequestApproval.status = 'cancelled';
         this.currentRequest.requestStatus = 'cancelled';
-        this.updateRequestAndApproval();
+        this.requestService.updateRequest(this.currentRequest, this.authService.getUserProp('email')).pipe(
+            tap(res => this.currentRequest = res),
+            concatMap( res =>
+                this.requestService.updateRequestApproval(this.currentRequestApproval)
+            )).subscribe(
+                res => {
+                        this.currentRequestApproval = res;
+                    },
+                error => {
+                        console.log(error);
+                        this.showSpinner = false;
+                        this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
+                        this.getCurrentRequest();
+                        UIkit.modal('#cancellationModal').hide();
+                    },
+            () => {
+                    this.successMessage = 'Το αίτημα ακυρώθηκε.';
+                    this.showSpinner = false;
+                    UIkit.modal('#cancellationModal').hide();
+                }
+            );
     }
 
 }

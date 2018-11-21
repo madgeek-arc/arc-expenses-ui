@@ -143,6 +143,7 @@ export class NewRequestComponent implements OnInit {
     }
 
     submitRequest() {
+        this.errorMessage = '';
         if ((this.requestType === 'trip') && !this.isRequestOnBehalfOfOther) {
             this.newRequestForm.get('trip_firstname').setValue(this.currentUser.firstname);
             this.newRequestForm.get('trip_lastname').setValue(this.currentUser.lastname);
@@ -155,28 +156,38 @@ export class NewRequestComponent implements OnInit {
                  (+this.newRequestForm.get('amount').value <= this.amountLimit) &&
                  ( this.newRequestForm.get('supplierSelectionMethod').value === 'direct' ) ) {
 
-                UIkit.modal.alert('Για αιτήματα άνω των 2.500 € η επιλογή προμηθευτή γίνεται μέσω διαγωνισμού ή έρευνας αγοράς.');
+                // UIkit.modal.alert('Για αιτήματα άνω των 2.500 € η επιλογή προμηθευτή γίνεται μέσω διαγωνισμού ή έρευνας αγοράς.');
+                this.errorMessage = 'Για αιτήματα άνω των 2.500 € η επιλογή προμηθευτή γίνεται μέσω διαγωνισμού ή έρευνας αγοράς.';
+                window.scroll(1, 1);
 
             } else if ( ( +this.newRequestForm.get('amount').value > this.amountLimit) && this.checkIfTrip() &&
                         ( this.newRequestForm.get('supplierSelectionMethod').value !== 'competition' ) ) {
 
-                UIkit.modal.alert('Για ποσά άνω των 20.000 € οι αναθέσεις πρέπει να γίνονται μέσω διαγωνισμού.');
+                // UIkit.modal.alert('Για ποσά άνω των 20.000 € οι αναθέσεις πρέπει να γίνονται μέσω διαγωνισμού.');
+                this.errorMessage = 'Για ποσά άνω των 20.000 € οι αναθέσεις πρέπει να γίνονται μέσω διαγωνισμού.';
+                window.scroll(1, 1);
 
             } else if ( this.checkIfTrip() &&
                         ( (this.newRequestForm.get('supplierSelectionMethod').value !== 'competition') &&
                           !this.newRequestForm.get('supplier').value )) {
 
-                UIkit.modal.alert('Τα πεδία που σημειώνονται με (*) είναι υποχρεωτικά.');
+                // UIkit.modal.alert('Τα πεδία που σημειώνονται με (*) είναι υποχρεωτικά.');
+                this.errorMessage = 'Τα πεδία που σημειώνονται με (*) είναι υποχρεωτικά.';
+                window.scroll(1, 1);
 
             } else if ( (( this.newRequestForm.get('supplierSelectionMethod').value !== 'direct' ) &&
                            this.checkIfTrip() ) &&
                           isUndefined(this.uploadedFile)  ) {
 
-                UIkit.modal.alert('Για αναθέσεις μέσω διαγωνισμού ή έρευνας αγοράς η επισύναψη εγγράφων είναι υποχρεωτική.');
+                // UIkit.modal.alert('Για αναθέσεις μέσω διαγωνισμού ή έρευνας αγοράς η επισύναψη εγγράφων είναι υποχρεωτική.');
+                this.errorMessage = 'Για αναθέσεις μέσω διαγωνισμού ή έρευνας αγοράς η επισύναψη εγγράφων είναι υποχρεωτική.';
+                window.scroll(1, 1);
 
             } else if ( (+this.newRequestForm.get('amount').value > this.lowAmountLimit) && isUndefined(this.uploadedFile) ) {
 
-                UIkit.modal.alert('Για αιτήματα άνω των 2.500 € η επισύναψη εγγράφων είναι υποχρεωτική.');
+                // UIkit.modal.alert('Για αιτήματα άνω των 2.500 € η επισύναψη εγγράφων είναι υποχρεωτική.');
+                this.errorMessage = 'Για αιτήματα άνω των 2.500 € η επισύναψη εγγράφων είναι υποχρεωτική.';
+                window.scroll(1, 1);
 
             } else {
                 this.request = new Request();
@@ -222,8 +233,8 @@ export class NewRequestComponent implements OnInit {
                 this.requestApproval.stage3 = new Stage3();
                 this.requestApproval.stage4 = new Stage4();
 
-                /*TODO: Uncomment this and remove the line below when we configure
-                        the case when the scientific coordinator becoming diataktis*/
+                /*TODO: Uncomment this and remove the line below when we clarify
+                        the case when the scientific coordinator becomes diataktis*/
                 /* if (this.request.stage1.amountInEuros <= this.lowAmount) {
                     this.requestApproval.stage5a = new Stage5a();
                 } */
@@ -247,8 +258,10 @@ export class NewRequestComponent implements OnInit {
                         },
                     error => {
                         console.log(error);
-                        UIkit.modal.alert('Παρουσιάστηκε πρόβλημα με την υποβολή της φόρμας.');
+                        // UIkit.modal.alert('Παρουσιάστηκε πρόβλημα με την υποβολή της φόρμας.');
+                        this.errorMessage = 'Παρουσιάστηκε πρόβλημα με την υποβολή της φόρμας.';
                         this.showSpinner = false;
+                        window.scroll(1, 1);
                     },
                     () => {
                         if (this.uploadedFile) {
@@ -261,19 +274,25 @@ export class NewRequestComponent implements OnInit {
             }
 
         } else {
-            UIkit.modal.alert('Τα πεδία που σημειώνονται με (*) είναι υποχρεωτικά.');
+            // UIkit.modal.alert('Τα πεδία που σημειώνονται με (*) είναι υποχρεωτικά.');
+            this.errorMessage = 'Τα πεδία που σημειώνονται με (*) είναι υποχρεωτικά.';
+            window.scroll(1, 1);
         }
     }
 
     submitRequestApproval() {
+        this.errorMessage = '';
         this.requestService.addRequestApproval(this.requestApproval).subscribe(
             res => this.requestApproval = res,
             error => {
                 console.log(error);
                 this.showSpinner = false;
-                UIkit.modal.alert('Παρουσιάστηκε πρόβλημα με την υποβολή της φόρμας.');
+                // UIkit.modal.alert('Παρουσιάστηκε πρόβλημα με την υποβολή της φόρμας.');
+                this.errorMessage = 'Παρουσιάστηκε πρόβλημα με την υποβολή της φόρμας.';
+                window.scroll(1, 1);
             },
             () => {
+                this.errorMessage = '';
                 this.showSpinner = false;
                 this.router.navigate(['/requests']);
             }
@@ -282,6 +301,7 @@ export class NewRequestComponent implements OnInit {
 
     uploadFile() {
         // this.showSpinner = true;
+        this.errorMessage = '';
         this.requestService.uploadAttachment<string>(this.request.archiveId, 'stage1', this.uploadedFile, 'request')
             .subscribe(
                 event => {
@@ -296,18 +316,24 @@ export class NewRequestComponent implements OnInit {
                 error => {
                     console.log(error);
                     this.showSpinner = false;
-                    UIkit.modal.alert('Παρουσιάστηκε πρόβλημα με την επισύναψη του αρχείου.');
+                    // UIkit.modal.alert('Παρουσιάστηκε πρόβλημα με την επισύναψη του αρχείου.');
+                    this.errorMessage = 'Παρουσιάστηκε πρόβλημα με την επισύναψη του αρχείου.';
+                    window.scroll(1, 1);
                 },
                 () => {
+                    this.errorMessage = '';
                     console.log('ready to update Request');
                     this.requestService.updateRequest(this.request, this.authService.getUserProp('email')).subscribe(
                         res => console.log('updated new request: ', res.requestStatus, res.stage1),
                         error => {
                             console.log('from update new request', error);
                             this.showSpinner = false;
-                            UIkit.modal.alert('Παρουσιάστηκε πρόβλημα με την επισύναψη του αρχείου.');
+                            // UIkit.modal.alert('Παρουσιάστηκε πρόβλημα με την επισύναψη του αρχείου.');
+                            this.errorMessage = 'Παρουσιάστηκε πρόβλημα με την επισύναψη του αρχείου.';
+                            window.scroll(1, 1);
                         },
                         () => {
+                            this.errorMessage = '';
                             this.submitRequestApproval();
                             /*this.showSpinner = false;
                             this.router.navigate(['/requests']);*/

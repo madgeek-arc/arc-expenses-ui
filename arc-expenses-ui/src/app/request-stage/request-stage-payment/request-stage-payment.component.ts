@@ -329,6 +329,7 @@ export class RequestStagePaymentComponent implements OnInit {
         if ( (stage === this.currentRequestPayment.stage) &&
             (this.currentRequestPayment.status !== 'rejected') &&
             (this.currentRequestPayment.status !== 'accepted') &&
+            (this.currentRequestPayment.status !== 'cancelled') &&
             ( (this.authService.getUserRole() === 'ROLE_ADMIN') || (this.canEdit === true) ) ) {
 
             this.stageLoaderItemList = [

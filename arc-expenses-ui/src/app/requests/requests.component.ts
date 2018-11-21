@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { BaseInfo, Project, Request, RequestSummary, User, Vocabulary } from '../domain/operation';
+import { Project, RequestSummary, User, Vocabulary } from '../domain/operation';
 import { ManageRequestsService } from '../services/manage-requests.service';
 import { AuthenticationService } from '../services/authentication.service';
 import { Paging, SearchParams } from '../domain/extraClasses';
 import { ActivatedRoute, Router } from '@angular/router';
 import { isNull, isNullOrUndefined } from 'util';
 import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
-import { approvalStages, paymentStages, requestTypes, stageIds, stageTitles, statesList } from '../domain/stageDescriptions';
+import { approvalStages, paymentStages, requestTypes, stageTitles } from '../domain/stageDescriptions';
 import { printRequestPage } from '../request-stage/print-request-function';
 import { ManageResourcesService } from '../services/manage-resources.service';
 import { ManageProjectService } from '../services/manage-project.service';
@@ -80,7 +80,7 @@ export class RequestsComponent implements OnInit {
     ngOnInit() {
         this.isSimpleUser = (this.authService.getUserRole() === 'ROLE_USER');
 
-        /* TODO: remove when projects and institutes are added */
+        /* TODO: remove when institutes are added */
         // this.initializeParams();
         // this.getInstitutes();
         this.readParams();
@@ -174,9 +174,8 @@ export class RequestsComponent implements OnInit {
     }
 
     setFormValues() {
-        console.log('trying to set filterValues');
         if (this.phaseId !== 0) {
-            this.setValueOfFormArrayControl('phases', this.phaseId-1, 'phase', true);
+            this.setValueOfFormArrayControl('phases', this.phaseId - 1, 'phase', true);
         } else {
             if (this.allPhasesSelected) {
                 this.setValueOfFormArrayControl('phases', 0, 'phase', true);
@@ -188,57 +187,62 @@ export class RequestsComponent implements OnInit {
                 this.statusesChoice.forEach(
                     st => {
                         let i: number;
-                        if ( (st === 'pending') || (st === 'under_review') ) { i = 0; }
-                        else if ( st === 'rejected' ) { i = 1; }
-                        else if ( st === 'accepted' ) { i = 2; }
-                        else { i = 3; }
+                        if ( (st === 'pending') || (st === 'under_review') ) {
+                            i = 0;
+                        } else if ( st === 'rejected' ) {
+                            i = 1;
+                        } else if ( st === 'accepted' ) {
+                            i = 2;
+                        } else {
+                            i = 3;
+                        }
 
                         this.setValueOfFormArrayControl('statusChoices', i, 'status', true);
                     }
                 );
-            }/* else {
+            } else {
                 if (this.allStatusSelected) {
-                    for (let i=0; i<4; i++) {
+                    for (let i = 0; i < 4; i++) {
                         this.setValueOfFormArrayControl('statusChoices', i, 'status', true);
                     }
                 }
-            }*/
+            }
         }
         if ( !isNullOrUndefined(this.stagesChoice[0]) ) {
             if ((this.stagesChoice[0] !== 'all') && (this.stagesChoice.length !== this.stages.length)) {
                 this.stagesChoice.forEach(
                     st => {
-                        let i = this.stages.indexOf(st);
+                        const i = this.stages.indexOf(st);
                         if ( i > -1 ) {
                             this.setValueOfFormArrayControl('stageChoices', i, 'stage', true);
                         }
                     }
                 );
-            }/* else {
+            } else {
                 if (this.allStagesSelected) {
-                    for (let i=0; i<this.stages.length; i++) {
+                    for (let i = 0; i < this.stages.length; i++) {
                         this.setValueOfFormArrayControl('stageChoices', i, 'stage', true);
                     }
                 }
-            }*/
+            }
         }
         if ( !isNullOrUndefined(this.typesChoice[0]) ) {
             if (this.typesChoice[0] !== 'all') {
                 this.typesChoice.forEach(
                     t => {
-                        let i = this.requestTypeIds.indexOf(t);
+                        const i = this.requestTypeIds.indexOf(t);
                         if ( i > -1 ) {
                             this.setValueOfFormArrayControl('typeChoices', i, 'type', true);
                         }
                     }
                 );
-            }/* else {
+            } else {
                 if (this.allTypesSelected) {
-                    for (let i=0; i<this.requestTypeIds.length; i++) {
+                    for (let i = 0; i < this.requestTypeIds.length; i++) {
                         this.setValueOfFormArrayControl('typeChoices', i, 'type', true);
                     }
                 }
-            }*/
+            }
         }
 
     }
@@ -672,7 +676,7 @@ export class RequestsComponent implements OnInit {
     }
 
     createSearchUrl() {
-        let url = new URLSearchParams();
+        const url = new URLSearchParams();
         this.statusesChoice.forEach( st => url.append('status', st) );
         this.stagesChoice.forEach( st => url.append('stage', st) );
         url.set('phase', this.phaseId.toString());
@@ -683,11 +687,14 @@ export class RequestsComponent implements OnInit {
         url.set('orderField', this.orderField);
         url.set('order', this.order);
 
+        this.router.navigateByUrl(`/requests?${url.toString()}`, { skipLocationChange: true })
+            .then(() => this.readParams() );
+
         // this.router.navigateByUrl(`/requests?${url.toString()}`);
         /*this.router.navigate([],{ relativeTo: this.route, queryParams: url });
         this.readParams();*/
         /*window.location.search = url.toString();*/
-        window.location.href = window.location.origin + window.location.pathname + '?' + url.toString();
+        // window.location.href = window.location.origin + window.location.pathname + '?' + url.toString();
         /*setTimeout(() => {this.readParams();}, 500);*/
     }
 

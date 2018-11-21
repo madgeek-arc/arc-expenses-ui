@@ -104,8 +104,11 @@
 
 
                 <!--end of 1st stage-->
-                <div *ngIf="userIsAdmin() || userIsRequester()" class="uk-align-right">
-                  <button class="uk-button uk-button-primary" (click)="cancelRequest()">Απόρριψη Αιτήματος</button>
+                <div *ngIf="(userIsAdmin() || userIsRequester()) && (currentRequestPayments.length === 0)"
+                     class="uk-text-right">
+                  <button class="uk-button uk-button-primary" type="button" uk-toggle="target: #cancellationModal">
+                    Ακύρωση Αιτήματος
+                  </button>
                 </div>
 
 
@@ -173,14 +176,17 @@
 
                   </div>
 
-                <!-- Message to a simpleUser -->
-                <div *ngIf="isSimpleUser && (currentRequestApproval.stage !== '1')" class="uk-alert uk-alert-primary uk-text-center uk-margin-top">
+                <!-- Message to a simpleUser when the request is pending -->
+                <div *ngIf="isSimpleUser && (currentRequestApproval.stage !== '1')"
+                     class="uk-alert uk-alert-primary uk-text-center uk-margin-top">
                   Το αίτημά σας {{ stateNames[currentRequest.requestStatus] }}.
                     <!-- TODO: add message about payments?? -->
                 </div>
 
-                <!-- Message to Executive user -->
-                <div *ngIf=" (currentRequest.requestStatus === 'accepted') || (currentRequest.requestStatus === 'rejected')"
+                <!-- Message to user -->
+                <div *ngIf=" (currentRequest.requestStatus === 'accepted') ||
+                             (currentRequest.requestStatus === 'rejected') ||
+                             (currentRequest.requestStatus === 'cancelled')"
                      class="uk-alert uk-alert-primary uk-text-center uk-margin-top">
                   Το αίτημα {{ stateNames[currentRequest.requestStatus] }}.
                 </div>
@@ -265,3 +271,16 @@
     </div>
   </div>
 </div>
+
+<div *ngIf="currentRequest" id="cancellationModal" uk-modal>
+  <div class="uk-modal-dialog uk-modal-body">
+    <h4 class="uk-modal-title uk-h4">Επιβεβαίωση ακύρωσης</h4>
+    <div class="uk-modal-body">
+      Είστε βέβαιοι ότι επιθυμείτε να ακυρώσετε το αίτημα με αρ.Πρ.{{ currentRequest.id }}
+    </div>
+    <button class="uk-button uk-button-primary uk-margin-small-right" (click)="confirmedCancel()">Ακύρωση αιτήματος</button>
+    <button class="uk-button uk-button-primary uk-modal-close">Επιστροφή στην σελίδα</button>
+  </div>
+</div>
+
+
