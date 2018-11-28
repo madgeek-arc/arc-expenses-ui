@@ -46,8 +46,12 @@ export class TopMenuComponent implements OnInit, DoCheck {
     this.authService.logout();
   }
 
+  routeToPage(route: string) {
+      window.location.href = route;
+  }
+
   isUserLoggedIn() {
-    this.loggedIn = ((this.authService.getIsUserLoggedIn() === true) &&
+    this.loggedIn = (this.authService.getIsUserLoggedIn() &&
                      this.authService.getUserProp('firstname') &&
                      this.authService.getUserProp('lastname') );
   }

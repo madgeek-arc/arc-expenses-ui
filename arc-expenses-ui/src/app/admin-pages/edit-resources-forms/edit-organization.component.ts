@@ -1,17 +1,18 @@
 import { Component, OnChanges, OnInit, QueryList, SimpleChanges, ViewChild, ViewChildren } from '@angular/core';
-import { EditResourcesComponent } from './edit-resources.components';
-import { Validators } from '@angular/forms';
-import { isNullOrUndefined } from 'util';
-import { Delegate, PersonOfInterest } from '../../domain/operation';
+import { EditResourcesComponent } from './edit-resources.component';
+import { FormBuilder, Validators } from '@angular/forms';
+import { Executive } from '../../domain/operation';
 import { EditPoiComponent } from './edit-poi.component';
+import { ManageResourcesService } from '../../services/manage-resources.service';
 
 @Component({
     selector: 'app-edit-organization',
     templateUrl: './edit-organization.component.html'
 })
 export class EditOrganizationComponent extends EditResourcesComponent implements OnInit, OnChanges {
-    delegates: Delegate[] = [];
-    pois: PersonOfInterest[] = [];
+
+    inEditMode: boolean;
+    executives: Executive[] = [];
 
     @ViewChild('poyForm') poyForm: EditPoiComponent;
     poyFormData: any[] = [];
@@ -24,15 +25,13 @@ export class EditOrganizationComponent extends EditResourcesComponent implements
     @ViewChild('dioikitikoSumvoulioForm') dioikitikoSumvoulioForm: EditPoiComponent;
     dioikitikoSumvoulioFormData: any[] = [];
 
-    searchForPOY = '';
-    searchForDirector = '';
-    searchForViceDirector = '';
-    searchForInspectionTeam = '';
-    searchForDioikitiko = '';
+    constructor(fb: FormBuilder, private resourcesService: ManageResourcesService) {
+        super(fb);
+    }
 
     ngOnInit() {
         this.resourceFormDefinition = {
-            id: [''],
+            id: ['', Validators.required],
             name: ['', Validators.required],
             poy: ['', Validators.required],
             director: ['', Validators.required],
@@ -44,12 +43,13 @@ export class EditOrganizationComponent extends EditResourcesComponent implements
         this.parseData();
     }
 
-    ngOnChanges(changes: SimpleChanges) {
-        if (!isNullOrUndefined(changes) &&
-            !isNullOrUndefined(changes['data']) &&
-            !isNullOrUndefined((changes['data'].currentValue))) {
 
-            if (!isNullOrUndefined(this.resourceForm) &&
+    ngOnChanges(changes: SimpleChanges) {
+        if ((changes !== undefined) && (changes !== null) &&
+            (changes['data'] !== undefined) && (changes['data'] !== null) &&
+            (changes['data'].currentValue !== undefined) && (changes['data'].currentValue !== null) ) {
+
+            if ((this.resourceForm !== undefined) && (this.resourceForm !== null) &&
                 (changes[ 'data' ].currentValue !== changes[ 'data' ].previousValue)) {
 
                 this.parseData();
@@ -57,60 +57,63 @@ export class EditOrganizationComponent extends EditResourcesComponent implements
         }
     }
 
+    /*  expects to receive a list of Executives
+        and maybe one Organization (in edit mode) from the input data */
     parseData() {
-        if (!isNullOrUndefined(this.data) && (this.data.length === 3)) {
-            Object.keys(this.resourceFormDefinition).forEach(
-                key => this.resourceForm
-                    .patchValue({ [key]: this.data[0][key] })
-            );
-            this.delegates = this.data[1];
-            this.pois = this.data[2];
-            if (!isNullOrUndefined(this.data[0].poy)) {
-                this.poyFormData = [this.data[0].poy, this.delegates];
-            }
-            if (!isNullOrUndefined(this.data[0].director)) {
-                this.directorFormData = [this.data[0].director, this.delegates];
-            }
-            if (!isNullOrUndefined(this.data[0].viceDirector)) {
-                this.viceDirectorFormData = [this.data[0].viceDirector, this.delegates];
-            }
-            if (!isNullOrUndefined(this.data[0].inspectionTeam)) {
-                this.data[0].inspectionTeam.forEach(
-                    insp => this.inspectionTeamFormsData.push([insp, this.delegates])
+        if ((this.data !== undefined) && (this.data !== null) && (this.data.length >= 1)) {
+            this.executives = this.data[0];
+
+            if ((this.data[1] !== undefined) && (this.data[1] !== null)) {
+                this.inEditMode = true;
+                Object.keys(this.resourceFormDefinition).forEach(
+                    key => this.resourceForm
+                        .patchValue({ [key]: this.data[1][key] })
                 );
-                this.resourceForm.get('inspectionTeam').setValue(['']);
-            }
-            if (!isNullOrUndefined(this.data[0].dioikitikoSumvoulio)) {
-                this.dioikitikoSumvoulioFormData = [this.data[0].dioikitikoSumvoulio, this.delegates];
+                if (this.data[1].poy) {
+                    this.poyFormData = [this.executives, this.data[1].poy];
+                }
+                if (this.data[1].director) {
+                    this.directorFormData = [this.executives, this.data[1].director];
+                }
+                if (this.data[1].viceDirector) {
+                    this.viceDirectorFormData = [this.executives, this.data[1].viceDirector];
+                }
+                if (this.data[1].inspectionTeam) {
+                    this.data[1].inspectionTeam.forEach(
+                        insp => this.inspectionTeamFormsData.push([this.executives, insp])
+                    );
+                    this.resourceForm.get('inspectionTeam').setValue(['']);
+                }
+                if (this.data[1].dioikitikoSumvoulio) {
+                    this.dioikitikoSumvoulioFormData = [this.executives, this.data[1].dioikitikoSumvoulio];
+                }
+                this.resourceForm.updateValueAndValidity();
             }
         }
-    }
-
-    updateSearchTerm(event: any, searchFieldName: string) {
-        this[searchFieldName] = event.target.value;
     }
 
     addPOIToList(poi?: any) {
-        this.searchForInspectionTeam = '';
-        if (!isNullOrUndefined(poi)) {
-            this.inspectionTeamFormsData.push([poi, this.delegates]);
+        if (poi !== undefined) {
+            this.inspectionTeamFormsData.push([this.executives, poi]);
         } else {
-            this.inspectionTeamFormsData.push([new PersonOfInterest(), this.delegates]);
+            this.inspectionTeamFormsData.push([this.executives]);
         }
     }
 
-    addPOI(searchFieldName: string, viewChildDataName: string, poi?: any) {
-        this[searchFieldName] = '';
-        if (!isNullOrUndefined(poi)) {
-            this[viewChildDataName] = [poi, this.delegates];
+    addPOI(viewChildDataName: string, poi?: any) {
+        if (poi !== undefined) {
+            this[viewChildDataName] = [this.executives, poi];
         } else {
-            this[viewChildDataName] = [new PersonOfInterest(), this.delegates];
+            this[viewChildDataName] = [this.executives];
         }
     }
 
-    refreshViewChildForm(viewChildName: string) {
-        this[viewChildName].data = [new PersonOfInterest(), this.delegates];
-        this[viewChildName].parseData();
+    saveChanges() {
+        if (this.inEditMode) {
+            this.updateOrganization();
+        } else {
+            this.addOrganization();
+        }
     }
 
     exportFormValue() {
@@ -129,6 +132,55 @@ export class EditOrganizationComponent extends EditResourcesComponent implements
             } else {
                 return this.resourceForm.value;
             }
+        } else {
+            return '';
+        }
+    }
+
+
+    addOrganization() {
+        this.errorMessage = '';
+        this.successMessage = '';
+        this.showSpinner = true;
+        const organization = this.exportFormValue();
+        if (organization !== '') {
+            this.resourcesService.addOrganization(organization).subscribe(
+                org => console.log(JSON.stringify(org)),
+                err => {
+                    console.log(err);
+                    this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
+                    this.showSpinner = false;
+                },
+                () => {
+                    this.errorMessage = '';
+                    this.successMessage = 'Ο οργανισμός προστέθηκε επιτυχώς.';
+                    this.showSpinner = false;
+                    window.scrollTo(1, 1);
+                }
+            );
+        }
+    }
+
+    updateOrganization() {
+        this.errorMessage = '';
+        this.successMessage = '';
+        this.showSpinner = true;
+        const organization = this.exportFormValue();
+        if (organization !== '') {
+            this.resourcesService.updateOrganization(organization).subscribe(
+                org => console.log(JSON.stringify(org)),
+                err => {
+                    console.log(err);
+                    this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
+                    this.showSpinner = false;
+                },
+                () => {
+                    this.errorMessage = '';
+                    this.successMessage = 'Ο οργανισμός ενημερώθηκε επιτυχώς.';
+                    this.showSpinner = false;
+                    window.scrollTo(1, 1);
+                }
+            );
         }
     }
 

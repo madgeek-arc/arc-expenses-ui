@@ -5,6 +5,7 @@ import { ReadMoreComponent } from './read-more/read-more.component';
 import { Stage1FormComponent } from '../request-stage/stage1-form/stage1-form.component';
 import { FilterByTerm } from './search-term.pipe';
 import { AnchorDirective } from './dynamic-loader-anchor-components/anchor.directive';
+import { FormFieldComponent, FormUploadFileComponent, FormUploadFilesComponent } from './form-wrappers/form-wrappers.component';
 
 @NgModule({
     imports: [
@@ -15,14 +16,20 @@ import { AnchorDirective } from './dynamic-loader-anchor-components/anchor.direc
         AsideHelpContentComponent,
         ReadMoreComponent,
         AnchorDirective,
-        FilterByTerm
+        FilterByTerm,
+        FormFieldComponent,
+        FormUploadFileComponent,
+        FormUploadFilesComponent
     ],
     exports: [
         HelpContentComponent,
         AsideHelpContentComponent,
         ReadMoreComponent,
         AnchorDirective,
-        FilterByTerm
+        FilterByTerm,
+        FormFieldComponent,
+        FormUploadFileComponent,
+        FormUploadFilesComponent
     ]
 })
 export class SharedComponentsModule {}

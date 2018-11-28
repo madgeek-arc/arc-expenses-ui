@@ -14,7 +14,7 @@ export const supplierSelectionMethodsMap = {
     direct: 'Απ\' ευθείας ανάθεση', market_investigation: 'Έρευνα αγοράς', competition: 'Διαγωνισμός' };
 
 /* field descriptions for the stages forms */
-export class StageFieldDescription {
+export class FieldDescription {
     id: string;
     label: string;
     type: string;
@@ -98,7 +98,7 @@ export class StageDescription {
     title: string;
     prev: string[];
     next: string[];
-    stageFields: StageFieldDescription [];
+    stageFields: FieldDescription [];
 }
 
 /* stages descriptions */

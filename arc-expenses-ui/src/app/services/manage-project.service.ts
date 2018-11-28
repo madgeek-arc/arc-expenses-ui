@@ -28,6 +28,15 @@ export class ManageProjectService {
             );
     }
 
+    updateProject(project: Project): Observable<Project> {
+        const url = `${this.apiUrl}update`;
+        console.log(`calling ${url}`);
+        return this.http.post<Project>(url, project, headerOptions)
+            .pipe(
+                catchError(this.handleError)
+            );
+    }
+
     getAllProjects(): Observable<Project[]> {
         const url = `${this.apiUrl}getAll`;
         console.log(`calling ${url}`);

@@ -244,6 +244,64 @@ export const delegates = [
     }
 ];
 
+export const executives = [
+    {
+        email: 'yvolti@athena-innovation.gr',
+        firstname: 'Γιάννα',
+        lastname: 'Βολτή'
+    },
+    {
+        email: 'yannis@athena-innovation.gr',
+        firstname: 'Γιάννης',
+        lastname: 'Ιωαννίδης'
+    },
+    {
+        email: 'serpanos@isi.gr',
+        firstname: 'Δημήτρης',
+        lastname: 'Σερπάνος'
+    },
+    {
+        email: 'avousdou@ilsp.gr',
+        firstname: 'Αγγελική',
+        lastname: 'Βουσδούκου'
+    },
+    {
+        email: 'abatzo@ipet.athena-innovation.gr',
+        firstname: 'Βασιλική',
+        lastname: 'Αμπατζόγλου'
+    },
+    {
+        email: 'evita@ilsp.gr',
+        firstname: 'Εβίτα',
+        lastname: 'Φωτεινέα'
+    },
+    {
+        email: 'liana@ilsp.gr',
+        firstname: 'Λιάνα',
+        lastname: 'Σταμάτη'
+    },
+    {
+        email: 'efi@ilsp.athena-innovation.gr',
+        firstname: 'Έφη',
+        lastname: 'Σαλωμίδη'
+    },
+    {
+        email: 'tnestor@ipet.athena-innovation.gr',
+        firstname: 'Νέστορας',
+        lastname: 'Τσιρλιγκάνης'
+    },
+    {
+        email: 'mtopalid@ipet.athena-innovation.gr',
+        firstname: 'Τοπαλίδου',
+        lastname: 'Μαρία'
+    },
+    {
+        email: 'd.kassianidi@athena-innovation.gr',
+        firstname: 'Δέσποινα',
+        lastname: 'Κασσιανίδη'
+    }
+];
+
 export const project = {
     id: '578',
     name: 'SRACH-3',

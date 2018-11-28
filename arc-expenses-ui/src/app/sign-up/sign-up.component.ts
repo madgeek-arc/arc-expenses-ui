@@ -89,13 +89,13 @@ export class SignUpComponent implements OnInit {
     }
 
     createAttachment(): Attachment {
-        const tempAttachment: Attachment = new Attachment();
-        if (this.uploadedFile) {
+        const tempAttachment: Attachment = new Attachment(this.uploadedFile.name, this.uploadedFile.type, this.uploadedFile.size, '');
+        /*if (this.uploadedFile) {
             tempAttachment.filename = this.uploadedFile.name;
             tempAttachment.mimetype = this.uploadedFile.type;
             tempAttachment.size = this.uploadedFile.size;
             tempAttachment.url = '';
-        }
+        }*/
 
         return tempAttachment;
     }

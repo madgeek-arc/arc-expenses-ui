@@ -34,6 +34,7 @@ export class NewRequestComponent implements OnInit {
     newRequestForm: FormGroup;
 
     uploadedFile: File;
+    uploadedFiles: File[] = [];
 
     requestedAmount: string;
     showWarning: boolean;
@@ -107,7 +108,8 @@ export class NewRequestComponent implements OnInit {
             () => {
                 this.showSpinner = false;
                 this.errorMessage = '';
-                if ( isNullOrUndefined(this.projects) || (this.projects.length === 0)) {
+                if ( ((this.projects === null) || (this.projects === undefined)) ||
+                     (this.projects.length === 0)) {
                     this.errorMessage = 'Παρουσιάστηκε πρόβλημα με την ανάκτηση των απαραίτητων πληροφοριών.';
                 }
             }
@@ -177,13 +179,14 @@ export class NewRequestComponent implements OnInit {
 
             } else if ( (( this.newRequestForm.get('supplierSelectionMethod').value !== 'direct' ) &&
                            this.checkIfTrip() ) &&
-                          isUndefined(this.uploadedFile)  ) {
+                          ((this.uploadedFiles === null) || (this.uploadedFiles.length === 0)) ) {
 
                 // UIkit.modal.alert('Για αναθέσεις μέσω διαγωνισμού ή έρευνας αγοράς η επισύναψη εγγράφων είναι υποχρεωτική.');
                 this.errorMessage = 'Για αναθέσεις μέσω διαγωνισμού ή έρευνας αγοράς η επισύναψη εγγράφων είναι υποχρεωτική.';
                 window.scroll(1, 1);
 
-            } else if ( (+this.newRequestForm.get('amount').value > this.lowAmountLimit) && isUndefined(this.uploadedFile) ) {
+            } else if ( (+this.newRequestForm.get('amount').value > this.lowAmountLimit) &&
+                        ((this.uploadedFiles === null) || this.uploadedFiles.length === 0) ) {
 
                 // UIkit.modal.alert('Για αιτήματα άνω των 2.500 € η επισύναψη εγγράφων είναι υποχρεωτική.');
                 this.errorMessage = 'Για αιτήματα άνω των 2.500 € η επισύναψη εγγράφων είναι υποχρεωτική.';
@@ -205,12 +208,14 @@ export class NewRequestComponent implements OnInit {
                 }
                 this.request.stage1.amountInEuros = +this.newRequestForm.get('amount').value;
                 this.request.stage1.finalAmount = +this.newRequestForm.get('amount').value;
-                if (this.uploadedFile) {
-                    this.request.stage1.attachment = new Attachment();
-                    this.request.stage1.attachment.filename = this.uploadedFile.name;
-                    this.request.stage1.attachment.mimetype = this.uploadedFile.type;
-                    this.request.stage1.attachment.size = this.uploadedFile.size;
-                    this.request.stage1.attachment.url = '';
+                if (this.uploadedFiles && (this.uploadedFiles.length > 0)) {
+                    this.request.stage1.attachments = [];
+                    for (let i = 0; i < this.uploadedFiles.length; i++) {
+                        this.request.stage1.attachments.push(
+                            new Attachment(this.uploadedFiles[i].name, this.uploadedFiles[i].type,
+                                           this.uploadedFiles[i].size, '')
+                        );
+                    }
                 }
 
                 if (this.requestType === 'trip') {
@@ -264,7 +269,7 @@ export class NewRequestComponent implements OnInit {
                         window.scroll(1, 1);
                     },
                     () => {
-                        if (this.uploadedFile) {
+                        if (this.uploadedFiles && (this.uploadedFiles.length > 0)) {
                             this.uploadFile();
                         } else {
                             this.submitRequestApproval();
@@ -302,7 +307,7 @@ export class NewRequestComponent implements OnInit {
     uploadFile() {
         // this.showSpinner = true;
         this.errorMessage = '';
-        this.requestService.uploadAttachment<string>(this.request.archiveId, 'stage1', this.uploadedFile, 'request')
+        this.requestService.uploadAttachments<string>(this.request.archiveId, 'stage1', this.uploadedFiles, 'request')
             .subscribe(
                 event => {
                     // console.log('uploadAttachment responded: ', JSON.stringify(event));
@@ -310,7 +315,10 @@ export class NewRequestComponent implements OnInit {
                         console.log('uploadAttachment responded: ', event);
                     } else if ( event instanceof HttpResponse) {
                         console.log('final event:', event.body);
-                        this.request.stage1.attachment.url = event.body;
+                        const fileUrls: string[] = JSON.parse(event.body);
+                        for (let i = 0; i < fileUrls.length; i++) {
+                            this.request.stage1.attachments[i].url = fileUrls[i];
+                        }
                     }
                 },
                 error => {
@@ -365,7 +373,7 @@ export class NewRequestComponent implements OnInit {
                 },
                 () => {
                     this.errorMessage = '';
-                    if ( !isNullOrUndefined(this.chosenProject) ) {
+                    if ( (this.chosenProject !== null) && (this.chosenProject !== undefined) ) {
                         this.programSelected = true;
                         if (this.chosenProject.institute && this.chosenProject.institute.name) {
                             this.newRequestForm.get('institute').setValue(this.chosenProject.institute.name);
@@ -389,7 +397,8 @@ export class NewRequestComponent implements OnInit {
 
     updateSearchTerm(event: any) {
         this.searchTerm = event.target.value;
-        if ( (this.searchTerm === '') && !isNullOrUndefined(this.chosenProject) ) {
+        if ( (this.searchTerm === '') &&
+             ((this.chosenProject !== undefined) && (this.chosenProject !== null)) ) {
             this.newRequestForm.get('program').setValue('');
             this.newRequestForm.get('institute').setValue('');
             this.newRequestForm.get('sciCoord').setValue('');
@@ -412,13 +421,14 @@ export class NewRequestComponent implements OnInit {
         }
     }
 
-    getUploadedFile(file: File) {
-        this.uploadedFile = file;
+    getUploadedFiles(files: File[]) {
+        // this.uploadedFile = file;
+        this.uploadedFiles = files;
     }
 
     showAmount() {
 
-        if ( !isNullOrUndefined(this.newRequestForm.get('amount').value.trim()) &&
+        if ( (this.newRequestForm.get('amount').value.trim() !== null) &&
              this.newRequestForm.get('amount').value.trim().includes(',')) {
 
             const temp = this.newRequestForm.get('amount').value.replace(',', '.');

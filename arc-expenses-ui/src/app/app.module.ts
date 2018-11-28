@@ -12,7 +12,6 @@ import { AboutComponent } from './about/about.component';
 import { SignUpComponent } from './sign-up/sign-up.component';
 import { HelpContentService } from './shared/help-content/help-content.service';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
-import { StageFormComponent, StageFormUploadFileComponent } from './shared/stage-form/stage-form.component';
 import { RequestStageComponent } from './request-stage/request-stage.component';
 import {
     Stage2Component, Stage3Component, StageComponent, Stage4Component, Stage6Component,
@@ -64,8 +63,6 @@ const stagesList = [
         RequestsComponent,
         AboutComponent,
         SignUpComponent,
-        StageFormComponent,
-        StageFormUploadFileComponent,
         RequestStageComponent,
         RequestStagePaymentComponent,
         Stage1FormComponent,

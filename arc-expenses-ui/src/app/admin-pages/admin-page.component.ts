@@ -1,62 +1,46 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { ResourcesLoaderComponent } from './resources-dynamic-load/resources-loader.component';
+import { Component, OnInit } from '@angular/core';
 import { AnchorItem } from '../shared/dynamic-loader-anchor-components/anchor-item';
-import { ManageProjectService } from '../services/manage-project.service';
-import { delegates, institutes, organizations, pois, project } from '../domain/mock_data';
-import { EditProjectComponent } from './edit-resources-forms/edit-project.component';
-import { EditInstituteComponent } from './edit-resources-forms/edit-institute.component';
-import { EditOrganizationComponent } from './edit-resources-forms/edit-organization.component';
-import { Project } from '../domain/operation';
+import { ActivatedRoute } from '@angular/router';
+import { ProjectsListComponent } from './resources-lists/projects-list.component';
+import { InstitutesListComponent } from './resources-lists/institutes-list.component';
+import { OrganizationsListComponent } from './resources-lists/organizations-list.component';
 
 @Component({
     selector: 'app-admin-page',
     templateUrl: './admin-page.component.html'
 })
 export class AdminPageComponent implements OnInit {
-    title = 'Επεξεργασία/Προσθήκη έργων';
-    selectedResourceType = 'project';
+    errorMessage: string;
+    showSpinner: boolean;
+
+    title = 'Εγγραφές';
+    addNewButtonLabel = 'Προσθήκη εγγραφής';
+    resourceType: string;
     resource: any;
 
-    currentProject = project;
-    pois = pois;
-    delegates = delegates;
-    organizations = organizations;
-    institutes = institutes;
-
-    @ViewChild('editResourceForm') editResourceForm: ResourcesLoaderComponent;
-
-    constructor(projectService: ManageProjectService) {}
+    constructor(private route: ActivatedRoute) {}
 
     ngOnInit() {
-        this.resource = new AnchorItem(
-            EditProjectComponent, [this.currentProject, this.delegates, this.pois, this.organizations, this.institutes] );
+        if (this.route.snapshot.paramMap.has('type')) {
+            this.resourceType = this.route.snapshot.paramMap.get('type');
+            this.showResourceListComponent();
+        }
     }
 
-    selectType(resourceType: string) {
-        this.selectedResourceType = resourceType;
+    showResourceListComponent() {
+        if (this.resourceType === 'projects') {
+            this.title = 'Έργα';
+            this.addNewButtonLabel = 'Προσθήκη έργου';
+            this.resource = new AnchorItem(ProjectsListComponent);
+        } else if (this.resourceType === 'institutes') {
+            this.title = 'Ινστιτούτα/Μονάδες';
+            this.addNewButtonLabel = 'Προσθήκη ινστιτούτου/μονάδας';
+            this.resource = new AnchorItem(InstitutesListComponent);
+        } else if (this.resourceType === 'organizations') {
+            this.title = 'Οργανισμοί';
+            this.addNewButtonLabel = 'Προσθήκη οργανισμού';
+            this.resource = new AnchorItem(OrganizationsListComponent);
+        }
     }
-
-    submitChanges() {
-        const submittedProj: Project = this.editResourceForm.getComponentFormValue();
-        console.log(JSON.stringify(submittedProj, null, 2));
-    }
-
-    getProjects() {}
-
-    getInstitutes() {}
-
-    getOrganizations() {}
-
-    addProject() {}
-
-    updateProject() {}
-
-    addInstitute() {}
-
-    updateInstitute() {}
-
-    addOrganization() {}
-
-    updateOrganization() {}
 
 }

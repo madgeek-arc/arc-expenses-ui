@@ -56,7 +56,7 @@
 
         <!-- FORM CONTROLS -->
         <div *ngFor="let desc of stageFields">
-            <app-stage-form [description]="desc">
+            <app-form-field [description]="desc">
 
                 <!-- add a checkbox -->
                 <div *ngIf="desc.type === 'checkbox'" class="uk-width-expand">
@@ -75,12 +75,12 @@
                     <textarea formControlName="{{ desc.id }}"
                               class="uk-form-controls uk-textarea" rows="2"></textarea>
                 </div>
-            </app-stage-form>
+            </app-form-field>
         </div>
 
         <!--ATTACHMENT FIELD-->
-        <app-stage-form-upload-file [uploadedFilename]="uploadedFilename"
-                                    (emitFile)="getAttachmentInput($event)"></app-stage-form-upload-file>
+        <app-form-upload-file [uploadedFilename]="uploadedFilename"
+                                    (emitFile)="getAttachmentInput($event)"></app-form-upload-file>
 
         <!--BUTTONS-->
         <div *ngIf="stageId !== '6' && stageId !== '11'">

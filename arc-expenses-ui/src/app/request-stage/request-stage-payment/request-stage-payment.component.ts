@@ -106,7 +106,8 @@ export class RequestStagePaymentComponent implements OnInit {
              ((this.currentRequest.type === 'regular') || (this.currentRequest.type === 'trip')) ) {
 
             this.currentRequestInfo.finalAmount = '';
-            if ( !isNullOrUndefined(this.currentRequest.stage1.finalAmount) ) {
+            if ( (this.currentRequest.stage1.finalAmount !== undefined) &&
+                 (this.currentRequest.stage1.finalAmount !== null) ) {
                 this.currentRequestInfo.finalAmount = (this.currentRequest.stage1.finalAmount).toString();
             }
         }
@@ -217,7 +218,7 @@ export class RequestStagePaymentComponent implements OnInit {
         this.wentBackOneStage = false;
         console.log('submitted status:', this.currentRequestPayment.status);
 
-        if ( !isNullOrUndefined(this.uploadedFile) ) {
+        if ( (this.uploadedFile !== undefined) && (this.uploadedFile !== null) ) {
             this.uploadFile();
         } else {
             if (this.requestNeedsUpdate) {
@@ -235,7 +236,7 @@ export class RequestStagePaymentComponent implements OnInit {
         this.errorMessage = '';
         this.successMessage = '';
 
-        if ( !isNullOrUndefined(this.uploadedFile) ) {
+        if ( (this.uploadedFile !== undefined) && (this.uploadedFile !== null) ) {
             this.currentRequestPayment[this.currentStageName]['attachment']['url'] = this.uploadedFileURL;
             this.uploadedFileURL = '';
             this.uploadedFile = null;
@@ -293,13 +294,13 @@ export class RequestStagePaymentComponent implements OnInit {
     }
 
     submitRequestAndPayment() {
-        if ( !isNullOrUndefined(this.uploadedFile) ) {
+        if ( (this.uploadedFile !== undefined) && (this.uploadedFile !== null) ) {
             this.currentRequestPayment[this.currentStageName]['attachment']['url'] = this.uploadedFileURL;
             this.uploadedFileURL = '';
             this.uploadedFile = null;
         }
 
-        if (!isNullOrUndefined(this.updatedFinalAmount)) {
+        if ( (this.updatedFinalAmount !== undefined) && (this.updatedFinalAmount !== null) ) {
             this.currentRequest.stage1.finalAmount = this.updatedFinalAmount;
             this.updatedFinalAmount = null;
         }
@@ -348,8 +349,8 @@ export class RequestStagePaymentComponent implements OnInit {
             if (stage === '1') {
                 return 2;
             }
-            if ( !isNullOrUndefined(this.currentRequestPayment[stageField]) &&
-                !isNullOrUndefined(this.currentRequestPayment[stageField].date)) {
+            if ( ((this.currentRequestPayment[stageField] !== undefined) && (this.currentRequestPayment[stageField] !== null)) &&
+                 ((this.currentRequestPayment[stageField].date !== undefined) && (this.currentRequestPayment[stageField].date !== null)) ) {
 
                 if ( !this.isSimpleUser || (stage === '7') ) {
 
@@ -360,15 +361,15 @@ export class RequestStagePaymentComponent implements OnInit {
                     if ( (stage === this.currentRequestPayment.stage) && (this.stages.indexOf(stage) > 0) ) {
 
                         const prevStageField = 'stage' + this.stages[this.stages.indexOf(stage) - 1];
-                        if (!isNullOrUndefined(this.currentRequestPayment[prevStageField]) &&
-                            !isNullOrUndefined(this.currentRequestPayment[prevStageField].date) &&
-                            (this.currentRequestPayment[prevStageField].date > this.currentRequestPayment[stageField].date) ) {
+                        if ( ((this.currentRequestPayment[prevStageField] !== undefined) && (this.currentRequestPayment[prevStageField] !== null)) &&
+                             ((this.currentRequestPayment[prevStageField].date !== undefined) && (this.currentRequestPayment[prevStageField].date !== null)) &&
+                             (this.currentRequestPayment[prevStageField].date > this.currentRequestPayment[stageField].date) ) {
 
                             return 4;
                         }
                     }
 
-                    if ( (!isUndefined(this.currentRequestPayment[stageField]['approved']) &&
+                    if ( ((this.currentRequestPayment[stageField]['approved'] !== undefined) &&
                           this.currentRequestPayment[stageField]['approved'] === true ) ||
                          (stage === '11') ) {
 
@@ -391,7 +392,7 @@ export class RequestStagePaymentComponent implements OnInit {
     }
 
     linkToFile() {
-        if (this.currentRequest.stage1.attachment && this.currentRequest.stage1.attachment.url) {
+        if (this.currentRequest.stage1.attachments && this.currentRequest.stage1.attachments[0].url) {
             /*window.open(this.currentRequest.stage1.attachment.url , '_blank', 'enabledstatus=0,toolbar=0,menubar=0,location=0');*/
             window.open(`${window.location.origin}/arc-expenses-service/request/store/download?requestId=${this.currentRequest.id}&stage=1&mode=request`,
                 '_blank', 'enabledstatus=0,toolbar=0,menubar=0,location=0');

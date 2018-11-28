@@ -2,13 +2,13 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { HomeComponent } from './home/home.component';
 import { NewRequestComponent } from './new-request/new-request.component';
-import {RequestsComponent} from './requests/requests.component';
-import {AboutComponent} from './about/about.component';
-import {SignUpComponent} from './sign-up/sign-up.component';
-import {RequestStageComponent} from './request-stage/request-stage.component';
-import {AuthGuardService} from './services/auth-guard.service';
+import { RequestsComponent } from './requests/requests.component';
+import { AboutComponent } from './about/about.component';
+import { SignUpComponent } from './sign-up/sign-up.component';
+import { RequestStageComponent } from './request-stage/request-stage.component';
+import { AuthGuardService } from './services/auth-guard.service';
 import { ForbiddenPageComponent } from './shared/403-forbidden-page.component';
-import {AdminPageComponent} from './admin-pages/admin-page.component';
+import { AdminPageComponent } from './admin-pages/admin-page.component';
 import { RequestStagePaymentComponent } from './request-stage/request-stage-payment/request-stage-payment.component';
 
 const appRoutes: Routes = [
@@ -60,7 +60,7 @@ const appRoutes: Routes = [
     component: SignUpComponent
   },
   {
-    path: 'admin',
+    path: 'resources',
     canActivate: [AuthGuardService],
     canLoad: [AuthGuardService],
     loadChildren: './admin-pages/admin.module#AdminModule'

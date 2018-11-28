@@ -280,7 +280,7 @@ export class RequestStageComponent implements OnInit {
 
         if ( !isNullOrUndefined(this.uploadedFile) ) {
 
-            this.currentRequest.stage1['attachment']['url'] = this.uploadedFileURL;
+            this.currentRequest.stage1['attachment'][0]['url'] = this.uploadedFileURL;
             this.uploadedFileURL = '';
             this.uploadedFile = null;
         }
@@ -402,6 +402,7 @@ export class RequestStageComponent implements OnInit {
         if ( (stage === this.currentRequestApproval.stage) &&
              (this.currentRequestApproval.status !== 'rejected') &&
              (this.currentRequestApproval.status !== 'accepted') &&
+             (this.currentRequestApproval.status !== 'cancelled') &&
              ( (this.authService.getUserRole() === 'ROLE_ADMIN') || (this.canEdit === true) ) ) {
 
             if (this.currentRequestApproval.stage !== '1') {
@@ -465,7 +466,7 @@ export class RequestStageComponent implements OnInit {
     }
 
     linkToFile() {
-        if (this.currentRequest.stage1.attachment && this.currentRequest.stage1.attachment.url) {
+        if (this.currentRequest.stage1.attachments && this.currentRequest.stage1.attachments[0].url) {
             /*window.open(this.currentRequest.stage1.attachment.url , '_blank', 'enabledstatus=0,toolbar=0,menubar=0,location=0');*/
             let url = `${window.location.origin}/arc-expenses-service/request/store/download?`;
             url = `${url}requestId=${this.currentRequest.id}&stage=1&mode=request`;

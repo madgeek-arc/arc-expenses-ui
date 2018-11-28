@@ -59,8 +59,8 @@ export class Stage1FormComponent implements OnInit {
             this.updateStage1Form.get('amount').markAsTouched();
         }
 
-        if (this.currentRequest.stage1.attachment) {
-            this.stage1AttachmentName = this.currentRequest.stage1.attachment.filename;
+        if (this.currentRequest.stage1.attachments) {
+            this.stage1AttachmentName = this.currentRequest.stage1.attachments[0].filename;
         }
         this.isSupplierRequired = (this.currentRequest.type !== 'trip');
     }
@@ -95,11 +95,11 @@ export class Stage1FormComponent implements OnInit {
                          ((this.currentRequest.type !== 'trip') &&
                           (this.currentRequest.type !== 'contract') )) &&
                         (isNullOrUndefined(this.uploadedFile) &&
-                         isNullOrUndefined(this.currentRequest.stage1.attachment) )) {
+                         isNullOrUndefined(this.currentRequest.stage1.attachments[0]) )) {
 
                 this.errorMessage = 'Για αναθέσεις μέσω διαγωνισμού ή έρευνας αγοράς η επισύναψη εγγράφων είναι υποχρεωτική.';
             } else if ( (+this.updateStage1Form.get('amount').value > this.lowAmountLimit) &&
-                        isNullOrUndefined(this.currentRequest.stage1.attachment) &&
+                        isNullOrUndefined(this.currentRequest.stage1.attachments[0]) &&
                         isNullOrUndefined(this.uploadedFile) ) {
 
                 this.errorMessage = 'Για αιτήματα άνω των 2.500 € η επισύναψη εγγράφων είναι υποχρεωτική.';
@@ -110,12 +110,11 @@ export class Stage1FormComponent implements OnInit {
                 this.currentRequest.stage1.supplierSelectionMethod = this.updateStage1Form.get('supplierSelectionMethod').value;
                 this.currentRequest.stage1.amountInEuros = +this.updateStage1Form.get('amount').value;
                 if ( !isNullOrUndefined(this.uploadedFile) ) {
-                    this.currentRequest.stage1.attachment = new Attachment();
-                    this.currentRequest.stage1.attachment.filename = this.uploadedFile.name;
-                    this.currentRequest.stage1.attachment.mimetype = this.uploadedFile.type;
-                    this.currentRequest.stage1.attachment.size = this.uploadedFile.size;
-                    this.currentRequest.stage1.attachment.url = '';
-                    this.emitFile.emit(this.uploadedFile);
+                    this.currentRequest.stage1.attachments = [];
+                    this.currentRequest.stage1.attachments.push(
+                        new Attachment(this.uploadedFile.name, this.uploadedFile.type,
+                                       this.uploadedFile.size, '')
+                    );
                 }
 
                 this.emitRequest.emit(this.currentRequest);

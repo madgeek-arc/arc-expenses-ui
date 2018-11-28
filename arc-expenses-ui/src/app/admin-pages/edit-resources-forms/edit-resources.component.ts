@@ -1,9 +1,6 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {FormBuilder, FormGroup} from '@angular/forms';
-import {isNullOrUndefined} from 'util';
-import {ManageProjectService} from '../../services/manage-project.service';
-import {ManageResourcesService} from '../../services/manage-resources.service';
-import { Delegate, Institute, Organization, PersonOfInterest, Project, Vocabulary } from '../../domain/operation';
+import { Component, Input, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { isNullOrUndefined } from 'util';
 
 @Component({
     selector: 'app-edit-resources',
@@ -11,17 +8,19 @@ import { Delegate, Institute, Organization, PersonOfInterest, Project, Vocabular
 })
 export class EditResourcesComponent implements OnInit {
     errorMessage: string;
+    successMessage: string;
+    showSpinner: boolean;
 
     @Input() id: string;
 
     /* data Input must be strictly of the form:
         [{an element of the class corresponding to the resourceForm}, {extra data if needed}]
         in particular data should be as follows:
-        editDelegateComponent -> [Delegate]
-        editPoiComponent -> [PersonOfInterest, Delegate[]]
-        editOrganizationComponent -> [Organization, Delegate[], PersonOfInterest[]]
-        editInstituteComponent -> [Institute, Delegate[], PersonOfInterest[], Organization[]]
-        editProjectComponent -> [Project, Delegate[], PersonOfInterest[], Organization[], Institute[]]
+        editDelegateComponent -> [Executive[], Delegate?]
+        editPoiComponent -> [Executive[], PersonOfInterest?]
+        editOrganizationComponent -> [Executive[], Organization?]
+        editInstituteComponent -> [Executive[], Organization[], Institute?]
+        editProjectComponent -> [Executive[], Institute[], Project?]
     */
     @Input() data: any[] = [];
     title: string;
@@ -29,7 +28,7 @@ export class EditResourcesComponent implements OnInit {
     resourceForm: FormGroup;
     resourceFormDefinition = null;
 
-    constructor(public fb: FormBuilder) {}
+    constructor(private fb: FormBuilder) {}
 
     ngOnInit() {
         this.createForm();

@@ -687,7 +687,7 @@ export class RequestsComponent implements OnInit {
         url.set('orderField', this.orderField);
         url.set('order', this.order);
 
-        this.router.navigateByUrl(`/requests?${url.toString()}`, { skipLocationChange: true })
+        this.router.navigateByUrl(`/requests?${url.toString()}`)
             .then(() => this.readParams() );
 
         // this.router.navigateByUrl(`/requests?${url.toString()}`);

@@ -1,33 +1,34 @@
 import { Component, OnChanges, OnInit, QueryList, SimpleChanges, ViewChild, ViewChildren } from '@angular/core';
-import { Delegate, Institute, Organization, PersonOfInterest, Project } from '../../domain/operation';
-import { isNullOrUndefined } from 'util';
-import { EditResourcesComponent } from './edit-resources.components';
-import { Validators } from '@angular/forms';
-import { EditInstituteComponent } from './edit-institute.component';
+import { Executive, Institute, Organization } from '../../domain/operation';
+import { EditResourcesComponent } from './edit-resources.component';
+import { FormBuilder, Validators } from '@angular/forms';
 import { EditPoiComponent } from './edit-poi.component';
+import { ManageProjectService } from '../../services/manage-project.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
     selector: 'app-edit-project',
     templateUrl: './edit-project.component.html'
 })
 export class EditProjectComponent extends EditResourcesComponent implements OnInit, OnChanges {
+
+    inEditMode: boolean;
+
     totalCostAmount: string;
 
-    delegates: Delegate[] = [];
-    pois: PersonOfInterest[] = [];
+    executives: Executive[] = [];
     organizations: Organization[] = [];
     institutes: Institute[] = [];
 
-    /*@ViewChild('instituteForm') instituteForm: EditInstituteComponent;
-    instituteFormData: any[] = [];*/
     @ViewChild('scientificCoordinatorForm') scientificCoordinatorForm: EditPoiComponent;
     scientificCoordinatorFormData: any[] = [];
     @ViewChildren('operatorForms') operatorForms: QueryList<EditPoiComponent>;
     operatorFormsData: any[] = [];
 
-    searchForInstitute = '';
-    searchForScientificCoordinator = '';
-    searchForOperator = '';
+    constructor(fb: FormBuilder, route: ActivatedRoute,
+                private projectService: ManageProjectService) {
+        super(fb);
+    }
 
     ngOnInit() {
         this.resourceFormDefinition = {
@@ -48,11 +49,11 @@ export class EditProjectComponent extends EditResourcesComponent implements OnIn
     }
 
     ngOnChanges(changes: SimpleChanges) {
-        if (!isNullOrUndefined(changes) &&
-            !isNullOrUndefined(changes['data']) &&
-            !isNullOrUndefined((changes['data'].currentValue))) {
+        if ((changes !== undefined) && (changes !== null) &&
+            (changes['data'] !== undefined) && (changes['data'] !== null) &&
+            (changes['data'].currentValue !== undefined) && (changes['data'].currentValue !== null) ) {
 
-            if (!isNullOrUndefined(this.resourceForm) &&
+            if ((this.resourceForm !== undefined) && (this.resourceForm !== null) &&
                 (changes[ 'data' ].currentValue !== changes[ 'data' ].previousValue)) {
 
                 this.parseData();
@@ -60,63 +61,58 @@ export class EditProjectComponent extends EditResourcesComponent implements OnIn
         }
     }
 
+    /*  expects to receive a list of Executives, a list of Institutes
+        and maybe one Project (in edit mode) from the input data */
     parseData() {
-        if (!isNullOrUndefined(this.data) && (this.data.length === 5)) {
-            Object.keys(this.resourceFormDefinition).forEach(
-                key => this.resourceForm
-                    .patchValue({ [key]: this.data[0][key] })
-            );
-            this.delegates = this.data[1];
-            this.pois = this.data[2];
-            this.organizations = this.data[3];
-            this.institutes = this.data[4];
-            if (!isNullOrUndefined(this.data[0].institute)) {
-                /*this.instituteFormData = [this.data[0].institute, this.delegates, this.pois, this.organizations];*/
-                this.resourceForm.patchValue({institute: this.data[0].institute.id})
-            }
-            if (!isNullOrUndefined(this.data[0].scientificCoordinator)) {
-                this.scientificCoordinatorFormData = [this.data[0].scientificCoordinator, this.delegates];
-                this.resourceForm.get('scientificCoordinator').setValue('');
-            }
-            if (!isNullOrUndefined(this.data[0].operator)) {
-                this.data[0].operator.forEach(
-                    op => this.operatorFormsData.push([op, this.delegates])
+        if ((this.data !== undefined) && (this.data !== null) && (this.data.length >= 2)) {
+            this.executives = this.data[0];
+            this.institutes = this.data[1];
+            if ((this.data[2] !== undefined) && (this.data[2] !== null)) {
+                this.inEditMode = true;
+                Object.keys(this.resourceFormDefinition).forEach(
+                    key => this.resourceForm.patchValue({ [key]: this.data[2][key] })
                 );
-                this.resourceForm.get('operator').setValue(['']);
+                if (this.data[2].institute) {
+                    this.resourceForm.patchValue({institute: this.data[2].institute.id});
+                }
+                if (this.data[2].scientificCoordinator) {
+                    this.scientificCoordinatorFormData = [this.executives, this.data[2].scientificCoordinator];
+                    this.resourceForm.get('scientificCoordinator').setValue('');
+                }
+                if (this.data[2].operator) {
+                    this.data[2].operator.forEach(
+                        op => this.operatorFormsData.push([this.executives, op])
+                    );
+                    this.resourceForm.get('operator').setValue(['']);
+                }
+                this.resourceForm.updateValueAndValidity();
             }
         }
     }
 
-    updateSearchTerm(event: any, searchFieldName: string) {
-        this[searchFieldName] = event.target.value;
-    }
-
     addPOIToList(poi?: any) {
-        this.searchForOperator = '';
-        if (!isNullOrUndefined(poi)) {
-            this.operatorFormsData.push([poi, this.delegates]);
+        if (poi) {
+            this.operatorFormsData.push([this.executives, poi]);
         } else {
-            this.operatorFormsData.push([new PersonOfInterest(), this.delegates]);
+            this.operatorFormsData.push([this.executives]);
         }
     }
 
     addPOI(poi?: any) {
-        this.searchForScientificCoordinator = '';
-        if (!isNullOrUndefined(poi)) {
-            this.scientificCoordinatorFormData = [poi, this.delegates];
+        if (poi) {
+            this.scientificCoordinatorFormData = [this.executives, poi];
         } else {
-            this.scientificCoordinatorFormData = [new PersonOfInterest(), this.delegates];
+            this.scientificCoordinatorFormData = [this.executives];
         }
     }
 
-    /*addInstitute(institute?: any) {
-        this.searchForInstitute = '';
-        if (!isNullOrUndefined(institute)) {
-            this.instituteFormData = [institute, this.delegates, this.pois, this.organizations];
+    saveChanges() {
+        if (this.inEditMode) {
+            this.updateProject();
         } else {
-            this.instituteFormData = [new Institute(), this.delegates, this.pois, this.organizations];
+            this.addProject();
         }
-    }*/
+    }
 
     exportFormValue() {
         // this.resourceForm.patchValue({institute: this.instituteForm.exportFormValue()});
@@ -133,11 +129,13 @@ export class EditProjectComponent extends EditResourcesComponent implements OnIn
             } else {
                 return this.resourceForm.value;
             }
+        } else {
+            return '';
         }
     }
 
     showAmount() {
-        if ( !isNullOrUndefined(this.resourceForm.get('totalCost').value.trim()) &&
+        if (this.resourceForm.get('totalCost').value.trim() &&
             this.resourceForm.get('totalCost').value.trim().includes(',')) {
 
             const temp = this.resourceForm.get('totalCost').value.replace(',', '.');
@@ -147,6 +145,52 @@ export class EditProjectComponent extends EditResourcesComponent implements OnIn
         this.resourceForm.get('totalCost').updateValueAndValidity();
         if ( !isNaN(this.resourceForm.get('totalCost').value.trim()) ) {
             this.totalCostAmount = this.resourceForm.get('totalCost').value.trim();
+        }
+    }
+
+    addProject() {
+        this.errorMessage = '';
+        this.successMessage = '';
+        this.showSpinner = true;
+        const project = this.exportFormValue();
+        if (project !== '') {
+            this.projectService.addProject(project).subscribe(
+                proj => console.log(JSON.stringify(proj)),
+                err => {
+                    console.log(err);
+                    this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
+                    this.showSpinner = false;
+                },
+                () => {
+                    this.errorMessage = '';
+                    this.successMessage = 'Το έργο προστέθηκε επιτυχώς.';
+                    this.showSpinner = false;
+                    window.scrollTo(1, 1);
+                }
+            );
+        }
+    }
+
+    updateProject() {
+        this.errorMessage = '';
+        this.successMessage = '';
+        this.showSpinner = true;
+        const project = this.exportFormValue();
+        if (project !== '') {
+            this.projectService.updateProject(project).subscribe (
+                proj => console.log(JSON.stringify(proj)),
+                err => {
+                    console.log(err);
+                    this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
+                    this.showSpinner = false;
+                },
+                () => {
+                    this.errorMessage = '';
+                    this.successMessage = 'Το έργο ενημερώθηκε επιτυχώς.';
+                    this.showSpinner = false;
+                    window.scrollTo(1, 1);
+                }
+            );
         }
     }
 

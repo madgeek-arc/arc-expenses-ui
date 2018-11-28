@@ -11,6 +11,7 @@ import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { Paging } from '../domain/extraClasses';
 import { ContactUsMail } from '../domain/operation';
 import {environment} from '../../environments/environment';
+import index from '@angular/cli/lib/cli';
 
 const headerOptions = {
     headers : new HttpHeaders().set('Content-Type', 'application/json').set('Accept', 'application/json'),
@@ -124,6 +125,24 @@ export class ManageRequestsService {
 
         const formBody: FormData = new FormData();
         formBody.append('file', file, file.name);
+        const req = new HttpRequest('POST', url, formBody, {
+            reportProgress: true,
+            responseType: 'text',
+            withCredentials: true
+        });
+        return this.http.request(req).pipe(catchError(this.handleError));
+        /*return this.http.request<HttpEvent<T>>('POST', url, {body: formBody, headers: headerOptions.headers, withCredentials: true});*/
+    }
+
+    uploadAttachments<T>(archiveid: string, stage: string, files: File[], mode: string): Observable<HttpEvent<T>> {
+        const url = `${this.apiUrl}store/uploadFile?archiveID=${archiveid}&stage=${stage}&mode=${mode}`;
+        console.log(`calling ${url}`);
+
+        const formBody: FormData = new FormData();
+        for (const f of files) {
+            formBody.append('file', f, f.name);
+        }
+
         const req = new HttpRequest('POST', url, formBody, {
             reportProgress: true,
             responseType: 'text',

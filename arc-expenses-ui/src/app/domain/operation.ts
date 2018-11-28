@@ -33,6 +33,13 @@ export class Attachment {
     mimetype: string;
     size: number;
     url: string;
+
+    constructor(filename: string, mimetype: string, size: number, url?: string) {
+        this.filename = filename;
+        this.mimetype = mimetype;
+        this.size = size;
+        this.url = url ? url : '';
+    }
 }
 
 export class BaseInfo {
@@ -148,7 +155,7 @@ export class Stage1 {
     supplierSelectionMethod: string;
     amountInEuros: number;
     finalAmount: number;
-    attachment: Attachment;
+    attachments: Attachment[];
 }
 
 export class Stage2 {
@@ -290,13 +297,12 @@ export class User {
     signatureArchiveId: string;
     receiveEmails: string;
     immediateEmails: string;
-    attachment: Attachment;
+    attachments: Attachment;
 }
 
-export class SignatureAttachment {
-    filename: string;
-    mimetype: string;
-    size: number;
-    url: string;
+export class Executive {
+    email: string;
+    firstname: string;
+    lastname: string;
 }
 

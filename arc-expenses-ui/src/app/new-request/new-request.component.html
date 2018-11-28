@@ -187,9 +187,16 @@
                       </div>
                     </div>
 
+                    <div *ngIf="uploadedFiles && (uploadedFiles.length > 0)" class="uk-margin">
+                      <div *ngFor="let f of uploadedFiles"
+                           class="uk-form-controls uk-form-controls-text">
+                        {{ f.name }}
+                      </div>
+                    </div>
+
                     <div class="uk-margin">
                       <div class="uk-form-controls uk-form-controls-text">
-                        <app-stage-form-upload-file (emitFile)="getUploadedFile($event)"></app-stage-form-upload-file>
+                        <app-form-upload-files (emitFile)="getUploadedFiles($event)"></app-form-upload-files>
                       </div>
                     </div>
 

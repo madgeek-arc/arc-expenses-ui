@@ -4,7 +4,7 @@ import {
     checkNecessityDesc, checkRegularityDesc,
     commentDesc,
     fundsAvailableDesc, loanDesc, loanSourceDesc,
-    StageFieldDescription, stageTitles
+    FieldDescription, stageTitles
 } from './stageDescriptions';
 import {Type} from '@angular/core';
 import {PersonOfInterest, Project, User} from './operation';
@@ -38,7 +38,7 @@ export class StageInfo {
     prev: string[];                                     // list of the possible ids of the previous stage
     next: string[];                                     // list of the possible ids of the next stage
     stageComponent: Type<any>;                          // the stage-component that corresponds to the stage
-    stageFields: StageFieldDescription [];              // a list of the stage's fields descriptions
+    stageFields: FieldDescription [];              // a list of the stage's fields descriptions
     stagePOIs: PersonOfInterest[];                                   // a list of possible POIs for the stage
     submittedStageResultMap: SubmittedStageResultMap;   // a map with descriptions of the stage's result (if submitted)
     showStage: number;                                  // an indicator of the stage's display status
@@ -47,7 +47,7 @@ export class StageInfo {
                 prev: string[],
                 next: string[],
                 stageComponent: Type<any>,
-                stageFields: StageFieldDescription [],
+                stageFields: FieldDescription [],
                 stagePOIs: PersonOfInterest[],
                 submittedStageResultMap: SubmittedStageResultMap) {
 

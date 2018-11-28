@@ -1,17 +1,23 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AdminPageComponent } from './admin-page.component';
+import { AdminEditResourcePageComponent } from './admin-edit-resource-page.component';
 
 const adminRoutes: Routes = [
     {
-        path: '',
-        component: AdminPageComponent,
+        path: ':type',
         children: [
             {
-                path: 'add-resource/:type'
+                path: '',
+                component: AdminPageComponent,
             },
             {
-                path: 'edit-resource/:type/:resourceId'
+                path: 'add',
+                component: AdminEditResourcePageComponent
+            },
+            {
+                path: 'edit/:resourceId',
+                component: AdminEditResourcePageComponent
             }
         ]
     }

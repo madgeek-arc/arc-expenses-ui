@@ -6,7 +6,6 @@ import { Attachment } from '../domain/operation';
 import { catchError, tap } from 'rxjs/operators';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { environment } from '../../environments/environment';
-import { isNullOrUndefined } from 'util';
 
 const headerOptions = {
     headers: new HttpHeaders()
@@ -29,10 +28,11 @@ export class AuthenticationService {
 
     private _storage: Storage = sessionStorage;
 
-    isLoggedIn: boolean = false;
+    isLoggedIn = false;
 
     public loginWithState() {
-        if ( isNullOrUndefined(sessionStorage.getItem('state.location')) ) {
+        if ( (sessionStorage.getItem('state.location') === undefined) ||
+             (sessionStorage.getItem('state.location') === null) ) {
             console.log(`logging in with state. Current url is: ${this.router.url}`);
             sessionStorage.setItem('state.location', this.router.url );
         }
@@ -71,8 +71,9 @@ export class AuthenticationService {
                     userInfo => {
                         console.log('User is still logged in');
                         console.log(userInfo);
-                        if ( isNullOrUndefined(sessionStorage.getItem('userInfo')) ||
-                             (isNullOrUndefined(this.getUserProp('email')) ) ) {
+                        if ( (sessionStorage.getItem('userInfo') === undefined) ||
+                             (sessionStorage.getItem('userInfo') === null) ||
+                             (this.getUserProp('email') === null ) ) {
                             console.log('received null userInfo');
                             this.isLoggedIn = false;
                             this.removeUserProperties();
@@ -90,12 +91,12 @@ export class AuthenticationService {
                 );
             }, 1000 * 60 * 5);
             /*console.log('email is', this.getUserProp('email'));*/
-            if ( isNullOrUndefined(sessionStorage.getItem('userInfo')) ) {
+            if ( (sessionStorage.getItem('userInfo') === undefined) || (sessionStorage.getItem('userInfo') === null) ) {
                 console.log(`session.userInfo wasn't found --> logging in via arc-service!`);
                 this.http.get(this.apiUrl + '/user/getUserInfo', headerOptions).subscribe(
                     userInfo => {
                         console.log(JSON.stringify(userInfo));
-                        if ( !isNullOrUndefined(userInfo) ) {
+                        if ( userInfo ) {
                             this.isLoggedIn = true;
                             // TODO: ALWAYS RESTORE ΒEFORE COMMIT!!
                             sessionStorage.setItem('role', userInfo['role']);
@@ -112,24 +113,26 @@ export class AuthenticationService {
                         this.router.navigate(['/home']);
                     },
                     () => {
-                        if ( !isNullOrUndefined( sessionStorage.getItem('userInfo') ) ) {
+                        if ( sessionStorage.getItem('userInfo') ) {
                             console.log(`the current user is: ${this.getUserProp('firstname')}, ` +
                                                              `${this.getUserProp('lastname')}, ` +
                                                              `${this.getUserProp('email')}`);
 
-                            if ( isNullOrUndefined(this.getUserProp('email')) ) {
+                            if ( (this.getUserProp('email') === undefined) || (this.getUserProp('email') === null) ) {
                                 this.logout();
-                            } else if ( (isNullOrUndefined(this.getUserProp('firstname')) ||
-                                    (this.getUserProp('firstname') === 'null')) ||
-                                isNullOrUndefined(this.getUserProp('lastname')) ||
-                                (this.getUserProp('lastname') === 'null')) {
+                            } else if ( (this.getUserProp('firstname') === undefined) ||
+                                        (this.getUserProp('firstname') === null) ||
+                                        (this.getUserProp('firstname') === 'null') ||
+                                        (this.getUserProp('lastname') === undefined) ||
+                                        (this.getUserProp('lastname') === null) ||
+                                        (this.getUserProp('lastname') === 'null') ) {
 
                                 console.log('in tryLogin navigating to sign-up');
                                 this.router.navigate(['/sign-up']);
 
                             } else {
                                 let state: string;
-                                if ( !isNullOrUndefined(sessionStorage.getItem('state.location')) ) {
+                                if ( sessionStorage.getItem('state.location') ) {
                                     state = sessionStorage.getItem('state.location');
                                     sessionStorage.removeItem('state.location');
                                     console.log(`cleared state.location - returning to state: ${state}`);
@@ -145,12 +148,15 @@ export class AuthenticationService {
     }
 
     public getIsUserLoggedIn() {
-        return ( !isNullOrUndefined(getCookie('arc_currentUser')) && !isNullOrUndefined(sessionStorage.getItem('userInfo')) );
+        return ((getCookie('arc_currentUser') !== undefined) &&
+                (getCookie('arc_currentUser') !== null) &&
+                (sessionStorage.getItem('userInfo') !== undefined) &&
+                (sessionStorage.getItem('userInfo') !== null));
     }
 
     public getUserRole() {
         if ( this.getIsUserLoggedIn() &&
-             !isNullOrUndefined(sessionStorage.getItem('role')) &&
+             sessionStorage.getItem('role') &&
              (sessionStorage.getItem('role') !== 'null') ) {
 
             return sessionStorage.getItem('role');
@@ -162,8 +168,8 @@ export class AuthenticationService {
 
     getUserProp(property: string) {
         const user = JSON.parse(sessionStorage.getItem('userInfo'));
-        if ( !isNullOrUndefined(user) && !isNullOrUndefined(user[property]) && (user[property] !== 'null') ) {
-            /*console.log('read', property, 'it is:', user[property]);*/
+        if ( user && user[property] && (user[property] !== 'null') ) {
+
             if ( (property === 'immediateEmails') || (property === 'receiveEmails') ) {
                 return (user[property] === 'true');
             }
@@ -174,7 +180,7 @@ export class AuthenticationService {
 
     getSignatureAttachment() {
         const signature: Attachment = this.getUserProp('attachment');
-        if ( this.getIsUserLoggedIn() && !isNullOrUndefined(signature) ) {
+        if ( this.getIsUserLoggedIn() && signature ) {
 
             return signature;
         } else {
@@ -184,8 +190,8 @@ export class AuthenticationService {
 
     getSignatureAttachmentProp( property: string ) {
         const signature: Attachment = this.getUserProp('attachment');
-        if ( this.getIsUserLoggedIn() && !isNullOrUndefined(signature) &&
-             !isNullOrUndefined(signature[property]) && (signature[property] !== 'null') ) {
+        if ( this.getIsUserLoggedIn() && signature &&
+             signature[property] && (signature[property] !== 'null') ) {
 
             return signature[property];
         } else {
@@ -251,106 +257,3 @@ export class AuthenticationService {
 
 
 }
-
-
-/*/!* public get  userId() *!/
-public getUserId() {
-    if (this.isLoggedIn &&
-        !isNullOrUndefined(sessionStorage.getItem('userid')) &&
-        (sessionStorage.getItem('userid') !== 'null')) {
-
-        return sessionStorage.getItem('userid');
-    } else {
-        return '';
-    }
-}
-
-public getUserFirstName() {
-    if (this.isLoggedIn &&
-        !isNullOrUndefined(sessionStorage.getItem('firstname')) &&
-        (sessionStorage.getItem('firstname') !== 'null')) {
-
-        return sessionStorage.getItem('firstname');
-    } else {
-        return '';
-    }
-}
-
-public getUserLastName() {
-    if (this.isLoggedIn &&
-        !isNullOrUndefined(sessionStorage.getItem('lastname')) &&
-        (sessionStorage.getItem('lastname') !== 'null')) {
-
-        return sessionStorage.getItem('lastname');
-    } else {
-        return '';
-    }
-}
-
-public getUserFirstNameInLatin() {
-    if (this.isLoggedIn &&
-        !isNullOrUndefined(sessionStorage.getItem('firstnameLatin')) &&
-        (sessionStorage.getItem('firstnameLatin') !== 'null')) {
-
-        return sessionStorage.getItem('firstnameLatin');
-    } else {
-        return '';
-    }
-}
-
-public getUserLastNameInLatin() {
-    if (this.isLoggedIn &&
-        !isNullOrUndefined(sessionStorage.getItem('lastnameLatin')) &&
-        (sessionStorage.getItem('lastnameLatin') !== 'null')) {
-
-        return sessionStorage.getItem('lastnameLatin');
-    } else {
-        return '';
-    }
-}
-
-public getUserEmail() {
-    if (this.isLoggedIn &&
-        !isNullOrUndefined(sessionStorage.getItem('email')) &&
-        (sessionStorage.getItem('email') !== 'null')) {
-
-        return sessionStorage.getItem('email');
-    } else {
-        return '';
-    }
-}
-
-public getUserReceiveEmails() {
-    return (this.isLoggedIn &&
-        (sessionStorage.getItem('receiveEmails') &&
-            sessionStorage.getItem('receiveEmails') === 'true'));
-}
-
-public getUserImmediateEmails() {
-    return (this.isLoggedIn &&
-        (sessionStorage.getItem('immediateEmails') &&
-            sessionStorage.getItem('immediateEmails') === 'true'));
-}
-
-public getUserSignatureArchiveID() {
-    if (this.isLoggedIn && !isNullOrUndefined(sessionStorage.getItem('signatureArchiveId')) ) {
-        return sessionStorage.getItem('signatureArchiveId');
-    } else {
-        return '';
-    }
-}
-
-public getUserSignatureAttachment() {
-    if (this.isLoggedIn && !isNullOrUndefined(sessionStorage.getItem('signatureUrl') &&
-        (sessionStorage.getItem('signatureUrl') !== 'null') )) {
-
-        const tempAttachment: Attachment = new Attachment();
-        tempAttachment.filename = sessionStorage.getItem('signatureFilename');
-        tempAttachment.mimetype = sessionStorage.getItem('signatureMimetype');
-        tempAttachment.size = +sessionStorage.getItem('signatureSize');
-        tempAttachment.url = sessionStorage.getItem('signatureUrl');
-        return tempAttachment;
-    } else {
-        return null;
-    }
-}*/

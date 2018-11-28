@@ -31,8 +31,10 @@ export class ResourcesLoaderComponent implements OnInit {
         const componentRef = viewContainerRef.createComponent(componentFactory);
         this.componentInstance = componentRef.instance;
 
-        (<AnchorInterfaceComponent>componentRef.instance).data = this.resource.data;
-        this.componentInstance.id = this.id;
+        if (this.resource.data !== undefined) {
+            (<AnchorInterfaceComponent>componentRef.instance).data = this.resource.data;
+            this.componentInstance.id = this.id;
+        }
     }
 
     getComponentFormValue() {

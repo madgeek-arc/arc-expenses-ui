@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Attachment, User, PersonOfInterest } from '../domain/operation';
-import { commentDesc, StageFieldDescription } from '../domain/stageDescriptions';
+import { commentDesc, FieldDescription } from '../domain/stageDescriptions';
 import { DatePipe } from '@angular/common';
 import { AuthenticationService } from '../services/authentication.service';
 import { isNullOrUndefined, isUndefined } from 'util';
@@ -42,11 +42,11 @@ export class StageComponent implements OnInit {
 
     stageForm: FormGroup;
     stageFormDefinition; /*will contain the form schema*/
-    commentFieldDesc: StageFieldDescription = commentDesc;
+    commentFieldDesc: FieldDescription = commentDesc;
 
     stageTitle: string;
     stageId: string;
-    stageFields: StageFieldDescription[];
+    stageFields: FieldDescription[];
 
     uploadedFile: File;
     uploadedFilename = ''; /*a filename to send to the attachment wrapper*/
@@ -278,13 +278,16 @@ export class StageComponent implements OnInit {
     }
 
     createAttachment(): Attachment {
-        const tempAttachment: Attachment = new Attachment();
-        if (this.uploadedFile) {
+        const tempAttachment: Attachment = new Attachment(this.uploadedFile.name,
+                                                          this.uploadedFile.type,
+                                                          this.uploadedFile.size,
+                                                          '');
+        /*if (this.uploadedFile) {
             tempAttachment.filename = this.uploadedFile.name;
             tempAttachment.mimetype = this.uploadedFile.type;
             tempAttachment.size = this.uploadedFile.size;
             tempAttachment.url = '';
-        }
+        }*/
 
         return tempAttachment;
     }
