@@ -94,8 +94,7 @@ export class AdminEditResourcePageComponent implements OnInit {
                 this.getOrganizationById();
             } else {
                 this.title = 'Προσθήκη οργανισμού';
-                this.resource = new AnchorItem (
-                    EditOrganizationComponent, [this.executives] );
+                this.resource = new AnchorItem ( EditOrganizationComponent, [this.executives] );
             }
         }
     }
@@ -126,7 +125,7 @@ export class AdminEditResourcePageComponent implements OnInit {
         this.resourcesService.getInstituteById(this.resourceId).subscribe(
             inst => {
                 this.currentResource = inst;
-                this.resource = new AnchorItem (EditProjectComponent, [this.executives, this.organizations, this.currentResource]);
+                this.resource = new AnchorItem (EditInstituteComponent, [this.executives, this.organizations, this.currentResource]);
                 this.showSpinner = false;
             },
             er => {
@@ -143,7 +142,7 @@ export class AdminEditResourcePageComponent implements OnInit {
         this.resourcesService.getOrganizationById(this.resourceId).subscribe(
             org => {
                 this.currentResource = org;
-                this.resource = new AnchorItem (EditProjectComponent, [this.executives, this.currentResource]);
+                this.resource = new AnchorItem (EditOrganizationComponent, [this.executives, this.currentResource]);
                 this.showSpinner = false;
             },
             er => {

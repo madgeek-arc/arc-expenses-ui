@@ -65,11 +65,11 @@ export class TopMenuComponent implements OnInit, DoCheck {
   }
 
   isUserAdmin() {
-      this.isAdmin = ( this.authService.getUserRole() === 'ROLE_ADMIN' );
+      this.isAdmin = ( this.authService.getUserRole().includes('ROLE_ADMIN' ));
   }
 
   isUserOperator() {
-      this.isOperator = ( this.authService.getUserRole() === 'ROLE_OPERATOR' );
+      this.isOperator = ( this.authService.getUserRole().includes('ROLE_OPERATOR'));
   }
 
   onClick(id: string) {

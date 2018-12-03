@@ -2,7 +2,7 @@
 <div *ngIf="!showSpinner && resourceForm" class="uk-width-1-1 uk-margin-bottom">
     <div [formGroup]="resourceForm">
         <div class="uk-margin">
-            <label class="uk-form-label" for="id_{{ id }}">Id</label>
+            <label class="uk-form-label" for="id_{{ id }}">Id (*)</label>
             <div class="uk-form-controls">
                 <div class="uk-width-1-1">
                     <input type="text" id="id_{{ id }}" class="uk-input" formControlName="id"/>
@@ -10,7 +10,7 @@
             </div>
         </div>
         <div class="uk-margin">
-            <label class="uk-form-label" for="name_{{ id }}">Όνομα</label>
+            <label class="uk-form-label" for="name_{{ id }}">Όνομα (*)</label>
             <div class="uk-form-controls">
                 <div class="uk-width-1-1">
                     <input type="text" id="name_{{ id }}" class="uk-input" formControlName="name"/>
@@ -19,7 +19,7 @@
         </div>
         <!--<div class="uk-card uk-card-body uk-card-basic-info">-->
         <div class="uk-margin">
-            <label class="uk-form-label">Πρόεδρος</label>
+            <label class="uk-form-label">Πρόεδρος (*)</label>
             <div class="uk-form-controls">
                 <div *ngIf="!directorFormData">
                     <div>
@@ -37,7 +37,7 @@
             </div>
         </div>
         <div class="uk-margin">
-            <label class="uk-form-label">Αντιπρόεδρος</label>
+            <label class="uk-form-label">Αντιπρόεδρος (*)</label>
             <div class="uk-form-controls">
                 <div *ngIf="!viceDirectorFormData">
                     <div>
@@ -55,7 +55,7 @@
             </div>
         </div>
         <div class="uk-margin">
-            <label class="uk-form-label">Προϊστάμενος Οικονομικών Υπηρεσιών</label>
+            <label class="uk-form-label">Προϊστάμενος Οικονομικών Υπηρεσιών (*)</label>
             <div class="uk-form-controls">
                 <div *ngIf="!poyFormData">
                     <div class="uk-inline">
@@ -73,7 +73,7 @@
             </div>
         </div>
         <div class="uk-margin">
-            <label class="uk-form-label">Μέλος Διοικητικού Συμβουλίου</label>
+            <label class="uk-form-label">Μέλος Διοικητικού Συμβουλίου (*)</label>
             <div class="uk-form-controls">
                 <div *ngIf="!dioikitikoSumvoulioFormData">
                     <div>
@@ -92,7 +92,7 @@
             </div>
         </div>
         <div class="uk-margin">
-            <label class="uk-form-label">Ομάδα Ελέγχου</label>
+            <label class="uk-form-label">Ομάδα Ελέγχου (*)</label>
             <div class="uk-form-controls">
                 <div *ngIf="inspectionTeamFormsData.length > 0" class="uk-margin-small-top">
                     <div *ngFor="let insp of inspectionTeamFormsData; let i = index;"

@@ -99,7 +99,8 @@ export class AuthenticationService {
                         if ( userInfo ) {
                             this.isLoggedIn = true;
                             // TODO: ALWAYS RESTORE ΒEFORE COMMIT!!
-                            sessionStorage.setItem('role', userInfo['role']);
+                            sessionStorage.setItem('role', JSON.stringify(userInfo['role']));
+                            console.log('role is', userInfo['role']);
                             // sessionStorage.setItem('role', 'ROLE_ADMIN');
                             this.setUserProperties(userInfo['user']);
                         }

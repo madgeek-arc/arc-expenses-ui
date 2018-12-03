@@ -2,7 +2,7 @@
 <div *ngIf="!showSpinner && resourceForm" class="uk-width-1-1 uk-margin-bottom">
     <div [formGroup]="resourceForm">
         <div class="uk-margin">
-            <label class="uk-form-label" for="id_{{ id }}">Id</label>
+            <label class="uk-form-label" for="id_{{ id }}">Id (*)</label>
             <div class="uk-form-controls">
                 <div class="uk-width-1-1">
                     <input type="text" id="id_{{ id }}" class="uk-input" formControlName="id"/>
@@ -10,7 +10,7 @@
             </div>
         </div>
         <div class="uk-margin">
-            <label class="uk-form-label" for="name_{{ id }}">Όνομα</label>
+            <label class="uk-form-label" for="name_{{ id }}">Όνομα (*)</label>
             <div class="uk-form-controls">
                 <div class="uk-width-1-1">
                     <input type="text" id="name_{{ id }}" class="uk-input" formControlName="name"/>
@@ -18,7 +18,7 @@
             </div>
         </div>
         <div class="uk-margin">
-            <label class="uk-form-label" for="{{id}}_org">Οργανισμός</label>
+            <label class="uk-form-label" for="{{id}}_org">Οργανισμός (*)</label>
             <div class="uk-form-controls">
                 <div class="uk-width-1-1">
                     <select class="uk-select" id="{{id}}_org" formControlName="organization">
@@ -29,7 +29,7 @@
             </div>
         </div>
         <div class="uk-margin">
-            <label class="uk-form-label">Πρόεδρος</label>
+            <label class="uk-form-label">Πρόεδρος (*)</label>
             <div class="uk-form-controls">
                 <div *ngIf="!instDirectorFormData" class="uk-width-1-1">
                     <div>
@@ -53,7 +53,7 @@
             <div class="uk-form-controls">&nbsp;&nbsp;&nbsp;</div>
         </div>
         <div class="uk-margin">
-            <label class="uk-form-label">Διευθυντής</label>
+            <label class="uk-form-label">Διευθυντής (*)</label>
             <div class="uk-form-controls">
                 <div *ngIf="!accountingDirectorFormData" class="uk-width-1-1">
                     <div>
@@ -72,7 +72,7 @@
             </div>
         </div>
         <div class="uk-margin">
-            <label class="uk-form-label">Υπεύθυνος Καταχώρησης</label>
+            <label class="uk-form-label">Υπεύθυνος Καταχώρησης (*)</label>
             <div class="uk-form-controls">
                 <div *ngIf="!accountingRegistrationFormData" class="uk-width-1-1">
                     <div>
@@ -91,7 +91,7 @@
             </div>
         </div>
         <div class="uk-margin">
-            <label class="uk-form-label">Υπεύθυνος Πληρωμών</label>
+            <label class="uk-form-label">Υπεύθυνος Πληρωμών (*)</label>
             <div class="uk-form-controls">
                 <div *ngIf="!accountingPaymentFormData" class="uk-width-1-1">
                     <div>
@@ -110,7 +110,7 @@
         </div>
         <hr>
         <div class="uk-margin">
-            <label class="uk-form-label">Υπεύθυνος Διαύγειας</label>
+            <label class="uk-form-label">Υπεύθυνος Διαύγειας (*)</label>
             <div class="uk-form-controls">
                 <div *ngIf="!diaugeiaFormData" class="uk-width-1-1">
                     <div>
@@ -128,7 +128,7 @@
             </div>
         </div>
         <div class="uk-margin">
-            <label class="uk-form-label">Υπεύθυνος Γραφείου Προμηθειών</label>
+            <label class="uk-form-label">Υπεύθυνος Γραφείου Προμηθειών (*)</label>
             <div class="uk-form-controls">
                 <div *ngIf="!suppliesOfficeFormData" class="uk-width-1-1">
                     <div>
@@ -146,7 +146,7 @@
             </div>
         </div>
         <div class="uk-margin">
-            <label class="uk-form-label">Υπεύθυνος Ταξιδίων</label>
+            <label class="uk-form-label">Υπεύθυνος Ταξιδίων (*)</label>
             <div class="uk-form-controls">
                 <div *ngIf="!travelManagerFormData" class="uk-width-1-1">
                     <div>
@@ -164,7 +164,7 @@
             </div>
         </div>
         <div class="uk-margin">
-            <label class="uk-form-label">Διατάκτης</label>
+            <label class="uk-form-label">Διατάκτης (*)</label>
             <div class="uk-form-controls">
                 <div *ngIf="!diataktisFormData" class="uk-width-1-1">
                     <div>

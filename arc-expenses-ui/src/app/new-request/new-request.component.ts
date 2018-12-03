@@ -185,7 +185,8 @@ export class NewRequestComponent implements OnInit {
                 this.errorMessage = 'Για αναθέσεις μέσω διαγωνισμού ή έρευνας αγοράς η επισύναψη εγγράφων είναι υποχρεωτική.';
                 window.scroll(1, 1);
 
-            } else if ( (+this.newRequestForm.get('amount').value > this.lowAmountLimit) &&
+            } else if ( (this.requestType !== 'services_contract') &&
+                        (+this.newRequestForm.get('amount').value > this.lowAmountLimit) &&
                         ((this.uploadedFiles === null) || this.uploadedFiles.length === 0) ) {
 
                 // UIkit.modal.alert('Για αιτήματα άνω των 2.500 € η επισύναψη εγγράφων είναι υποχρεωτική.');

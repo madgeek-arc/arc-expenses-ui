@@ -78,7 +78,7 @@ export class RequestsComponent implements OnInit {
                 private fb: FormBuilder) {}
 
     ngOnInit() {
-        this.isSimpleUser = (this.authService.getUserRole() === 'ROLE_USER');
+        this.isSimpleUser = (this.authService.getUserRole().includes('ROLE_USER'));
 
         /* TODO: remove when institutes are added */
         // this.initializeParams();
@@ -661,7 +661,7 @@ export class RequestsComponent implements OnInit {
 
     getIfUserCanEdit(id: string, requestId: string, requester: User, project: Project, stage: string, type: string) {
         const newRequestInfo = new RequestInfo(id, requestId, requester, project, (type === 'trip'));
-        return (( this.authService.getUserRole() === 'ROLE_ADMIN' ) ||
+        return (( this.authService.getUserRole().includes('ROLE_ADMIN')) ||
                 ( ((stage === '1') || (stage === '7')) && (this.authService.getUserProp('email') === newRequestInfo.requester.email) ) ||
                 ((stage !== '1') &&
                  newRequestInfo[stage].stagePOIs.some(

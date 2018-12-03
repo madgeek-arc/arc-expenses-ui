@@ -54,7 +54,7 @@ export class RequestStagePaymentComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.isSimpleUser = (this.authService.getUserRole() === 'ROLE_USER');
+        this.isSimpleUser = (this.authService.getUserRole().includes('ROLE_USER'));
         console.log(`current user role is: ${this.authService.getUserRole()}`);
         this.getCurrentRequest();
     }
@@ -331,7 +331,7 @@ export class RequestStagePaymentComponent implements OnInit {
             (this.currentRequestPayment.status !== 'rejected') &&
             (this.currentRequestPayment.status !== 'accepted') &&
             (this.currentRequestPayment.status !== 'cancelled') &&
-            ( (this.authService.getUserRole() === 'ROLE_ADMIN') || (this.canEdit === true) ) ) {
+            ( (this.authService.getUserRole().includes('ROLE_ADMIN')) || (this.canEdit === true) ) ) {
 
             this.stageLoaderItemList = [
                 new AnchorItem(
@@ -408,7 +408,7 @@ export class RequestStagePaymentComponent implements OnInit {
     }
 
     userIsAdmin() {
-        return (this.authService.getUserRole() === 'ROLE_ADMIN');
+        return (this.authService.getUserRole().includes('ROLE_ADMIN'));
     }
 
 }

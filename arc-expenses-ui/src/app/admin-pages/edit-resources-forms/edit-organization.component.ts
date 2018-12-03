@@ -46,12 +46,9 @@ export class EditOrganizationComponent extends EditResourcesComponent implements
 
 
     ngOnChanges(changes: SimpleChanges) {
-        if ((changes !== undefined) && (changes !== null) &&
-            (changes['data'] !== undefined) && (changes['data'] !== null) &&
-            (changes['data'].currentValue !== undefined) && (changes['data'].currentValue !== null) ) {
+        if (changes && changes['data'] && changes['data'].currentValue ) {
 
-            if ((this.resourceForm !== undefined) && (this.resourceForm !== null) &&
-                (changes[ 'data' ].currentValue !== changes[ 'data' ].previousValue)) {
+            if (this.resourceForm && (changes[ 'data' ].currentValue !== changes[ 'data' ].previousValue)) {
 
                 this.parseData();
             }
@@ -61,10 +58,10 @@ export class EditOrganizationComponent extends EditResourcesComponent implements
     /*  expects to receive a list of Executives
         and maybe one Organization (in edit mode) from the input data */
     parseData() {
-        if ((this.data !== undefined) && (this.data !== null) && (this.data.length >= 1)) {
+        if (this.data && (this.data.length >= 1)) {
             this.executives = this.data[0];
 
-            if ((this.data[1] !== undefined) && (this.data[1] !== null)) {
+            if (this.data[1]) {
                 this.inEditMode = true;
                 Object.keys(this.resourceFormDefinition).forEach(
                     key => this.resourceForm
@@ -136,12 +133,10 @@ export class EditOrganizationComponent extends EditResourcesComponent implements
         this.resourceForm.patchValue({inspectionTeam: inspectionTeamFormArrayValue});
         this.resourceForm.patchValue({dioikitikoSumvoulio: this.dioikitikoSumvoulioForm.exportFormValue()});
         if (this.resourceForm.valid) {
-            if (this.checkIfFormIsEmpty()) {
-                return '';
-            } else {
-                return this.resourceForm.value;
-            }
+            return this.resourceForm.value;
         } else {
+            this.errorMessage = 'Παρακαλώ συμπληρώστε όλα τα πεδία.';
+            window.scrollTo(1, 1);
             return '';
         }
     }
@@ -158,6 +153,7 @@ export class EditOrganizationComponent extends EditResourcesComponent implements
                 err => {
                     console.log(err);
                     this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
+                    window.scrollTo(1, 1);
                     this.showSpinner = false;
                 },
                 () => {
@@ -189,6 +185,7 @@ export class EditOrganizationComponent extends EditResourcesComponent implements
                     this.successMessage = 'Ο οργανισμός ενημερώθηκε επιτυχώς.';
                     this.showSpinner = false;
                     window.scrollTo(1, 1);
+                    window.location.href = window.location.origin + '/resources/organizations';
                 }
             );
         }

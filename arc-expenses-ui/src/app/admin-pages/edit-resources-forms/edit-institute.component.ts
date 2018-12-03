@@ -165,12 +165,10 @@ export class EditInstituteComponent extends EditResourcesComponent implements On
         this.resourceForm.patchValue({travelManager: this.travelManagerForm.exportFormValue()});
         this.resourceForm.patchValue({diataktis: this.diataktisForm.exportFormValue()});
         if (this.resourceForm.valid) {
-            if (this.checkIfFormIsEmpty()) {
-                return '';
-            } else {
-                return this.resourceForm.value;
-            }
+            return this.resourceForm.value;
         } else {
+            this.errorMessage = 'Παρακαλώ συμπληρώστε όλα τα πεδία.';
+            window.scrollTo(1, 1);
             return '';
         }
     }
@@ -186,6 +184,7 @@ export class EditInstituteComponent extends EditResourcesComponent implements On
                 err => {
                     console.log(err);
                     this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
+                    window.scrollTo(1, 1);
                     this.showSpinner = false;
                 },
                 () => {
@@ -193,6 +192,7 @@ export class EditInstituteComponent extends EditResourcesComponent implements On
                     this.successMessage = 'Το ινστιτούτο προστέθηκε επιτυχώς.';
                     this.showSpinner = false;
                     window.scrollTo(1, 1);
+                    window.location.href = window.location.origin + '/resources/institutes';
                 }
             );
         }
@@ -209,6 +209,7 @@ export class EditInstituteComponent extends EditResourcesComponent implements On
                 err => {
                     console.log(err);
                     this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
+                    window.scrollTo(1, 1);
                     this.showSpinner = false;
                 },
                 () => {
@@ -216,6 +217,7 @@ export class EditInstituteComponent extends EditResourcesComponent implements On
                     this.successMessage = 'Το ινστιτούτο ενημερώθηκε επιτυχώς.';
                     this.showSpinner = false;
                     window.scrollTo(1, 1);
+                    window.location.href = window.location.origin + '/resources/institutes';
                 }
             );
         }

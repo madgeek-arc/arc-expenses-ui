@@ -131,12 +131,10 @@ export class EditProjectComponent extends EditResourcesComponent implements OnIn
         }
         this.resourceForm.patchValue({operator: operators});
         if (this.resourceForm.valid) {
-            if (this.checkIfFormIsEmpty()) {
-                return '';
-            } else {
-                return this.resourceForm.value;
-            }
+            return this.resourceForm.value;
         } else {
+            this.errorMessage = 'Παρακαλώ συμπληρώστε όλα τα απαιτούμενα πεδία.';
+            window.scrollTo(1, 1);
             return '';
         }
     }
@@ -166,6 +164,7 @@ export class EditProjectComponent extends EditResourcesComponent implements OnIn
                 err => {
                     console.log(err);
                     this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
+                    window.scrollTo(1, 1);
                     this.showSpinner = false;
                 },
                 () => {
@@ -173,6 +172,7 @@ export class EditProjectComponent extends EditResourcesComponent implements OnIn
                     this.successMessage = 'Το έργο προστέθηκε επιτυχώς.';
                     this.showSpinner = false;
                     window.scrollTo(1, 1);
+                    window.location.href = window.location.origin + '/resources/projects';
                 }
             );
         }
@@ -189,6 +189,7 @@ export class EditProjectComponent extends EditResourcesComponent implements OnIn
                 err => {
                     console.log(err);
                     this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
+                    window.scrollTo(1, 1);
                     this.showSpinner = false;
                 },
                 () => {
@@ -196,6 +197,7 @@ export class EditProjectComponent extends EditResourcesComponent implements OnIn
                     this.successMessage = 'Το έργο ενημερώθηκε επιτυχώς.';
                     this.showSpinner = false;
                     window.scrollTo(1, 1);
+                    window.location.href = window.location.origin + '/resources/projects';
                 }
             );
         }

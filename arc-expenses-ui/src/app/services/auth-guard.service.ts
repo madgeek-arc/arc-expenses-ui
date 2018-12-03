@@ -36,13 +36,13 @@ export class AuthGuardService implements CanActivate, CanLoad {
     }
 
     canLoad () {
-        if ( this.authenticationService.getUserRole() === 'ROLE_ADMIN' ) {
+        if ( this.authenticationService.getUserRole().includes('ROLE_ADMIN')) {
 
             return true;
         }
 
-        if ( (this.authenticationService.getUserRole() === 'ROLE_OPERATOR') &&
-             (this.router.url.includes('resources/projects/')) ) {
+        if ( (this.authenticationService.getUserRole().includes('ROLE_OPERATOR')) &&
+             (window.location.pathname.includes('resources/projects')) ) {
 
             return true;
         }

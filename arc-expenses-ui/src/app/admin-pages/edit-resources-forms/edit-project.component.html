@@ -4,7 +4,7 @@
 <div *ngIf="!showSpinner && resourceForm" class="uk-width-1-1 uk-margin-bottom">
     <div [formGroup]="resourceForm">
         <div class="uk-margin">
-            <label class="uk-form-label" for="id_{{ id }}">Id</label>
+            <label class="uk-form-label" for="id_{{ id }}">Id (*)</label>
             <div class="uk-form-controls">
                 <div class="uk-width-1-1">
                     <input type="text" id="id_{{ id }}" class="uk-input" formControlName="id"/>
@@ -12,7 +12,7 @@
             </div>
         </div>
         <div class="uk-margin">
-            <label class="uk-form-label" for="name_{{ id }}">Όνομα</label>
+            <label class="uk-form-label" for="name_{{ id }}">Όνομα (*)</label>
             <div class="uk-form-controls">
                 <div class="uk-width-1-1">
                     <input type="text" id="name_{{ id }}" class="uk-input" formControlName="name"/>
@@ -20,7 +20,7 @@
             </div>
         </div>
         <div class="uk-margin">
-            <label class="uk-form-label" for="acronym_{{ id }}">Ακρώνυμο</label>
+            <label class="uk-form-label" for="acronym_{{ id }}">Ακρώνυμο (*)</label>
             <div class="uk-form-controls">
                 <div class="uk-width-1-1">
                     <input type="text" id="acronym_{{ id }}" class="uk-input" formControlName="acronym"/>
@@ -36,15 +36,15 @@
             </div>
         </div>
         <div class="uk-margin">
-            <label class="uk-form-label" for="startDate_{{ id }}">Ημ/νία έναρξης</label>
+            <label class="uk-form-label" for="startDate_{{ id }}">Ημ/νία έναρξης (*)</label>
             <div class="uk-form-controls">
                 <div class="uk-width-1-1">
-                    <input type="text" id="startDate_{{ id }}" class="uk-input" formControlName="startDate"/>
+                    <input type="text" id="startDate_{{ id }}" class="uk-input" formControlName="startDate" />
                 </div>
             </div>
         </div>
         <div class="uk-margin">
-            <label class="uk-form-label" for="startDate_{{ id }}">Ημ/νία ολοκλήρωσης</label>
+            <label class="uk-form-label" for="endDate_{{ id }}">Ημ/νία ολοκλήρωσης (*)</label>
             <div class="uk-form-controls">
                 <div class="uk-width-1-1">
                     <input type="text" id="endDate_{{ id }}" class="uk-input" formControlName="endDate"/>
@@ -77,7 +77,7 @@
             </div>
         </div>
         <div class="uk-margin">
-            <label class="uk-form-label" for="{{id}}_inst">Ινστιτούτο/Μονάδα</label>
+            <label class="uk-form-label" for="{{id}}_inst">Ινστιτούτο/Μονάδα (*)</label>
             <div class="uk-form-controls">
                 <div class="uk-width-1-1">
                     <select class="uk-select" id="{{id}}_inst" formControlName="institute">
@@ -88,7 +88,7 @@
             </div>
         </div>
         <div class="uk-margin">
-            <label class="uk-form-label">Επιστημονικός Υπεύθυνος</label>
+            <label class="uk-form-label">Επιστημονικός Υπεύθυνος (*)</label>
             <div class="uk-form-controls">
                 <div *ngIf="!scientificCoordinatorFormData">
                     <div>
@@ -107,7 +107,7 @@
         </div>
         <hr>
         <div class="uk-margin">
-            <label class="uk-form-label">Χειριστές</label>
+            <label class="uk-form-label">Χειριστές (*)</label>
             <div class="uk-form-controls">
                 <div *ngIf="operatorFormsData.length > 0" class="uk-margin-small-top">
                     <div *ngFor="let op of operatorFormsData; let i = index;"
