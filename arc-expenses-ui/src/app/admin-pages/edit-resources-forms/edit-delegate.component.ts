@@ -22,17 +22,15 @@ export class EditDelegateComponent extends EditResourcesComponent implements OnI
             lastname:  [''],
             hidden:  ['']
         };
-        // super.ngOnInit();
+        super.ngOnInit();
+        this.resourceForm.get('firstname').disable();
+        this.resourceForm.get('lastname').disable();
         this.parseData();
     }
 
     ngOnChanges(changes: SimpleChanges) {
-        if ((changes !== undefined) && (changes !== null) &&
-            (changes['data'] !== undefined) && (changes['data'] !== null) &&
-            (changes['data'].currentValue !== undefined) && (changes['data'].currentValue !== null) ) {
-
+        if (changes && changes['data'] && changes['data'].currentValue) {
             if (this.resourceForm && (changes[ 'data' ].currentValue !== changes[ 'data' ].previousValue)) {
-
                 this.parseData();
             }
         }
@@ -42,34 +40,37 @@ export class EditDelegateComponent extends EditResourcesComponent implements OnI
         and maybe one Delegate (in edit mode) from the input data */
     parseData() {
         // this.resourceForm.reset();
-        this.showForm = false;
+        // this.showForm = false;
         if (this.data && (this.data.length >= 1)) {
             this.executives = this.data[0];
 
             if (this.data[1]) {
-                this.createForm();
                 Object.keys(this.resourceFormDefinition).forEach(
                     key => this.resourceForm.patchValue({ [key]: this.data[1][key] })
                 );
-                this.showForm = true;
+                // this.showForm = true;
                 this.resourceForm.updateValueAndValidity();
             }
         }
     }
 
-    updateSearchTerm(event: any) {
-        this.searchTerm = event.target.value;
+    updateSearchTerm() {
+        if (!this.newDelegateMode) {
+            this.searchTerm = this.resourceForm.get('email').value;
+        }
     }
 
     addDelegate(delegate?: any) {
         this.searchTerm = '';
-        this.createForm();
         if (delegate) {
             Object.keys(this.resourceFormDefinition).forEach(
                 key => this.resourceForm.patchValue({ [key]: delegate[key] })
             );
+        } else {
+            this.resourceForm.get('firstname').enable();
+            this.resourceForm.get('lastname').enable();
         }
-        this.showForm = true;
+        // this.showForm = true;
         this.resourceForm.updateValueAndValidity();
     }
 
@@ -77,6 +78,9 @@ export class EditDelegateComponent extends EditResourcesComponent implements OnI
         this.newDelegateMode = newDelegateMode;
         if (this.newDelegateMode) {
             this.addDelegate();
+        } else {
+            this.resourceForm.get('firstname').disable();
+            this.resourceForm.get('lastname').disable();
         }
     }
 

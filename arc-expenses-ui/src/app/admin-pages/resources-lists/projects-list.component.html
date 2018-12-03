@@ -1,3 +1,18 @@
+<div class="uk-grid page-controls uk-flex-right">
+    <div class="uk-margin-bottom ">
+        <div class="uk-inline">
+            <div class="filterLabel">Αιτήσεις ανά σελίδα:</div>
+            <div class="inlineBlock">
+                <select id="req-pagesize" class="form-control" (change)="getItemsPerPage($event)">
+                    <option value="10" [selected] = "itemsPerPage === 10">10</option>
+                    <option value="25" [selected] = "itemsPerPage === 25">25</option>
+                    <option value="50" [selected] = "itemsPerPage === 50">50</option>
+                    <option value="100" [selected] = "itemsPerPage === 100">100</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="contentAndPagerPanel">
 
     <div class="uk-width-1-1 uk-margin-top uk-padding-top uk-padding-remove-bottom">
@@ -46,11 +61,11 @@
                     <th>Ινστιτουτο / Μοναδα</th>
                 </tr>
                 <tr class="uk-link" *ngFor="let proj of projects"
-                    routerLink="/resources/projects/edit/{{ proj.projectID }}"
+                    routerLink="/resources/projects/edit/{{ proj.id }}"
                     title="Μετάβαση στην σελίδα του έργου">
-                    <td>{{ proj.projectID }}</td>
-                    <td>{{ proj.projectAcronym }}</td>
-                    <td>{{ proj.instituteName }}</td>
+                    <td>{{ proj.id }}</td>
+                    <td>{{ proj.acronym }}</td>
+                    <td>{{ proj.institute.name }}</td>
                 </tr>
                 </thead>
             </table>

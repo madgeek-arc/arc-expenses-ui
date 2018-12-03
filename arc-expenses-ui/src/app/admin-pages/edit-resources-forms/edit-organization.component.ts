@@ -7,7 +7,8 @@ import { ManageResourcesService } from '../../services/manage-resources.service'
 
 @Component({
     selector: 'app-edit-organization',
-    templateUrl: './edit-organization.component.html'
+    templateUrl: './edit-organization.component.html',
+    styleUrls: ['./edit-resources.component.scss']
 })
 export class EditOrganizationComponent extends EditResourcesComponent implements OnInit, OnChanges {
 
@@ -88,6 +89,12 @@ export class EditOrganizationComponent extends EditResourcesComponent implements
                     this.dioikitikoSumvoulioFormData = [this.executives, this.data[1].dioikitikoSumvoulio];
                 }
                 this.resourceForm.updateValueAndValidity();
+            } else {
+                this.addPOIToList();
+                this.addPOI('poyFormData');
+                this.addPOI('directorFormData');
+                this.addPOI('viceDirectorFormData');
+                this.addPOI('dioikitikoSumvoulioFormData');
             }
         }
     }
@@ -122,7 +129,9 @@ export class EditOrganizationComponent extends EditResourcesComponent implements
         this.resourceForm.patchValue({viceDirector: this.viceDirectorForm.exportFormValue()});
         const inspectionTeamFormArrayValue = [];
         for (const del of this.inspectionTeamForms.toArray()) {
-            inspectionTeamFormArrayValue.push(del.exportFormValue());
+            if (del.exportFormValue()) {
+                inspectionTeamFormArrayValue.push(del.exportFormValue());
+            }
         }
         this.resourceForm.patchValue({inspectionTeam: inspectionTeamFormArrayValue});
         this.resourceForm.patchValue({dioikitikoSumvoulio: this.dioikitikoSumvoulioForm.exportFormValue()});
@@ -145,7 +154,7 @@ export class EditOrganizationComponent extends EditResourcesComponent implements
         const organization = this.exportFormValue();
         if (organization !== '') {
             this.resourcesService.addOrganization(organization).subscribe(
-                org => console.log(JSON.stringify(org)),
+                org => console.log('add organization responded', JSON.stringify(org)),
                 err => {
                     console.log(err);
                     this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
@@ -156,6 +165,7 @@ export class EditOrganizationComponent extends EditResourcesComponent implements
                     this.successMessage = 'Ο οργανισμός προστέθηκε επιτυχώς.';
                     this.showSpinner = false;
                     window.scrollTo(1, 1);
+                    window.location.href = window.location.origin + '/resources/organizations';
                 }
             );
         }
@@ -168,7 +178,7 @@ export class EditOrganizationComponent extends EditResourcesComponent implements
         const organization = this.exportFormValue();
         if (organization !== '') {
             this.resourcesService.updateOrganization(organization).subscribe(
-                org => console.log(JSON.stringify(org)),
+                org => console.log('update organization responded', JSON.stringify(org)),
                 err => {
                     console.log(err);
                     this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';

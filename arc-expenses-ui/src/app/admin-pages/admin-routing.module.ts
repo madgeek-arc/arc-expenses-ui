@@ -5,21 +5,16 @@ import { AdminEditResourcePageComponent } from './admin-edit-resource-page.compo
 
 const adminRoutes: Routes = [
     {
-        path: ':type',
-        children: [
-            {
-                path: '',
-                component: AdminPageComponent,
-            },
-            {
-                path: 'add',
-                component: AdminEditResourcePageComponent
-            },
-            {
-                path: 'edit/:resourceId',
-                component: AdminEditResourcePageComponent
-            }
-        ]
+        path: '',
+        component: AdminPageComponent,
+    },
+    {
+        path: 'add',
+        component: AdminEditResourcePageComponent
+    },
+    {
+        path: 'edit/:resourceId',
+        component: AdminEditResourcePageComponent
     }
 ];
 

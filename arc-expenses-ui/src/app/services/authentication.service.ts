@@ -61,7 +61,7 @@ export class AuthenticationService {
     public tryLogin() {
         console.log('entering tryLogin -> state.location is:', sessionStorage.getItem('state.location'));
         console.log('cookie is:', JSON.stringify(getCookie('arc_currentUser')));
-        if (getCookie('arc_currentUser')) {
+        if (getCookie('arc_currentUser') && (getCookie('arc_currentUser') !== '')) {
 
             console.log(`I got the cookie!`);
 
@@ -143,15 +143,16 @@ export class AuthenticationService {
                     }
                 );
             }
-        }
+        } /*else if (getCookie('arc_currentUser') && (getCookie('arc_currentUser') === '')) {
+            console.log('empty cookie!');
+            window.alert('Δεν κατέστη δυνατή η ταυτοποίηση του χρήστη. Παρακαλώ προσπαθήστε ξανά.');
+        }*/
 
     }
 
     public getIsUserLoggedIn() {
-        return ((getCookie('arc_currentUser') !== undefined) &&
-                (getCookie('arc_currentUser') !== null) &&
-                (sessionStorage.getItem('userInfo') !== undefined) &&
-                (sessionStorage.getItem('userInfo') !== null));
+        return (getCookie('arc_currentUser') && (getCookie('arc_currentUser') !== '') &&
+                sessionStorage.getItem('userInfo') && (sessionStorage.getItem('userInfo') !== ''));
     }
 
     public getUserRole() {

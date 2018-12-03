@@ -5,6 +5,7 @@ import {Observable} from 'rxjs/Observable';
 import {HttpClient, HttpErrorResponse, HttpHeaders} from '@angular/common/http';
 import {ErrorObservable} from 'rxjs/observable/ErrorObservable';
 import {environment} from '../../environments/environment';
+import { SearchResults } from '../domain/extraClasses';
 
 const headerOptions = {
     headers : new HttpHeaders().set('Content-Type', 'application/json').set('Accept', 'application/json'),
@@ -37,10 +38,10 @@ export class ManageProjectService {
             );
     }
 
-    getAllProjects(): Observable<Project[]> {
-        const url = `${this.apiUrl}getAll`;
+    getAllProjects(from: number, quantity: number): Observable<SearchResults<Project>> {
+        const url = `${this.apiUrl}getAll/${from}/${quantity}`;
         console.log(`calling ${url}`);
-        return this.http.get<Project[]>(url, headerOptions)
+        return this.http.get<SearchResults<Project>>(url, headerOptions)
             .pipe(
                 catchError(this.handleError)
             );

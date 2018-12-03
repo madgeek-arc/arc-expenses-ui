@@ -3,6 +3,7 @@ import {Injectable} from '@angular/core';
 import {environment} from '../../environments/environment';
 import {Delegate, Institute, Organization, PersonOfInterest, Executive} from '../domain/operation';
 import {Observable} from 'rxjs/Observable';
+import { SearchResults } from '../domain/extraClasses';
 
 const headerOptions = {
     headers : new HttpHeaders().set('Content-Type', 'application/json').set('Accept', 'application/json'),
@@ -18,10 +19,10 @@ export class ManageResourcesService {
     constructor(private http: HttpClient) {}
 
     /* Institutes */
-    getAllInstitutes(): Observable<Institute[]> {
+    getAllInstitutes(): Observable<SearchResults<Institute>> {
         const url = `${this.apiUrl}/institute/getAll`;
         console.log(`calling ${url}`);
-        return this.http.get<Institute[]>(url, headerOptions);
+        return this.http.get<SearchResults<Institute>>(url, headerOptions);
     }
 
     getInstituteNames(): Observable<Map<string, string>> {
@@ -50,10 +51,10 @@ export class ManageResourcesService {
 
 
     /* Organizations */
-    getAllOrganizations(): Observable<Organization[]> {
+    getAllOrganizations(): Observable<SearchResults<Organization>> {
         const url = `${this.apiUrl}/organization/getAll`;
         console.log(`calling ${url}`);
-        return this.http.get<Organization[]>(url, headerOptions);
+        return this.http.get<SearchResults<Organization>>(url, headerOptions);
     }
 
     getOrganizationById(id: string): Observable<Organization> {

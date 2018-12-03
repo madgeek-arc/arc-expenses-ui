@@ -17,6 +17,7 @@ export class TopMenuComponent implements OnInit, DoCheck {
 
   loggedIn: boolean = false;
   isAdmin: boolean = false;
+  isOperator: boolean = false;
 
   contactForm: FormGroup;
   modalError: string;
@@ -34,6 +35,7 @@ export class TopMenuComponent implements OnInit, DoCheck {
       this.isUserLoggedIn();
       this.isUserAdmin();
       this.getUserName();
+      this.isUserOperator();
   }
 
   login() {
@@ -64,6 +66,10 @@ export class TopMenuComponent implements OnInit, DoCheck {
 
   isUserAdmin() {
       this.isAdmin = ( this.authService.getUserRole() === 'ROLE_ADMIN' );
+  }
+
+  isUserOperator() {
+      this.isOperator = ( this.authService.getUserRole() === 'ROLE_OPERATOR' );
   }
 
   onClick(id: string) {

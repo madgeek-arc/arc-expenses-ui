@@ -97,7 +97,7 @@
                         </a>
                     </div>
                 </div>
-                <div *ngIf="scientificCoordinatorFormData">
+                <div *ngIf="scientificCoordinatorFormData" style="border: 1px dotted mediumblue" class="uk-padding-small">
                     <div>
                         <app-edit-poi #scientificCoordinatorForm [id]="id + '_sciCoord'"
                                       [data]="scientificCoordinatorFormData"></app-edit-poi>

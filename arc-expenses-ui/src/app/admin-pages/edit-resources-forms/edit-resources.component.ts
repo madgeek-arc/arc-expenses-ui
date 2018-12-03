@@ -56,15 +56,4 @@ export class EditResourcesComponent implements OnInit {
         console.log(JSON.stringify(this[dataArrayName]));
     }
 
-    /* this function is overloaded by the class descendants */
-    /*exportFormValue() {
-        if (this.resourceForm.valid) {
-            if (this.checkIfFormIsEmpty()) {
-                return '';
-            } else {
-                return this.resourceForm.value;
-            }
-        }
-    }*/
-
 }

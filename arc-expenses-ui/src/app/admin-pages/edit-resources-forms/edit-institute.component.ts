@@ -7,7 +7,8 @@ import { ManageResourcesService } from '../../services/manage-resources.service'
 
 @Component({
     selector: 'app-edit-institute',
-    templateUrl: './edit-institute.component.html'
+    templateUrl: './edit-institute.component.html',
+    styleUrls: ['./edit-resources.component.scss']
 })
 export class EditInstituteComponent extends EditResourcesComponent implements OnInit, OnChanges {
 
@@ -117,6 +118,14 @@ export class EditInstituteComponent extends EditResourcesComponent implements On
                 }
             } else {
                 this.resourceForm.patchValue({organization: 'ARC'});
+                this.addPOI('instDirectorFormData');
+                this.addPOI('accountingRegistrationFormData');
+                this.addPOI('accountingPaymentFormData');
+                this.addPOI('accountingDirectorFormData');
+                this.addPOI('diaugeiaFormData');
+                this.addPOI('suppliesOfficeFormData');
+                this.addPOI('travelManagerFormData');
+                this.addPOI('diataktisFormData');
             }
             this.resourceForm.updateValueAndValidity();
         }

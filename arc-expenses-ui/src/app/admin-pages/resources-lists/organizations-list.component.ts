@@ -22,7 +22,9 @@ export class OrganizationsListComponent implements OnInit {
         this.showSpinner = true;
         this.resourcesService.getAllOrganizations().subscribe(
             orgs => {
-                this.organizations = orgs;
+                if (orgs.results) {
+                    this.organizations = orgs.results;
+                }
                 this.errorMessage = '';
                 this.showSpinner = false;
             },

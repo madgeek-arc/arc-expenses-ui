@@ -1,18 +1,34 @@
-<div *ngIf="!showForm" class="uk-margin-bottom">
-    <div class="uk-width-1-1 uk-margin-bottom">
+<div class="uk-margin-bottom">
+    <div class="uk-inline uk-margin-large-right">
         <div>
-            <label for="chooseDelegateRadio">
-                <input class="uk-radio" id="chooseDelegateRadio"
-                       type="radio" name="delegateChoiceMode" checked
+            <label for="chooseDelegateRadio_{{id}}">
+                <input class="uk-radio" id="chooseDelegateRadio_{{id}}"
+                       type="radio" name="delegateChoiceMode_{{id}}" checked
                        (change)="inNewDelegateMode(false)">
-                &nbsp;Επιλογή εκπροσώπου
+                &nbsp;Επιλογή από τους ήδη υπάρχοντες
             </label>
         </div>
+    </div>
+    <div class="uk-inline">
         <div>
-            <input class="uk-input" value="{{ searchTerm }}"
-                   placeholder="Αναζήτηση εκπροσώπου με βάση το email" type="text"
-                   (keyup)="updateSearchTerm($event)" [disabled]="newDelegateMode">
-            <div class="uk-comment-body uk-text-small uk-text-muted">
+            <label for="createNewDelegateRadio_{{id}}">
+                <input class="uk-radio" id="createNewDelegateRadio_{{id}}"
+                       type="radio" name="delegateChoiceMode_{{id}}"
+                       (change)="inNewDelegateMode(true)">
+                &nbsp;Δημιουργία νέου
+            </label>
+        </div>
+    </div>
+</div>
+<div *ngIf="resourceForm" class="uk-margin-bottom">
+    <div [formGroup]="resourceForm">
+        <div class="">
+            <!--<label class="uk-form-label" for="email_{{ id }}">Email (*)</label>-->
+            <div class="">
+                <input type="email" placeholder="Email (*)" id="email_{{ id }}" class="uk-input"
+                       formControlName="email" (keyup)="updateSearchTerm()" />
+            </div>
+            <div *ngIf="!newDelegateMode"  class="uk-comment-body uk-text-small uk-text-muted">
                 <i>Ξεκινήστε να γράφετε το email του εκπροσώπου και επιλέξτε τον από την λίστα που θα εμφανιστεί.</i>
             </div>
             <div *ngIf="searchTerm" class="uk-nav uk-padding-small uk-width-large uk-position-absolute" style="background-color: white">
@@ -24,20 +40,6 @@
                 </ul>
             </div>
         </div>
-    </div>
-    <div class="uk-width-1-1">
-        <div>
-            <label for="createNewDelegateRadio">
-                <input class="uk-radio" id="createNewDelegateRadio"
-                       type="radio" name="delegateChoiceMode"
-                       (change)="inNewDelegateMode(true)">
-                &nbsp;Δημιουργία νέου
-            </label>
-        </div>
-    </div>
-</div>
-<div *ngIf="resourceForm && showForm" class="uk-margin-bottom">
-    <div [formGroup]="resourceForm">
         <div class="">
             <!--<label class="uk-form-label" for="firstname_{{ id }}">Όνομα</label>-->
             <div class="">
@@ -50,13 +52,6 @@
             <div class="">
                 <input type="text" placeholder="Επώνυμο" id="lastname_{{ id }}" class="uk-input"
                        formControlName="lastname"/>
-            </div>
-        </div>
-        <div class="">
-            <!--<label class="uk-form-label" for="email_{{ id }}">Email (*)</label>-->
-            <div class="">
-                <input type="email" placeholder="Email (*)" id="email_{{ id }}" class="uk-input"
-                       formControlName="email"/>
             </div>
         </div>
         <div>

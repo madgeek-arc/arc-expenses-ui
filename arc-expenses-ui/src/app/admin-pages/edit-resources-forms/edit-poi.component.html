@@ -1,43 +1,47 @@
-<div *ngIf="!showForm" class="uk-margin-bottom uk-margin-small-top">
-    <div class="uk-margin">
+<div class="uk-margin-bottom uk-margin-top">
+    <div class="uk-inline uk-margin-large-right">
         <div>
-            <label for="choosePOIRadio">
-                <input class="uk-radio" id="choosePOIRadio"
-                       type="radio" name="poiChoiceMode" checked
+            <label for="choosePOIRadio_{{id}}">
+                <input class="uk-radio" id="choosePOIRadio_{{id}}"
+                       type="radio" name="poiChoiceMode_{{id}}" checked
                        (change)="inNewPOIMode(false)">
-                Επιλογή υπευθύνου
+                Επιλογή από τους ήδη υπάρχοντες
             </label>
         </div>
-        <div>
-            <input class="uk-input" value="{{ searchTerm }}"
-                   placeholder="Αναζήτηση υπευθύνου με βάση το email" type="text"
-                   (keyup)="updateSearchTerm($event)" [disabled]="newPOIMode">
-            <div class="uk-comment-body uk-text-small uk-text-muted">
-                <i>Ξεκινήστε να γράφετε το email του υπευθύνου και επιλέξτε τον από την λίστα που θα εμφανιστεί.</i>
-            </div>
-            <div *ngIf="searchTerm" class="uk-nav uk-padding-small uk-width-large uk-position-absolute" style="background-color: white">
-                <ul>
-                    <li *ngFor="let poi of executives | filterByTerm: searchTerm: 'email'">
-                        <a (click)="addPOI(poi)">
-                            {{ poi.firstname + ' ' + poi.lastname + ' (' + poi.email + ')' }}</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
     </div>
-    <div class="uk-margin">
+    <div class="uk-inline">
         <div>
-            <label for="createNewPOIRadio">
-                <input class="uk-radio" id="createNewPOIRadio"
-                       type="radio" name="poiChoiceMode"
+            <label for="createNewPOIRadio_{{id}}">
+                <input class="uk-radio" id="createNewPOIRadio_{{id}}"
+                       type="radio" name="poiChoiceMode_{{id}}"
                        (change)="inNewPOIMode(true)">
                 Δημιουργία νέου
             </label>
         </div>
     </div>
 </div>
-<div *ngIf="resourceForm && showForm" class="uk-margin-bottom uk-margin-small-top">
+<div *ngIf="resourceForm" class="uk-margin-bottom uk-margin-small-top">
     <div [formGroup]="resourceForm">
+        <div>
+            <!--<label class="uk-countdown-label" for="email_{{ id }}">Email (*)</label>-->
+            <div class="">
+                <div class="uk-width-1-1">
+                    <input type="email" placeholder="Email (*)" id="email_{{ id }}" class="uk-input"
+                           formControlName="email" (keyup)="updateSearchTerm()" />
+                    <div *ngIf="!newPOIMode" class="uk-comment-body uk-text-small uk-text-muted">
+                        <i>Ξεκινήστε να γράφετε το email του υπευθύνου και επιλέξτε τον από την λίστα που θα εμφανιστεί.</i>
+                    </div>
+                    <div *ngIf="searchTerm" class="uk-nav uk-padding-small uk-width-large uk-position-absolute" style="background-color: white">
+                        <ul>
+                            <li *ngFor="let poi of executives | filterByTerm: searchTerm: 'email'">
+                                <a (click)="addPOI(poi)">
+                                    {{ poi.firstname + ' ' + poi.lastname + ' (' + poi.email + ')' }}</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div>
             <!--<label class="uk-form-label" for="firstname_{{ id }}">Όνομα</label>-->
             <div class="">
@@ -56,19 +60,11 @@
                 </div>
             </div>
         </div>
-        <div>
-            <!--<label class="uk-countdown-label" for="email_{{ id }}">Email (*)</label>-->
-            <div class="">
-                <div class="uk-width-1-1">
-                    <input type="email" placeholder="Email (*)" id="email_{{ id }}" class="uk-input" formControlName="email"/>
-                </div>
-            </div>
-        </div>
         <div *ngIf="delegateFormsData.length > 0"
-             class="uk-padding-small uk-margin-small-top"
-             style="border: 1px solid lightgray">
-            <div class="custom-form-label uk-text-uppercase">Εκπροσωποι</div>
-            <div *ngFor="let delData of delegateFormsData; let i = index;">
+             class="uk-padding-small uk-margin-small-top">
+            <div class="custom-form-label uk-text-uppercase uk-text-bold">Εκπροσωποι</div>
+            <div *ngFor="let delData of delegateFormsData; let i = index;" class="uk-padding"
+                 style="border: 1px solid lightgray">
                 <div>
                     <!--<label class="uk-form-label">Εκπρόσωπος {{i+1}}</label>-->
                     <a class="uk-float-right uk-margin-small-top" uk-icon="icon: close"
@@ -78,7 +74,6 @@
                     <app-edit-delegate #delegateForms
                                        [id]="id +'delegates_' + i"
                                        [data]="delData"></app-edit-delegate>
-                    <hr class="uk-divider-icon">
                 </div>
             </div>
         </div>

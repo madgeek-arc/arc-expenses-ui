@@ -10,6 +10,7 @@ import { AuthGuardService } from './services/auth-guard.service';
 import { ForbiddenPageComponent } from './shared/403-forbidden-page.component';
 import { AdminPageComponent } from './admin-pages/admin-page.component';
 import { RequestStagePaymentComponent } from './request-stage/request-stage-payment/request-stage-payment.component';
+import { CallHelpdeskPageComponent } from './error-pages/call-helpdesk-page.component';
 
 const appRoutes: Routes = [
   {
@@ -60,7 +61,7 @@ const appRoutes: Routes = [
     component: SignUpComponent
   },
   {
-    path: 'resources',
+    path: 'resources/:type',
     canActivate: [AuthGuardService],
     canLoad: [AuthGuardService],
     loadChildren: './admin-pages/admin.module#AdminModule'
@@ -68,6 +69,10 @@ const appRoutes: Routes = [
   {
       path: '403-forbidden',
       component: ForbiddenPageComponent
+  },
+  {
+      path: 'login-error',
+      component: CallHelpdeskPageComponent
   },
   {
     path: '**',

@@ -22,7 +22,9 @@ export class InstitutesListComponent implements OnInit {
         this.showSpinner = true;
         this.resourcesService.getAllInstitutes().subscribe(
             insts => {
-                this.institutes = insts;
+                if (insts.results) {
+                    this.institutes = insts.results;
+                }
                 this.errorMessage = '';
                 this.showSpinner = false;
             },

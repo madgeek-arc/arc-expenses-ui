@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { Vocabulary } from '../../domain/operation';
+import { Project, Vocabulary } from '../../domain/operation';
 import { ManageProjectService } from '../../services/manage-project.service';
+import { SearchResults } from '../../domain/extraClasses';
 
 @Component({
     selector: 'app-projects-list',
@@ -9,7 +10,8 @@ import { ManageProjectService } from '../../services/manage-project.service';
 export class ProjectsListComponent implements OnInit {
     errorMessage: string;
     showSpinner: boolean;
-    projects: Vocabulary[] = [];
+    searchResults: SearchResults<Project>;
+    projects: Project[] = [];
 
     itemsPerPage = 10;
     currentPage = 0;
@@ -26,9 +28,13 @@ export class ProjectsListComponent implements OnInit {
         this.errorMessage = '';
         this.showSpinner = true;
         const currentOffset = this.currentPage * this.itemsPerPage;
-        this.projectService.getAllProjectsNames().subscribe(
+        this.projectService.getAllProjects(currentOffset, this.itemsPerPage).subscribe(
             projs => {
-                this.projects = projs;
+                this.searchResults = projs;
+                if (projs.results) {
+                    this.projects = projs.results;
+                    this.totalPages = Math.ceil(this.searchResults.total / this.itemsPerPage);
+                }
                 this.errorMessage = '';
                 this.showSpinner = false;
             },
@@ -43,12 +49,14 @@ export class ProjectsListComponent implements OnInit {
     goToPreviousPage() {
         if (this.currentPage > 0) {
             this.currentPage--;
+            this.getProjects();
         }
     }
 
     goToNextPage() {
         if ( (this.currentPage + 1) < this.totalPages) {
             this.currentPage++;
+            this.getProjects();
         }
     }
 

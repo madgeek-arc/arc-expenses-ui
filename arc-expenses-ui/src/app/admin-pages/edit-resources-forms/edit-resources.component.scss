@@ -5,3 +5,7 @@
   text-transform:none;
   letter-spacing:0;
 }
+
+.ng-touched.ng-invalid {
+  border-color: darkred;
+}

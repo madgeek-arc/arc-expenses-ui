@@ -34,6 +34,7 @@ import { ForbiddenPageComponent } from './shared/403-forbidden-page.component';
 import { ManageUserService } from './services/manage-user.service';
 import { ManageResourcesService } from './services/manage-resources.service';
 import { RequestStagePaymentComponent } from './request-stage/request-stage-payment/request-stage-payment.component';
+import { CallHelpdeskPageComponent } from './error-pages/call-helpdesk-page.component';
 
 registerLocaleData(localeEL);
 
@@ -68,6 +69,7 @@ const stagesList = [
         Stage1FormComponent,
         StagesLoaderComponent,
         ForbiddenPageComponent,
+        CallHelpdeskPageComponent,
         ...stagesList
     ],
     imports: [

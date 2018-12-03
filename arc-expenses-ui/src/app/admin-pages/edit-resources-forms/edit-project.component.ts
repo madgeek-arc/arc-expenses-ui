@@ -8,7 +8,8 @@ import { ActivatedRoute } from '@angular/router';
 
 @Component({
     selector: 'app-edit-project',
-    templateUrl: './edit-project.component.html'
+    templateUrl: './edit-project.component.html',
+    styleUrls: ['./edit-resources.component.scss']
 })
 export class EditProjectComponent extends EditResourcesComponent implements OnInit, OnChanges {
 
@@ -49,13 +50,12 @@ export class EditProjectComponent extends EditResourcesComponent implements OnIn
     }
 
     ngOnChanges(changes: SimpleChanges) {
-        if ((changes !== undefined) && (changes !== null) &&
-            (changes['data'] !== undefined) && (changes['data'] !== null) &&
-            (changes['data'].currentValue !== undefined) && (changes['data'].currentValue !== null) ) {
+        if (changes && changes['data'] && changes['data'].currentValue) {
 
-            if ((this.resourceForm !== undefined) && (this.resourceForm !== null) &&
+            if (this.resourceForm &&
                 (changes[ 'data' ].currentValue !== changes[ 'data' ].previousValue)) {
 
+                console.log('getting ready to parse data');
                 this.parseData();
             }
         }
@@ -64,10 +64,10 @@ export class EditProjectComponent extends EditResourcesComponent implements OnIn
     /*  expects to receive a list of Executives, a list of Institutes
         and maybe one Project (in edit mode) from the input data */
     parseData() {
-        if ((this.data !== undefined) && (this.data !== null) && (this.data.length >= 2)) {
+        if (this.data && (this.data.length >= 2)) {
             this.executives = this.data[0];
             this.institutes = this.data[1];
-            if ((this.data[2] !== undefined) && (this.data[2] !== null)) {
+            if (this.data[2]) {
                 this.inEditMode = true;
                 Object.keys(this.resourceFormDefinition).forEach(
                     key => this.resourceForm.patchValue({ [key]: this.data[2][key] })
@@ -86,6 +86,9 @@ export class EditProjectComponent extends EditResourcesComponent implements OnIn
                     this.resourceForm.get('operator').setValue(['']);
                 }
                 this.resourceForm.updateValueAndValidity();
+            } else {
+                this.addPOI();
+                this.addPOIToList();
             }
         }
     }
@@ -112,15 +115,19 @@ export class EditProjectComponent extends EditResourcesComponent implements OnIn
         } else {
             this.addProject();
         }
+        // console.log(JSON.stringify(this.exportFormValue(), null, 2));
     }
 
     exportFormValue() {
-        // this.resourceForm.patchValue({institute: this.instituteForm.exportFormValue()});
-        this.resourceForm.patchValue({institute: this.institutes.filter(i => i.id === this.resourceForm.get('institute').value )[0]});
+        this.resourceForm.patchValue({
+            institute: this.institutes.filter(i => i.id === this.resourceForm.get('institute').value )[0]
+        });
         this.resourceForm.patchValue({scientificCoordinator: this.scientificCoordinatorForm.exportFormValue()});
         const operators = [];
         for (const op of this.operatorForms.toArray()) {
-            operators.push(op.exportFormValue());
+            if (op.exportFormValue()) {
+                operators.push(op.exportFormValue());
+            }
         }
         this.resourceForm.patchValue({operator: operators});
         if (this.resourceForm.valid) {

@@ -282,7 +282,7 @@ export class RequestsComponent implements OnInit {
             res => {
                 if (res && !isNull(res)) {
                     this.searchResults = res;
-                    if (this.searchResults && !isNull(this.searchResults.results) &&
+                    if (this.searchResults && this.searchResults.results &&
                         this.searchResults.results.length > 0 &&
                         !this.searchResults.results.some(x => isNull(x))) {
 

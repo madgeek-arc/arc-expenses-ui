@@ -9,6 +9,7 @@ import { EditOrganizationComponent } from './edit-resources-forms/edit-organizat
 import { ManageProjectService } from '../services/manage-project.service';
 import { ManageResourcesService } from '../services/manage-resources.service';
 import { concatMap, tap } from 'rxjs/operators';
+import { executives, institutes, organizations, project } from '../domain/mock_data';
 
 @Component({
     selector: 'app-admin-edit-resource',
@@ -36,11 +37,11 @@ export class AdminEditResourcePageComponent implements OnInit {
                 private resourcesService: ManageResourcesService) {}
 
     ngOnInit() {
-        this.getDataLists();
-
         if (this.route.snapshot.paramMap.has('type')) {
             this.resourceType = this.route.snapshot.paramMap.get('type');
         }
+        this.getDataLists();
+
         /* TODO: REMOVE WHEN getDataLists is activated */
         /*this.resourcesService.getAllExecutives().subscribe(
             res => this.executives = res,
@@ -59,12 +60,14 @@ export class AdminEditResourcePageComponent implements OnInit {
     }
 
     getCurrentResource() {
-        if (this.route.snapshot.paramMap.has('resourceId')) {
+        if (this.organizations && this.institutes && this.executives) {
+            if (this.route.snapshot.paramMap.has('resourceId')) {
 
-            this.resourceId = this.route.snapshot.paramMap.get('resourceId');
+                this.resourceId = this.route.snapshot.paramMap.get('resourceId');
+            }
+
+            this.createChildComponent();
         }
-
-        this.createChildComponent();
     }
 
     createChildComponent() {
@@ -74,8 +77,7 @@ export class AdminEditResourcePageComponent implements OnInit {
                 this.getProjectById();
             } else {
                 this.title = 'Προσθήκη έργου';
-                this.resource = new AnchorItem (
-                    EditProjectComponent, [this.executives, this.institutes] );
+                this.resource = new AnchorItem ( EditProjectComponent, [this.executives, this.institutes] );
             }
         } else if (this.resourceType === 'institutes') {
             if (this.resourceId) {
@@ -113,6 +115,9 @@ export class AdminEditResourcePageComponent implements OnInit {
                 this.showSpinner = false;
             }
         );
+
+        // this.currentResource = project;
+        // this.resource = new AnchorItem (EditProjectComponent, [this.executives, this.institutes, this.currentResource]);
     }
 
     getInstituteById() {
@@ -150,12 +155,26 @@ export class AdminEditResourcePageComponent implements OnInit {
     }
 
     getDataLists() {
+        /* using mock data */
+        /*this.executives = executives;
+        this.institutes = institutes;
+        this.organizations = organizations;
+        this.getCurrentResource();*/
+
         this.errorMessage = '';
         this.showSpinner = true;
         this.resourcesService.getAllInstitutes().pipe(
-            tap(res => this.institutes = res),
+            tap(res => {
+                if (res.results) {
+                    this.institutes = res.results;
+                }
+            }),
             concatMap(() => this.resourcesService.getAllOrganizations().pipe(
-                tap(res => this.organizations = res),
+                tap(res => {
+                    if (res.results) {
+                        this.organizations = res.results;
+                    }
+                }),
                 concatMap(() => this.resourcesService.getAllExecutives())
             ))
         ).subscribe(

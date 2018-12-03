@@ -42,7 +42,6 @@ export class Paging<T> {
     occurences: Occurences;
 }
 
-// TODO: send a SearchParams at getAll instead of many query params
 export class SearchParams {
     email: string;
     from: string;
