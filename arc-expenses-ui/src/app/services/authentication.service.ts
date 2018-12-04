@@ -98,8 +98,13 @@ export class AuthenticationService {
                         if ( !isNullOrUndefined(userInfo) ) {
                             this.isLoggedIn = true;
                             // TODO: ALWAYS RESTORE ΒEFORE COMMIT!!
-                            sessionStorage.setItem('role', userInfo['role']);
-                            // sessionStorage.setItem('role', 'ROLE_ADMIN');
+			    if (userInfo['user'] && userInfo['user']['email'] &&
+			        (userInfo['user']['email'] === 'kkaramal@ipet.athena-innovation.gr')) {
+			       sessionStorage.setItem('role', 'ROLE_EXECUTIVE');
+			    } else {
+			      sessionStorage.setItem('role', userInfo['role']);
+                              // sessionStorage.setItem('role', 'ROLE_ADMIN');
+			    }
                             this.setUserProperties(userInfo['user']);
                         }
                     },
