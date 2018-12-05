@@ -98,9 +98,10 @@ export class Stage1FormComponent implements OnInit {
                          isNullOrUndefined(this.currentRequest.stage1.attachments[0]) )) {
 
                 this.errorMessage = 'Για αναθέσεις μέσω διαγωνισμού ή έρευνας αγοράς η επισύναψη εγγράφων είναι υποχρεωτική.';
-            } else if ( (+this.updateStage1Form.get('amount').value > this.lowAmountLimit) &&
-                        isNullOrUndefined(this.currentRequest.stage1.attachments[0]) &&
-                        isNullOrUndefined(this.uploadedFile) ) {
+            } else if ( (this.currentRequest.type !== 'services_contract') &&
+                        (+this.updateStage1Form.get('amount').value > this.lowAmountLimit) &&
+                        (!this.currentRequest.stage1.attachments || (this.currentRequest.stage1.attachments.length === 0)) &&
+                        !this.uploadedFile ) {
 
                 this.errorMessage = 'Για αιτήματα άνω των 2.500 € η επισύναψη εγγράφων είναι υποχρεωτική.';
             } else {

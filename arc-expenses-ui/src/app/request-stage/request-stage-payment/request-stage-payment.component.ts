@@ -236,7 +236,7 @@ export class RequestStagePaymentComponent implements OnInit {
         this.errorMessage = '';
         this.successMessage = '';
 
-        if ( (this.uploadedFile !== undefined) && (this.uploadedFile !== null) ) {
+        if ( this.uploadedFile ) {
             this.currentRequestPayment[this.currentStageName]['attachment']['url'] = this.uploadedFileURL;
             this.uploadedFileURL = '';
             this.uploadedFile = null;

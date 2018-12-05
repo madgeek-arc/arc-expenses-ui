@@ -80,29 +80,31 @@ export class RequestsComponent implements OnInit {
     ngOnInit() {
         this.isSimpleUser = (this.authService.getUserRole().includes('ROLE_USER'));
 
-        /* TODO: remove when institutes are added */
-        // this.initializeParams();
+        /* TODO: add when institutes are added */
         // this.getInstitutes();
         this.readParams();
     }
 
     initializeParams() {
-        this.stages = approvalStages.concat(paymentStages);
-        this.initializeFiltersForm();
-        this.keywordField = this.fb.group({ keyword: [''] });
+        this.statusesChoice = ['all'];
+        this.stagesChoice = ['all'];
+        this.typesChoice = ['all'];
+        this.institutesChoice = ['all'];
+
         this.searchTerm = '';
-        this.statusesChoice.push('all');
-        this.stagesChoice.push('all');
-        this.typesChoice.push('all');
-        this.institutesChoice.push('all');
+        this.keywordField = this.fb.group({ keyword: [''] });
+
         this.phaseId = 0;
+        this.stages = approvalStages.concat(paymentStages);
+
         this.currentPage = 0;
         this.itemsPerPage = 10;
+
         this.order = 'DESC';
         this.orderField = 'creation_date';
         this.totalPages = 0;
 
-        this.getListOfRequests();
+        this.createSearchUrl();
     }
 
     readParams() {
@@ -630,7 +632,7 @@ export class RequestsComponent implements OnInit {
                             }
                         }
                     );
-                    this.initializeParams();
+                    this.readParams();
                 }
             }
         );
@@ -689,13 +691,6 @@ export class RequestsComponent implements OnInit {
 
         this.router.navigateByUrl(`/requests?${url.toString()}`)
             .then(() => this.readParams() );
-
-        // this.router.navigateByUrl(`/requests?${url.toString()}`);
-        /*this.router.navigate([],{ relativeTo: this.route, queryParams: url });
-        this.readParams();*/
-        /*window.location.search = url.toString();*/
-        // window.location.href = window.location.origin + window.location.pathname + '?' + url.toString();
-        /*setTimeout(() => {this.readParams();}, 500);*/
     }
 
 }

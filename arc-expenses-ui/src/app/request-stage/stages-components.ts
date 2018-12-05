@@ -93,7 +93,7 @@ export class StageComponent implements OnInit {
         if (this.showStage === 1) {
 
             /* set filename if exists */
-            if ( !isNullOrUndefined(this.currentStage['attachment']) ) {
+            if ( this.currentStage['attachment'] ) {
                 this.uploadedFilename = this.currentStage['attachment']['filename'];
             }
 
