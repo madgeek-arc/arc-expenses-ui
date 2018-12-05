@@ -106,7 +106,6 @@ export class AuthenticationService {
                                 sessionStorage.setItem('role', JSON.stringify(userInfo['role']));
                                 // sessionStorage.setItem('role', 'ROLE_ADMIN');
                             }
-
                             this.setUserProperties(userInfo['user']);
                         }
                     },

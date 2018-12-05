@@ -402,8 +402,8 @@ export class RequestStageComponent implements OnInit {
         if ( (stage === this.currentRequestApproval.stage) &&
              (this.currentRequestApproval.status !== 'rejected') &&
              (this.currentRequestApproval.status !== 'accepted') &&
-             (this.currentRequestApproval.status !== 'cancelled') &&
-             ( (this.authService.getUserRole().includes('ROLE_ADMIN')) || (this.canEdit === true) ) ) {
+	     (this.currentRequestApproval.status !== 'cancelled') &&
+             ( (this.authService.getUserRole() === 'ROLE_ADMIN') || (this.canEdit === true) ) ) {
 
             if (this.currentRequestApproval.stage !== '1') {
                 this.stageLoaderItemList = [
