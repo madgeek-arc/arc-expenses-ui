@@ -155,7 +155,7 @@ export class Stage1 {
     supplierSelectionMethod: string;
     amountInEuros: number;
     finalAmount: number;
-    attachments: Attachment[];
+    attachment: Attachment;
 }
 
 export class Stage2 {
@@ -297,7 +297,7 @@ export class User {
     signatureArchiveId: string;
     receiveEmails: string;
     immediateEmails: string;
-    attachments: Attachment;
+    attachment: Attachment;
 }
 
 export class Executive {

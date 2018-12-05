@@ -110,7 +110,7 @@ export class StageComponent implements OnInit {
     }
 
     findCurrentPOI() {
-        if ((this.currentStageInfo.stagePOIs.length === 1) || (this.authService.getUserRole().includes('ROLE_ADMIN')) ) {
+        if ((this.currentStageInfo.stagePOIs.length === 1) || (this.authService.getUserRole().some(x => x.authority === 'ROLE_ADMIN')) ) {
             return this.currentStageInfo.stagePOIs[0];
         } else {
             let curEmail: string;
@@ -211,7 +211,7 @@ export class StageComponent implements OnInit {
 
     createUser(): User {
         const tempUser: User = new User();
-        if ( (this.authService.getUserRole().includes('ROLE_ADMIN')) &&
+        if ( (this.authService.getUserRole().some(x => x.authority === 'ROLE_ADMIN')) &&
              ((this.stageId !== '7') ||
              (this.authService.getUserProp('email') !== this.currentRequestInfo.requester.email)) ) {
             tempUser.id = this.authService.getUserProp('id');
@@ -256,7 +256,7 @@ export class StageComponent implements OnInit {
             /* the name of the Inspection Team member that editted stage8 will only be shown to the POY and the Admins */
             if ((this.stageId !== '8') ||
                 ((this.stageId === '8') &&
-                 ((this.authService.getUserRole().includes('ROLE_ADMIN')) ||
+                 ((this.authService.getUserRole().some(x => x.authority === 'ROLE_ADMIN')) ||
                   this.currentRequestInfo['4'].stagePOIs.some(x => x.email === this.authService.getUserProp('email'))) )) {
 
                 if ( this.getIsDelegateHidden() ) {

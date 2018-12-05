@@ -41,22 +41,6 @@ export class AdminEditResourcePageComponent implements OnInit {
             this.resourceType = this.route.snapshot.paramMap.get('type');
         }
         this.getDataLists();
-
-        /* TODO: REMOVE WHEN getDataLists is activated */
-        /*this.resourcesService.getAllExecutives().subscribe(
-            res => this.executives = res,
-            er => {
-                console.log(er);
-                this.errorMessage = 'Παρουσιάστηκε πρόβλημα με την ανάκτηση των απαραίτητων πληροφοριών';
-                this.showSpinner = false;
-            },
-            () => {
-                this.showSpinner = false;
-                if (this.resourceType) {
-                    this.getCurrentResource();
-                }
-            }
-        );*/
     }
 
     getCurrentResource() {

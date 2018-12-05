@@ -7,7 +7,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AuthenticationService } from '../services/authentication.service';
 import { DatePipe } from '@angular/common';
 import { ManageProjectService } from '../services/manage-project.service';
-import { isNullOrUndefined, isUndefined } from 'util';
+import { isUndefined } from 'util';
 import { HttpEventType, HttpResponse } from '@angular/common/http';
 import { requestTypes, supplierSelectionMethodsMap } from '../domain/stageDescriptions';
 
@@ -34,11 +34,10 @@ export class NewRequestComponent implements OnInit {
     newRequestForm: FormGroup;
 
     uploadedFile: File;
-    uploadedFiles: File[] = [];
 
     requestedAmount: string;
     showWarning: boolean;
-    searchTerm: string = '';
+    searchTerm = '';
 
     request: Request;
     requestApproval: RequestApproval;
@@ -178,8 +177,7 @@ export class NewRequestComponent implements OnInit {
                 window.scroll(1, 1);
 
             } else if ( (( this.newRequestForm.get('supplierSelectionMethod').value !== 'direct' ) &&
-                           this.checkIfTrip() ) &&
-                          ((this.uploadedFiles === null) || (this.uploadedFiles.length === 0)) ) {
+                           this.checkIfTrip() ) && (!this.uploadedFile) ) {
 
                 // UIkit.modal.alert('Για αναθέσεις μέσω διαγωνισμού ή έρευνας αγοράς η επισύναψη εγγράφων είναι υποχρεωτική.');
                 this.errorMessage = 'Για αναθέσεις μέσω διαγωνισμού ή έρευνας αγοράς η επισύναψη εγγράφων είναι υποχρεωτική.';
@@ -208,14 +206,9 @@ export class NewRequestComponent implements OnInit {
                 }
                 this.request.stage1.amountInEuros = +this.newRequestForm.get('amount').value;
                 this.request.stage1.finalAmount = +this.newRequestForm.get('amount').value;
-                if (this.uploadedFiles && (this.uploadedFiles.length > 0)) {
-                    this.request.stage1.attachments = [];
-                    for (let i = 0; i < this.uploadedFiles.length; i++) {
-                        this.request.stage1.attachments.push(
-                            new Attachment(this.uploadedFiles[i].name, this.uploadedFiles[i].type,
-                                           this.uploadedFiles[i].size, '')
-                        );
-                    }
+                if (this.uploadedFile) {
+                    this.request.stage1.attachment = new Attachment(this.uploadedFile.name, this.uploadedFile.type,
+                                                                    this.uploadedFile.size, '');
                 }
 
                 if (this.requestType === 'trip') {
@@ -269,7 +262,7 @@ export class NewRequestComponent implements OnInit {
                         window.scroll(1, 1);
                     },
                     () => {
-                        if (this.uploadedFiles && (this.uploadedFiles.length > 0)) {
+                        if (this.uploadedFile) {
                             this.uploadFile();
                         } else {
                             this.submitRequestApproval();
@@ -307,7 +300,7 @@ export class NewRequestComponent implements OnInit {
     uploadFile() {
         // this.showSpinner = true;
         this.errorMessage = '';
-        this.requestService.uploadAttachments<string>(this.request.archiveId, 'stage1', this.uploadedFiles, 'request')
+        this.requestService.uploadAttachment<string>(this.request.archiveId, 'stage1', this.uploadedFile, 'request')
             .subscribe(
                 event => {
                     // console.log('uploadAttachment responded: ', JSON.stringify(event));
@@ -315,10 +308,7 @@ export class NewRequestComponent implements OnInit {
                         console.log('uploadAttachment responded: ', event);
                     } else if ( event instanceof HttpResponse) {
                         console.log('final event:', event.body);
-                        const fileUrls: string[] = JSON.parse(event.body);
-                        for (let i = 0; i < fileUrls.length; i++) {
-                            this.request.stage1.attachments[i].url = fileUrls[i];
-                        }
+                        this.request.stage1.attachment.url = event.body;
                     }
                 },
                 error => {
@@ -421,9 +411,9 @@ export class NewRequestComponent implements OnInit {
         }
     }
 
-    getUploadedFiles(files: File[]) {
+    getUploadedFile(file: File) {
         // this.uploadedFile = file;
-        this.uploadedFiles = files;
+        this.uploadedFile = file;
     }
 
     showAmount() {

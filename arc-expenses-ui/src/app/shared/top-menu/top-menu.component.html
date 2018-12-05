@@ -76,14 +76,15 @@
                             <div *ngIf="loggedIn" uk-dropdown>
                                 <ul class="uk-nav uk-dropdown-nav">
                                     <li><a [routerLink]="['/sign-up']">Στοιχεία χρήστη</a></li>
-                                    <li *ngIf="isAdmin || isOperator">
-                                        <a (click)="routeToPage('/resources/projects')">Επεγεργασία έργων</a>
+                                    <!-- TODO:: ADD OPERATORS WHEN DECIDED -->
+                                    <li *ngIf="isAdmin">
+                                        <a (click)="routeToPage('/resources/projects')">Επεξεργασία έργων</a>
                                     </li>
                                     <li *ngIf="isAdmin">
-                                        <a (click)="routeToPage('/resources/institutes')">Επεγεργασία ινστιτούτων</a>
+                                        <a (click)="routeToPage('/resources/institutes')">Επεξεργασία ινστιτούτων</a>
                                     </li>
                                     <li *ngIf="isAdmin">
-                                        <a (click)="routeToPage('/resources/organizations')">Επεγεργασία οργανισμών</a>
+                                        <a (click)="routeToPage('/resources/organizations')">Επεξεργασία οργανισμών</a>
                                     </li>
                                     <li><a (click)="logout()">Έξοδος</a></li>
                                 </ul>

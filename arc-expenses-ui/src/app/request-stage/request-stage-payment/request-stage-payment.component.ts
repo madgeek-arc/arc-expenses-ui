@@ -54,7 +54,8 @@ export class RequestStagePaymentComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.isSimpleUser = (this.authService.getUserRole().includes('ROLE_USER'));
+        this.isSimpleUser = (this.authService.getUserRole().some(x => x.authority === 'ROLE_USER') &&
+                             (this.authService.getUserRole().length === 1));
         console.log(`current user role is: ${this.authService.getUserRole()}`);
         this.getCurrentRequest();
     }
@@ -331,7 +332,7 @@ export class RequestStagePaymentComponent implements OnInit {
             (this.currentRequestPayment.status !== 'rejected') &&
             (this.currentRequestPayment.status !== 'accepted') &&
             (this.currentRequestPayment.status !== 'cancelled') &&
-            ( (this.authService.getUserRole().includes('ROLE_ADMIN')) || (this.canEdit === true) ) ) {
+            ( (this.authService.getUserRole().some(x => x.authority === 'ROLE_ADMIN')) || (this.canEdit === true) ) ) {
 
             this.stageLoaderItemList = [
                 new AnchorItem(
@@ -392,7 +393,7 @@ export class RequestStagePaymentComponent implements OnInit {
     }
 
     linkToFile() {
-        if (this.currentRequest.stage1.attachments && this.currentRequest.stage1.attachments[0].url) {
+        if (this.currentRequest.stage1.attachment && this.currentRequest.stage1.attachment.url) {
             /*window.open(this.currentRequest.stage1.attachment.url , '_blank', 'enabledstatus=0,toolbar=0,menubar=0,location=0');*/
             window.open(`${window.location.origin}/arc-expenses-service/request/store/download?requestId=${this.currentRequest.id}&stage=1&mode=request`,
                 '_blank', 'enabledstatus=0,toolbar=0,menubar=0,location=0');
@@ -408,7 +409,7 @@ export class RequestStagePaymentComponent implements OnInit {
     }
 
     userIsAdmin() {
-        return (this.authService.getUserRole().includes('ROLE_ADMIN'));
+        return (this.authService.getUserRole().some(x => x.authority === 'ROLE_ADMIN'));
     }
 
 }

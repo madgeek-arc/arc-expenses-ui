@@ -62,7 +62,8 @@ export class RequestStageComponent implements OnInit {
 
     ngOnInit() {
         this.getCurrentRequest();
-        this.isSimpleUser = (this.authService.getUserRole().includes('ROLE_USER'));
+        this.isSimpleUser = (this.authService.getUserRole().some(x => x.authority === 'ROLE_USER') &&
+                             (this.authService.getUserRole().length === 1));
         console.log(`current user role is: ${this.authService.getUserRole()}`);
     }
 
@@ -280,7 +281,7 @@ export class RequestStageComponent implements OnInit {
 
         if ( !isNullOrUndefined(this.uploadedFile) ) {
 
-            this.currentRequest.stage1['attachment'][0]['url'] = this.uploadedFileURL;
+            this.currentRequest.stage1.attachment.url = this.uploadedFileURL;
             this.uploadedFileURL = '';
             this.uploadedFile = null;
         }
@@ -383,7 +384,6 @@ export class RequestStageComponent implements OnInit {
                     this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
                 },
                 () => {
-                    console.log('ready to update Request');
                     if (this.currentStageName === 'stage1') {
                         this.submitRequest();
                     } else if (this.requestNeedsUpdate) {
@@ -402,8 +402,8 @@ export class RequestStageComponent implements OnInit {
         if ( (stage === this.currentRequestApproval.stage) &&
              (this.currentRequestApproval.status !== 'rejected') &&
              (this.currentRequestApproval.status !== 'accepted') &&
-	     (this.currentRequestApproval.status !== 'cancelled') &&
-             ( (this.authService.getUserRole() === 'ROLE_ADMIN') || (this.canEdit === true) ) ) {
+    	     (this.currentRequestApproval.status !== 'cancelled') &&
+             ( (this.authService.getUserRole().some(x => x.authority === 'ROLE_ADMIN')) || (this.canEdit === true) ) ) {
 
             if (this.currentRequestApproval.stage !== '1') {
                 this.stageLoaderItemList = [
@@ -466,7 +466,7 @@ export class RequestStageComponent implements OnInit {
     }
 
     linkToFile() {
-        if (this.currentRequest.stage1.attachments && this.currentRequest.stage1.attachments[0].url) {
+        if (this.currentRequest.stage1.attachment && this.currentRequest.stage1.attachment.url) {
             /*window.open(this.currentRequest.stage1.attachment.url , '_blank', 'enabledstatus=0,toolbar=0,menubar=0,location=0');*/
             let url = `${window.location.origin}/arc-expenses-service/request/store/download?`;
             url = `${url}requestId=${this.currentRequest.id}&stage=1&mode=request`;
@@ -485,6 +485,7 @@ export class RequestStageComponent implements OnInit {
     }
 
     getUploadedFile(file: File) {
+        console.log('I got the file!');
         this.uploadedFile = file;
     }
 
@@ -527,7 +528,7 @@ export class RequestStageComponent implements OnInit {
     }
 
     userIsAdmin() {
-        return (this.authService.getUserRole().includes('ROLE_ADMIN'));
+        return (this.authService.getUserRole().some(x => x.authority === 'ROLE_ADMIN'));
     }
 
     userIsRequester() {

@@ -101,7 +101,7 @@ export class AuthenticationService {
                             // TODO: ALWAYS RESTORE ΒEFORE COMMIT!!
                             if (userInfo['user'] && userInfo['user']['email'] &&
                                 (userInfo['user']['email'] === 'kkaramal@ipet.athena-innovation.gr')) {
-                                sessionStorage.setItem('role', 'ROLE_EXECUTIVE');
+                                sessionStorage.setItem('role', '[{"authority":"ROLE_EXECUTIVE"}]');
                             } else {
                                 sessionStorage.setItem('role', JSON.stringify(userInfo['role']));
                                 // sessionStorage.setItem('role', 'ROLE_ADMIN');
@@ -165,9 +165,9 @@ export class AuthenticationService {
              sessionStorage.getItem('role') &&
              (sessionStorage.getItem('role') !== 'null') ) {
 
-            return sessionStorage.getItem('role');
+            return JSON.parse(sessionStorage.getItem('role'));
         } else {
-            return '';
+            return [];
         }
     }
 
