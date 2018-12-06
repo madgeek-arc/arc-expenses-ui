@@ -10,12 +10,12 @@
           <div class="uk-width-1-1@m uk-first-column">
             <div>
               <div class="search_box_bg" style="text-align:center">
-                <div [formGroup]="keywordField" class="uk-align-center uk-margin-top">
+                <form [formGroup]="keywordField" class="uk-align-center uk-margin-top">
                   <input class="uk-input uk-width-2-3 uk-search-field"
                          placeholder="αρ.πρωτοκόλλου, αιτών, χειριστής, υπεύθυνος, έργο, ινστιτούτο" formControlName="keyword">
-                  <button class="uk-button uk-button-secondary" (click)="getSearchByKeywordResults()"><i class="fa fa-search"></i> Αναζήτηση</button>
+                  <button class="uk-button uk-button-secondary" type="submit" (click)="getSearchByKeywordResults()"><i class="fa fa-search"></i> Αναζήτηση</button>
                   <button class="uk-button uk-button-default" (click)="initializeParams()">Καθάρισμα επιλογών</button>
-                </div>
+                </form>
               </div>
             </div>
           </div>

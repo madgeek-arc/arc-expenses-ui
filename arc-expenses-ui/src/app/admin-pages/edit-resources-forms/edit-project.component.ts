@@ -154,11 +154,11 @@ export class EditProjectComponent extends EditResourcesComponent implements OnIn
     }
 
     addProject() {
-        this.errorMessage = '';
-        this.successMessage = '';
-        this.showSpinner = true;
         const project = this.exportFormValue();
         if (project !== '') {
+            this.errorMessage = '';
+            this.successMessage = '';
+            this.showSpinner = true;
             this.projectService.addProject(project).subscribe(
                 proj => console.log(JSON.stringify(proj)),
                 err => {
@@ -179,11 +179,11 @@ export class EditProjectComponent extends EditResourcesComponent implements OnIn
     }
 
     updateProject() {
-        this.errorMessage = '';
-        this.successMessage = '';
-        this.showSpinner = true;
         const project = this.exportFormValue();
         if (project !== '') {
+            this.errorMessage = '';
+            this.successMessage = '';
+            this.showSpinner = true;
             this.projectService.updateProject(project).subscribe (
                 proj => console.log(JSON.stringify(proj)),
                 err => {

@@ -31,7 +31,8 @@
             <div *ngIf="!newDelegateMode"  class="uk-comment-body uk-text-small uk-text-muted">
                 <i>Ξεκινήστε να γράφετε το email του εκπροσώπου και επιλέξτε τον από την λίστα που θα εμφανιστεί.</i>
             </div>
-            <div *ngIf="searchTerm" class="uk-nav uk-padding-small uk-width-large uk-position-absolute" style="background-color: white">
+            <div *ngIf="searchTerm" class="uk-nav uk-padding-small uk-width-large uk-position-absolute uk-position-z-index"
+                 style="background-color: #FFFFFF !important;">
                 <ul>
                     <li *ngFor="let delegate of executives | filterByTerm: searchTerm: 'email'">
                         <a (click)="addDelegate(delegate)">

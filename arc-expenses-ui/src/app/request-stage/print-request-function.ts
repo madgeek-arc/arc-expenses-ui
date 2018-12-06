@@ -14,15 +14,11 @@ export function printRequestPage() {
           </style>
           <title>Αίτημα </title>
           <!-- UIkit CSS -->
-          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.5/css/uikit.min.css" />
-          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.5/css/uikit.min.css" />
-          <link rel="stylesheet" href="assets/css/theme.scss" />
-          <link rel="stylesheet" href="assets/css/theme.update.scss" />
-          <link rel="stylesheet" href="../../styles.scss" />
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.25/css/uikit.min.css" />
 
           <!-- UIkit JS -->
-          <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.5/js/uikit.min.js"></script>
-          <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.5/js/uikit-icons.min.js"></script>
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.25/js/uikit.min.js"></script>
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.25/js/uikit-icons.min.js"></script>
         </head>
     <body onload="window.print();window.close()">${printContents}</body>
       </html>`

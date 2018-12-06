@@ -135,7 +135,7 @@ export class EditOrganizationComponent extends EditResourcesComponent implements
         if (this.resourceForm.valid) {
             return this.resourceForm.value;
         } else {
-            this.errorMessage = 'Παρακαλώ συμπληρώστε όλα τα πεδία.';
+            this.errorMessage = 'Παρακαλώ συμπληρώστε όλα τα απαιτούμενα πεδία.';
             window.scrollTo(1, 1);
             return '';
         }
@@ -143,11 +143,11 @@ export class EditOrganizationComponent extends EditResourcesComponent implements
 
 
     addOrganization() {
-        this.errorMessage = '';
-        this.successMessage = '';
-        this.showSpinner = true;
         const organization = this.exportFormValue();
         if (organization !== '') {
+            this.errorMessage = '';
+            this.successMessage = '';
+            this.showSpinner = true;
             this.resourcesService.addOrganization(organization).subscribe(
                 org => console.log('add organization responded', JSON.stringify(org)),
                 err => {
@@ -168,11 +168,11 @@ export class EditOrganizationComponent extends EditResourcesComponent implements
     }
 
     updateOrganization() {
-        this.errorMessage = '';
-        this.successMessage = '';
-        this.showSpinner = true;
         const organization = this.exportFormValue();
         if (organization !== '') {
+            this.errorMessage = '';
+            this.successMessage = '';
+            this.showSpinner = true;
             this.resourcesService.updateOrganization(organization).subscribe(
                 org => console.log('update organization responded', JSON.stringify(org)),
                 err => {

@@ -167,18 +167,18 @@ export class EditInstituteComponent extends EditResourcesComponent implements On
         if (this.resourceForm.valid) {
             return this.resourceForm.value;
         } else {
-            this.errorMessage = 'Παρακαλώ συμπληρώστε όλα τα πεδία.';
+            this.errorMessage = 'Παρακαλώ συμπληρώστε όλα τα απαιτούμενα πεδία.';
             window.scrollTo(1, 1);
             return '';
         }
     }
 
     addInstitute() {
-        this.errorMessage = '';
-        this.successMessage = '';
-        this.showSpinner = true;
         const institute = this.exportFormValue();
         if (institute !== '') {
+            this.errorMessage = '';
+            this.successMessage = '';
+            this.showSpinner = true;
             this.resourcesService.addInstitute(institute).subscribe(
                 inst => console.log(JSON.stringify(inst)),
                 err => {
@@ -199,11 +199,11 @@ export class EditInstituteComponent extends EditResourcesComponent implements On
     }
 
     updateInstitute() {
-        this.errorMessage = '';
-        this.successMessage = '';
-        this.showSpinner = true;
         const institute = this.exportFormValue();
         if (institute !== '') {
+            this.errorMessage = '';
+            this.successMessage = '';
+            this.showSpinner = true;
             this.resourcesService.updateInstitute(institute).subscribe(
                 inst => console.log(JSON.stringify(inst)),
                 err => {
