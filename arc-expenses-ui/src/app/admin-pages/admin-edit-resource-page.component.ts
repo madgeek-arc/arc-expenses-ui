@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Executive, Institute, Organization } from '../domain/operation';
 import { AnchorItem } from '../shared/dynamic-loader-anchor-components/anchor-item';
 import { EditProjectComponent } from './edit-resources-forms/edit-project.component';
@@ -33,6 +33,7 @@ export class AdminEditResourcePageComponent implements OnInit {
     @ViewChild('editResourceForm') editResourceForm: ResourcesLoaderComponent;
 
     constructor(private route: ActivatedRoute,
+                private router: Router,
                 private projectService: ManageProjectService,
                 private resourcesService: ManageResourcesService) {}
 
@@ -80,6 +81,8 @@ export class AdminEditResourcePageComponent implements OnInit {
                 this.title = 'Προσθήκη οργανισμού';
                 this.resource = new AnchorItem ( EditOrganizationComponent, [this.executives] );
             }
+        } else {
+            this.router.navigate(['/home']);
         }
     }
 

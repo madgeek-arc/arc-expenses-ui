@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AnchorItem } from '../shared/dynamic-loader-anchor-components/anchor-item';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ProjectsListComponent } from './resources-lists/projects-list.component';
 import { InstitutesListComponent } from './resources-lists/institutes-list.component';
 import { OrganizationsListComponent } from './resources-lists/organizations-list.component';
@@ -18,7 +18,7 @@ export class AdminPageComponent implements OnInit {
     resourceType: string;
     resource: any;
 
-    constructor(private route: ActivatedRoute) {}
+    constructor(private route: ActivatedRoute, private router: Router) {}
 
     ngOnInit() {
         if (this.route.snapshot.paramMap.has('type')) {
@@ -40,6 +40,8 @@ export class AdminPageComponent implements OnInit {
             this.title = 'Οργανισμοί';
             this.addNewButtonLabel = 'Προσθήκη οργανισμού';
             this.resource = new AnchorItem(OrganizationsListComponent);
+        } else {
+            this.router.navigate(['/home']);
         }
     }
 

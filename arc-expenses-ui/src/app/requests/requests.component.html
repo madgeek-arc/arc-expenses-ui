@@ -228,9 +228,9 @@
                                             <tr>
                                                 <th></th>
                                                 <th>Αρ.Πρωτ./Ειδος</th>
-                                                <th><a (click)="sortBy('request_project')" title="Ταξινόμηση με βάση το ακρώνυμο του έργου">
+                                                <th><a (click)="sortBy('request_project_acronym')" title="Ταξινόμηση με βάση το ακρώνυμο του έργου">
                                                     Εργο&nbsp;
-                                                    <span *ngIf="orderField && (orderField === 'request_project')"
+                                                    <span *ngIf="orderField && (orderField === 'request_project_acronym')"
                                                           [innerHtml]="getOrderSign()"></span>
                                                     </a>
                                                 </th>
