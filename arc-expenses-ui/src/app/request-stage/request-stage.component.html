@@ -9,9 +9,6 @@
           Αίτημα {{currentRequest ? currentRequest.id : ''}}
           <span *ngIf="currentRequest" class="uk-text-small">[{{ reqTypes[currentRequest.type] }}]</span></h1>
 
-        <!-- TODO: activate printing -->
-        <!--<button class="uk-button uk-button-small" (click)="printRequest()">Εκτύπωση</button>-->
-
         <!-- TOP HELP CONTENT -->
         <help-content #topHelperContent [position]="'top'"
                       [ngClass]="topHelperContent.isPresent()?'uk-margin-medium-top uk-margin-medium-bottom':'clear-style'">
@@ -104,12 +101,17 @@
 
 
                 <!--end of 1st stage-->
-                <!--<div *ngIf="(userIsAdmin() || userIsRequester()) && (currentRequestPayments.length === 0)"
+                <div *ngIf="(userIsAdmin() || userIsRequester()) && (currentRequestPayments.length === 0)"
                      class="uk-text-right">
                   <button class="uk-button uk-button-primary" type="button" uk-toggle="target: #cancellationModal">
                     Ακύρωση Αιτήματος
                   </button>
-                </div>-->
+                </div>
+
+                <!-- TODO: activate printing -->
+                <div class="uk-text-right uk-margin-small-top">
+                  <button class="uk-button uk-button-default" (click)="printRequest()">Εκτύπωση Αιτήματος</button>
+                </div>
 
 
                 <!-- Submitted stages display -->
