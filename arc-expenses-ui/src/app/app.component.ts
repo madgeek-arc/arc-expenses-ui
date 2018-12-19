@@ -15,7 +15,7 @@ export class AppComponent implements OnInit, OnDestroy {
               private authService: AuthenticationService) {
 
     // TODO: DON'T FORGET TO UPDATE BEFORE COMMIT!!!
-    console.log('committed on: 17-12-2018 14:20 pm');
+    console.log('committed on: 19-12-2018 20:40 pm');
 
     // hides the console logs in production
     if ( (environment.production === true) &&
