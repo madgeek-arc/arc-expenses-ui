@@ -70,7 +70,7 @@
                                             <span>{{ currentRequest.stage1.subject }}</span>
                                         </div>
 
-                                        <div *ngIf="currentRequest.stage1.attachment">
+                                        <div *ngIf="currentRequest.stage1.attachment" class="no-print">
                                             <a class="uk-link uk-width-1-1@l uk-margin-small-top" (click)="linkToFile()">
                                                 Πατήστε εδώ για να κατεβάσετε τα σχετικά αρχεία
                                             </a>
@@ -93,7 +93,7 @@
                                 </div>
 
                                 <!-- TODO: activate printing -->
-                                <!--<div class="uk-text-right uk-margin-small-top">
+                                <!--<div class="uk-text-right uk-margin-small-top no-print">
                                     <button class="uk-button uk-button-default" (click)="printRequest()">Εκτύπωση Αιτήματος</button>
                                 </div>-->
 

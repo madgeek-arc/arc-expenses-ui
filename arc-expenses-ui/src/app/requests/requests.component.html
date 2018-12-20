@@ -261,7 +261,7 @@
                                                 <td>{{ req.request.project.acronym }}</td>
                                                 <td>{{ req.request.project.institute.name }}</td>
                                                 <td>{{ req.request.user.firstname }} {{ req.request.user.lastname }}</td>
-                                                <td>{{ req.request.stage1.requestDate | date : 'dd-MM-yyyy' }}</td>
+                                                <td>{{ req.baseInfo.creationDate | date : 'dd-MM-yyyy' }}</td>
                                                 <td *ngIf="!isSimpleUser">{{ stagesMap[req.baseInfo.stage]}}</td>
                                                 <td>{{ getStatusAsString(req.baseInfo.status) }}</td>
                                             </tr>

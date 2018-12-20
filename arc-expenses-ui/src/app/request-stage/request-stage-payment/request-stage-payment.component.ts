@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { BaseInfo, Request, RequestPayment, RequestSummary } from '../../domain/operation';
-import { paymentStages, requestTypes, stageIds } from '../../domain/stageDescriptions';
+import { paymentStages, requestTypes } from '../../domain/stageDescriptions';
 import { RequestInfo } from '../../domain/requestInfoClasses';
 import { AnchorItem } from '../../shared/dynamic-loader-anchor-components/anchor-item';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -8,7 +8,6 @@ import { ManageRequestsService } from '../../services/manage-requests.service';
 import { AuthenticationService } from '../../services/authentication.service';
 import { concatMap, mergeMap, tap } from 'rxjs/operators';
 import { HttpErrorResponse, HttpEventType, HttpResponse } from '@angular/common/http';
-import { isNullOrUndefined, isUndefined } from 'util';
 import { printRequestPage } from '../print-request-function';
 
 @Component({
@@ -148,10 +147,10 @@ export class RequestStagePaymentComponent implements OnInit {
     }
 
     getNextStage(stage: string) {
-        if (isUndefined(this.currentRequestPayment['stage' + stage]['approved']) ||
+        if ((this.currentRequestPayment['stage' + stage]['approved'] === undefined) ||
             (this.currentRequestPayment['stage' + stage]['approved'] === true)) {
             for (const nextStage of this.currentRequestInfo[stage]['next']) {
-                if (!isUndefined(this.currentRequestPayment['stage' + nextStage])) {
+                if (this.currentRequestPayment['stage' + nextStage] !== undefined) {
                     return nextStage;
                 }
             }
@@ -161,7 +160,7 @@ export class RequestStagePaymentComponent implements OnInit {
 
     getPreviousStage(stage: string) {
         for (const prevStage of this.currentRequestInfo[stage]['prev']) {
-            if (!isUndefined(this.currentRequestPayment['stage' + prevStage])) {
+            if (this.currentRequestPayment['stage' + prevStage] !== undefined) {
                 return prevStage;
             }
         }
@@ -405,7 +404,7 @@ export class RequestStagePaymentComponent implements OnInit {
     }
 
     printRequest(): void {
-        printRequestPage();
+        printRequestPage(this.currentRequest.id, this.reqTypes[this.currentRequest.type]);
     }
 
     userIsAdmin() {

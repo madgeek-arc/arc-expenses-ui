@@ -83,10 +83,11 @@ export class AuthenticationService {
                     },
                     () => {
                         console.log(`Something went wrong -- I'm logging out!`);
-                        this.isLoggedIn = false;
+                        /*this.isLoggedIn = false;
                         this.removeUserProperties();
                         deleteCookie('arc_currentUser');
-                        this.router.navigate(['/home']);
+                        this.router.navigate(['/home']);*/
+                        this.logout();
                     }
                 );
             }, 1000 * 60 * 5);
@@ -171,15 +172,16 @@ export class AuthenticationService {
         }
     }
 
-
     getUserProp(property: string) {
-        const user = JSON.parse(sessionStorage.getItem('userInfo'));
-        if ( user && user[property] && (user[property] !== 'null') ) {
+        if (sessionStorage.getItem('userInfo')) {
+            const user = JSON.parse(sessionStorage.getItem('userInfo'));
+            if ( user && user[property] && (user[property] !== 'null') ) {
 
-            if ( (property === 'immediateEmails') || (property === 'receiveEmails') ) {
-                return (user[property] === 'true');
+                if ( (property === 'immediateEmails') || (property === 'receiveEmails') ) {
+                    return (user[property] === 'true');
+                }
+                return user[property];
             }
-            return user[property];
         }
         return null;
     }

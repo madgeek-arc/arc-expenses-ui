@@ -102,9 +102,23 @@
                         <app-edit-poi #scientificCoordinatorForm [id]="id + '_sciCoord'"
                                       [data]="scientificCoordinatorFormData"></app-edit-poi>
                     </div>
+                    <div>
+                        <label class="custom-form-label uk-margin-small-right" for="sciCoorAsDiat_{{ id }}">Επιθυμεί να δρα ως διατάκτης για ποσά κάτω των €2500</label>
+                        <span>
+                            <input type="checkbox" id="sciCoorAsDiat_{{ id }}" class="uk-checkbox" formControlName="scientificCoordinatorAsDiataktis"/>
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>
+        <!--<div class="uk-margin">
+            <label class="uk-form-label" for="sciCoorAsDiat_{{ id }}">Θα δρα ως διατάκτης<br>>για μικρά ποσά (< €2500)</label>
+            <div class="uk-form-controls">
+                <div class="uk-width-1-1">
+                    <input type="checkbox" id="sciCoorAsDiat_{{ id }}" class="uk-checkbox" formControlName="scientificCoordinatorAsDiataktis"/>
+                </div>
+            </div>
+        </div>-->
         <hr>
         <div class="uk-margin">
             <label class="uk-form-label">Χειριστές (*)</label>

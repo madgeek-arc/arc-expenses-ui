@@ -489,8 +489,8 @@ export class RequestStageComponent implements OnInit {
         this.uploadedFile = file;
     }
 
-    printRequest(): void {
-        printRequestPage();
+    printRequest() {
+        printRequestPage(this.currentRequest.id, this.reqTypes[this.currentRequest.type]);
     }
 
     createRequestPayment() {

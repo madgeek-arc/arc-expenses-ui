@@ -73,10 +73,10 @@ export class SignUpComponent implements OnInit {
           this.signUpForm.get('immediateEmails').setValue(true);
           this.signUpForm.get('immediateEmails').enable();
       }*/
-      if ( !isNullOrUndefined(this.authService.getSignatureAttachment()) ) {
+      /*if ( !isNullOrUndefined(this.authService.getSignatureAttachment()) ) {
           this.userAttachment = this.authService.getSignatureAttachment();
           this.signatureFilename = this.userAttachment.filename;
-      }
+      }*/
     }
 
     toggleImmediateEmailsDisable() {

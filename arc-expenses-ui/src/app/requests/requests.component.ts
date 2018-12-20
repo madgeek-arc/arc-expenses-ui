@@ -674,10 +674,6 @@ export class RequestsComponent implements OnInit {
                 ) );
     }
 
-    printRequest(): void {
-        printRequestPage();
-    }
-
     createSearchUrl() {
         const url = new URLSearchParams();
         this.statusesChoice.forEach( st => url.append('status', st) );

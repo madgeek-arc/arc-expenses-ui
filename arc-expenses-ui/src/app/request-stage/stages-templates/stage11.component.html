@@ -10,13 +10,13 @@
         </div>
 
         <!-- display a long text value -->
-        <div *ngIf="currentStage['comment']">
+        <div *ngIf="currentStage['comment']" class="uk-margin-small-top">
             <span class="uk-text-bold uk-margin-small-right">Σχόλια: </span>
             <span> {{ currentStage['comment'] }} </span>
         </div>
 
         <!-- display link to attachment -->
-        <div *ngIf="currentStage['attachment']">
+        <div *ngIf="currentStage['attachment']" class="no-print">
             <a class="uk-link uk-width-1-1@l uk-margin-small-top" (click)="linkToFile()">
                 Πατήστε εδώ για να κατεβάσετε τα σχετικά αρχεία
             </a>

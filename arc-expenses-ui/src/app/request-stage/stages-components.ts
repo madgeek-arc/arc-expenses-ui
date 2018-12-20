@@ -228,10 +228,16 @@ export class StageComponent implements OnInit {
     }
 
     getIsDelegateHidden() {
-        if (this.currentPOI.email === this.currentStage['user']['email']) {
+        if (this.currentPOI &&
+            (this.currentPOI.email === this.currentStage['user']['email'])) {
             return false;
         } else {
-            return this.currentPOI.delegates.filter(x => x.email === this.currentStage['user']['email'])[0].hidden;
+            if (this.currentPOI.delegates &&
+                this.currentPOI.delegates.some(x => x.email === this.currentStage['user']['email'])) {
+                return this.currentPOI.delegates.filter(x => x.email === this.currentStage['user']['email'])[0].hidden;
+            } else {
+                return false;
+            }
         }
     }
 
@@ -253,7 +259,7 @@ export class StageComponent implements OnInit {
         /* in stages 4 and 9 the name will always be hidden */
         } else if ( (this.stageId !== '4') && (this.stageId !== '9') ) {
 
-            /* the name of the Inspection Team member that editted stage8 will only be shown to the POY and the Admins */
+            /* the name of the Inspection Team member that edited stage8 will only be shown to the POY and the Admins */
             if ((this.stageId !== '8') ||
                 ((this.stageId === '8') &&
                  ((this.authService.getUserRole().some(x => x.authority === 'ROLE_ADMIN')) ||
