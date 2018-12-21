@@ -99,6 +99,9 @@ export class RequestInfo {
             (this['7']).stagePOIs.push(project.institute.travelManager);
         }
 
+        /* TODO::if requester is diataktis or traveller is diataktis ->
+                 if he is also the organization director then
+                 diataktis is organixation viceDirector else diataktis is organization director */
         if ((this.requester.email === project.institute.organization.director.email) &&
             (this.requester.email === project.institute.diataktis.email) ) {
             console.log('requester is diataktis!');
