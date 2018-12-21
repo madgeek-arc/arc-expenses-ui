@@ -109,9 +109,10 @@
                 </div>-->
 
                 <!-- TODO: activate printing -->
-                <!--<div class="uk-text-right uk-margin-small-top no-print">
-                  <button class="uk-button uk-button-default" (click)="printRequest()">Εκτύπωση Αιτήματος</button>
-                </div>-->
+                <div class="uk-text-right uk-margin-small-top no-print">
+                  <button class="uk-button uk-button-default" (click)="printRequest()"
+                          title="Προτείνεται η χρήση<br>Google Chrome" uk-tooltip>Εκτύπωση Αιτήματος</button>
+                </div>
 
 
                 <!-- Submitted stages display -->
@@ -166,8 +167,8 @@
 
 
                   <!-- Create/Edit pending stage -->
-                  <div class="uk-margin-medium-top" *ngIf="(currentRequestApproval.stage !== '1') &&
-                                                         (currentRequestInfo[currentRequestApproval.stage].showStage === 1)">
+                  <div class="uk-margin-medium-top no-print" *ngIf="(currentRequestApproval.stage !== '1') &&
+                                                              (currentRequestInfo[currentRequestApproval.stage].showStage === 1)">
                       <!--<hr>-->
 
                       <app-stage-loader [stages]="stageLoaderItemList"
@@ -209,12 +210,12 @@
                     <div *ngIf="(currentRequestPayments && (currentRequestPayments.length > 0))">
 
                       <!-- Link to Payment -->
-                      <div *ngIf="(currentRequest.type !== 'services_contract')">
+                      <div *ngIf="(currentRequest.type !== 'services_contract')" class="no-print">
                           <a [routerLink]="['/requests/request-stage-payment', currentRequestPayments[0].id]">Προβολή Περαίωσης</a>
                       </div>
 
                       <!-- Payments list -->
-                      <div *ngIf="(currentRequest.type === 'services_contract')">
+                      <div *ngIf="(currentRequest.type === 'services_contract')" class="no-print">
 
                         <div>
                           <h4>Περαιώσεις του αιτήματος</h4>

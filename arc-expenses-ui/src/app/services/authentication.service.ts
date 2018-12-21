@@ -41,6 +41,21 @@ export class AuthenticationService {
         window.location.href = this.loginUrl;
     }
 
+    clearSessionAndLoginWithState() {
+        let state: string;
+        if (sessionStorage.getItem('state.location')) {
+            state = sessionStorage.getItem('state.location');
+        }
+        deleteCookie('arc_currentUser');
+        this.isLoggedIn = false;
+        this.removeUserProperties();
+        console.log('trying to login again');
+        if (state) {
+            sessionStorage.setItem('state.location', state);
+        }
+        this.loginWithState();
+    }
+
     public logout() {
         deleteCookie('arc_currentUser');
         this.isLoggedIn = false;
@@ -92,7 +107,7 @@ export class AuthenticationService {
                 );
             }, 1000 * 60 * 5);
             /*console.log('email is', this.getUserProp('email'));*/
-            if ( (sessionStorage.getItem('userInfo') === undefined) || (sessionStorage.getItem('userInfo') === null) ) {
+            if ( !sessionStorage.getItem('userInfo') ) {
                 console.log(`session.userInfo wasn't found --> logging in via arc-service!`);
                 this.http.get(this.apiUrl + '/user/getUserInfo', headerOptions).subscribe(
                     userInfo => {

@@ -232,12 +232,12 @@ export class StageComponent implements OnInit {
             (this.currentPOI.email === this.currentStage['user']['email'])) {
             return false;
         } else {
-            if (this.currentPOI.delegates &&
-                this.currentPOI.delegates.some(x => x.email === this.currentStage['user']['email'])) {
+            /*if (this.currentPOI.delegates &&
+                this.currentPOI.delegates.some(x => x.email === this.currentStage['user']['email'])) {*/
                 return this.currentPOI.delegates.filter(x => x.email === this.currentStage['user']['email'])[0].hidden;
-            } else {
+            /*} else {
                 return false;
-            }
+            }*/
         }
     }
 

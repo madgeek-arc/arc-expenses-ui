@@ -87,15 +87,17 @@
 
                                     </div>
 
-                                    <div class="uk-margin uk-margin-remove-left">
+                                    <div class="uk-margin uk-margin-remove-left no-print">
                                         <a [routerLink]="['/requests/request-stage',currentRequest.id+'-a1']">Μετάβαση στην σελίδα έγκρισης της ανάληψης υποχρέωσης δαπάνης</a>
                                     </div>
                                 </div>
 
                                 <!-- TODO: activate printing -->
-                                <!--<div class="uk-text-right uk-margin-small-top no-print">
-                                    <button class="uk-button uk-button-default" (click)="printRequest()">Εκτύπωση Αιτήματος</button>
-                                </div>-->
+                                <div class="uk-text-right uk-margin-small-top no-print">
+                                    <button class="uk-button uk-button-default" (click)="printRequest()"
+                                            title="Προτείνεται η χρήση<br>Google Chrome" uk-tooltip>
+                                        Εκτύπωση Αιτήματος</button>
+                                </div>
 
 
                                 <hr>
@@ -158,7 +160,7 @@
 
 
                                 <!-- Create/Edit pending stage -->
-                                <div class="uk-margin-medium-top" *ngIf="currentRequestInfo[currentRequestPayment.stage].showStage === 1">
+                                <div class="uk-margin-medium-top no-print" *ngIf="currentRequestInfo[currentRequestPayment.stage].showStage === 1">
                                     <!--<hr>-->
 
                                     <app-stage-loader [stages]="stageLoaderItemList"

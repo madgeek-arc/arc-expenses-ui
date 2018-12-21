@@ -8,15 +8,9 @@ export function printRequestPage(reqId: string, reqType: string) {
       <html>
         <head>
           <style>
-            @media print {
-                @page {
-                    size: A4;
-                }
-                .uk-card-basic-info {
-                    page-break-inside: avoid;
-                    page-break-before: auto;
-                    page-break-after: always;
-                }
+            @page {
+                size: A4;
+                margin-top: 2cm;
             }
             body {
                 padding: 50px 20px 50px 20px;
@@ -30,8 +24,7 @@ export function printRequestPage(reqId: string, reqType: string) {
                 border-radius: 2px;
                 padding: 20px 20px;
                 page-break-inside: avoid;
-                page-break-before: auto;
-                page-break-after: always;
+                margin-bottom: 6px;
             }
           </style>
           <title>Αίτημα ${reqId}</title>
