@@ -171,7 +171,7 @@
                         <div class="uk-overlay-default uk-position-cover"></div>
                         <div uk-spinner="ratio: 2" class="uk-overlay uk-dark"></div>
                     </div>
-                    <div *ngIf="searchResults">
+                    <div *ngIf="searchResults && !showSpinner">
                         <div class="uk-float-left">A=Ανάληψη, Π=Περαίωση</div>
                         <div class="uk-grid page-controls uk-flex-right">
                             <div class="uk-margin-bottom ">

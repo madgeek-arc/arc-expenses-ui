@@ -154,6 +154,9 @@ export class RequestsComponent implements OnInit {
                     this.searchTerm = params.get('searchTerm');
                     this.keywordField.get('keyword').setValue(this.searchTerm);
                 }
+                if ( params.has('page') && !isNaN(+params.get('page')) ) {
+                    this.currentPage = +params.get('page');
+                }
                 if ( params.has('itemsPerPage') && !isNaN(+params.get('itemsPerPage'))) {
                     this.itemsPerPage = +params.get('itemsPerPage');
                 }
@@ -346,14 +349,16 @@ export class RequestsComponent implements OnInit {
     goToPreviousPage() {
         if (this.currentPage > 0) {
             this.currentPage--;
-            this.getListOfRequests();
+            // this.getListOfRequests();
+            this.createSearchUrl();
         }
     }
 
     goToNextPage() {
         if ( (this.currentPage + 1) < this.totalPages) {
             this.currentPage++;
-            this.getListOfRequests();
+            // this.getListOfRequests();
+            this.createSearchUrl();
         }
     }
 
@@ -682,6 +687,7 @@ export class RequestsComponent implements OnInit {
         this.typesChoice.forEach( t => url.append('type', t) );
         // this.institutesChoice.forEach( inst => url.append('institute', inst) );
         url.set('searchTerm', this.searchTerm);
+        url.set('page', this.currentPage.toString());
         url.set('itemsPerPage', this.itemsPerPage.toString());
         url.set('orderField', this.orderField);
         url.set('order', this.order);
