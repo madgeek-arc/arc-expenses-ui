@@ -98,11 +98,18 @@ export class RequestStageComponent implements OnInit {
             },
             () => {
                 this.stages = approvalStages;
-                this.currentRequestInfo = new RequestInfo(this.currentRequestApproval.id,
-                                                          this.currentRequest.id,
-                                                          this.currentRequest.user,
-                                                          this.currentRequest.project,
-                                                          (this.currentRequest.type === 'trip'));
+		if (this.currentRequest.type === 'trip') {
+                    this.currentRequestInfo = new RequestInfo(this.currentRequestApproval.id,
+                                                              this.currentRequest.id,
+                                                              this.currentRequest.user,
+                                                              this.currentRequest.project,
+                                                              this.currentRequest.trip.email);
+                } else {
+                    this.currentRequestInfo = new RequestInfo(this.currentRequestApproval.id,
+                                                              this.currentRequest.id,
+                                                              this.currentRequest.user,
+                                                              this.currentRequest.project);
+                }
                 this.checkIfStageIs5b();
                 this.getIfUserCanEditRequest();
                 if ((this.currentRequest.type !== 'contract') &&
@@ -560,6 +567,7 @@ export class RequestStageComponent implements OnInit {
             () => {
                     this.successMessage = 'Το αίτημα ακυρώθηκε.';
                     this.showSpinner = false;
+		    this.getIfUserCanEditRequest();
                     UIkit.modal('#cancellationModal').hide();
                 }
             );

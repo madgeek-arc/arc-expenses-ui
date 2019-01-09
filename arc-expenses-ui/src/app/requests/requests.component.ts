@@ -658,17 +658,26 @@ export class RequestsComponent implements OnInit {
     }
 
     getTrStyle(req: RequestSummary) {
+        let travellerEmail = '';
+        if ( req.request.trip ) {
+            travellerEmail = req.request.trip.email;
+        }
         if (this.getIfUserCanEdit(req.baseInfo.id, req.request.id,
                                   req.request.user, req.request.project,
-                                  req.baseInfo.stage, req.request.type)) {
+                                  req.baseInfo.stage, travellerEmail)) {
             return '#f7f7f7';
         } else {
             return '';
         }
     }
 
-    getIfUserCanEdit(id: string, requestId: string, requester: User, project: Project, stage: string, type: string) {
-        const newRequestInfo = new RequestInfo(id, requestId, requester, project, (type === 'trip'));
+    getIfUserCanEdit(id: string, requestId: string, requester: User, project: Project, stage: string, travellerEmail?: string) {
+        let newRequestInfo: RequestInfo;
+        if (travellerEmail) {
+            newRequestInfo = new RequestInfo(id, requestId, requester, project, travellerEmail);
+        } else {
+            newRequestInfo = new RequestInfo(id, requestId, requester, project);
+        }
         return (( this.authService.getUserRole().some(x => x.authority === 'ROLE_ADMIN')) ||
                 ( ((stage === '1') || (stage === '7')) && (this.authService.getUserProp('email') === newRequestInfo.requester.email) ) ||
                 ((stage !== '1') &&

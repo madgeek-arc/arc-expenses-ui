@@ -69,6 +69,7 @@ export class RequestInfo {
     requestedAmount: string;
     supplier: string;
     requester: User;
+    travellerEmail: string;
 
     finalAmount: string;
 
@@ -87,30 +88,39 @@ export class RequestInfo {
     '12': StageInfo;
     '13': StageInfo;
 
-    constructor(phaseId: string, requestId: string, requester: User, project: Project, isTrip: boolean) {
+    constructor(phaseId: string, requestId: string, requester: User, project: Project, travellerEmail?: string) {
 
         this.phaseId = phaseId;
         this.requestId = requestId;
         this.requester = requester;
+	this.travellerEmail = travellerEmail;
         this.initiateStagesInfo(project);
 
-        if (isTrip) {
+        if (travellerEmail) {
             (this['7']).stagePOIs = [];
             (this['7']).stagePOIs.push(project.institute.travelManager);
         }
 
-        /* TODO::if requester is diataktis or traveller is diataktis ->
-                 if he is also the organization director then
-                 diataktis is organixation viceDirector else diataktis is organization director */
-        if ((this.requester.email === project.institute.organization.director.email) &&
-            (this.requester.email === project.institute.diataktis.email) ) {
+        /* TODO::if requester or traveller is also diataktis ->
+                 diataktis is the organization viceDirector or organization director */
+        if ( (this.requester.email === project.institute.diataktis.email) ||
+             (this.requester.email === project.institute.organization.director.email) ||
+             ((this.travellerEmail !== undefined) &&
+             ((this.travellerEmail === project.institute.diataktis.email) ||
+             (this.travellerEmail === project.institute.organization.director.email)) ) ) {
             console.log('requester is diataktis!');
             this['5a'].stagePOIs = [];
-            this['5a'].stagePOIs.push(project.institute.organization.viceDirector);
-            console.log(this['5a'].stagePOIs);
             this['10'].stagePOIs = [];
-            this['10'].stagePOIs.push(project.institute.organization.viceDirector);
-            console.log(this['10'].stagePOIs);
+	    if ( (this.requester.email === project.institute.organization.director.email) ||
+	         ( (this.travellerEmail !== undefined) && (this.travellerEmail === project.institute.organization.director.email) ) ) {
+	      this['5a'].stagePOIs.push(project.institute.organization.viceDirector);
+	      this['10'].stagePOIs.push(project.institute.organization.viceDirector);
+	      console.log('diataktis is:', project.institute.organization.viceDirector);
+	    } else {
+	      this['5a'].stagePOIs.push(project.institute.organization.director);
+	      this['10'].stagePOIs.push(project.institute.organization.director);
+	      console.log('diataktis is:', project.institute.organization.director);
+	    }
         }
 
     }
