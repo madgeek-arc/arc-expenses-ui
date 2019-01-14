@@ -52,8 +52,9 @@ export class EditDelegateComponent extends EditResourcesComponent implements OnI
                 this.resourceForm.updateValueAndValidity();
             }
         }
-        this.resourceForm.get('firstname').disable();
-        this.resourceForm.get('lastname').disable();
+        // TODO:: RESTORE DISABLED FIELDS
+        // this.resourceForm.get('firstname').disable();
+        // this.resourceForm.get('lastname').disable();
     }
 
     updateSearchTerm() {
@@ -74,8 +75,9 @@ export class EditDelegateComponent extends EditResourcesComponent implements OnI
                     }
                 }
             );
-            this.resourceForm.get('firstname').disable();
-            this.resourceForm.get('lastname').disable();
+            // TODO:: RESTORE DISABLED FIELDS
+            // this.resourceForm.get('firstname').disable();
+            // this.resourceForm.get('lastname').disable();
         }
         // this.resourceForm.updateValueAndValidity();
     }
@@ -85,8 +87,9 @@ export class EditDelegateComponent extends EditResourcesComponent implements OnI
         if (this.newDelegateMode) {
             this.addDelegate();
         } else {
-            this.resourceForm.get('firstname').disable();
-            this.resourceForm.get('lastname').disable();
+            // TODO:: RESTORE DISABLED FIELDS
+            // this.resourceForm.get('firstname').disable();
+            // this.resourceForm.get('lastname').disable();
         }
     }
 

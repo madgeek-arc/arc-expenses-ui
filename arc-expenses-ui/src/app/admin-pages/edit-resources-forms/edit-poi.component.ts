@@ -57,8 +57,9 @@ export class EditPoiComponent extends EditResourcesComponent implements OnInit, 
                 this.addDelegate();
             }
         }
-        this.resourceForm.get('firstname').disable();
-        this.resourceForm.get('lastname').disable();
+        // TODO:: RESTORE DISABLED FIELDS
+        // this.resourceForm.get('firstname').disable();
+        // this.resourceForm.get('lastname').disable();
     }
 
     updateSearchTerm() {
@@ -88,8 +89,9 @@ export class EditPoiComponent extends EditResourcesComponent implements OnInit, 
                     }
                 }
             );
-            this.resourceForm.get('firstname').disable();
-            this.resourceForm.get('lastname').disable();
+            // TODO:: RESTORE DISABLED FIELDS
+            // this.resourceForm.get('firstname').disable();
+            // this.resourceForm.get('lastname').disable();
         }
         // this.resourceForm.updateValueAndValidity();
     }
@@ -99,8 +101,9 @@ export class EditPoiComponent extends EditResourcesComponent implements OnInit, 
         if (this.newPOIMode) {
             this.addPOI();
         } else {
-            this.resourceForm.get('firstname').disable();
-            this.resourceForm.get('lastname').disable();
+            // TODO:: RESTORE DISABLED FIELDS
+            // this.resourceForm.get('firstname').disable();
+            // this.resourceForm.get('lastname').disable();
         }
     }
 
