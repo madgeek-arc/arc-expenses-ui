@@ -93,7 +93,7 @@ export class RequestInfo {
         this.phaseId = phaseId;
         this.requestId = requestId;
         this.requester = requester;
-	this.travellerEmail = travellerEmail;
+        this.travellerEmail = travellerEmail;
         this.initiateStagesInfo(project);
 
         if (travellerEmail) {
@@ -103,24 +103,35 @@ export class RequestInfo {
 
         /* TODO::if requester or traveller is also diataktis ->
                  diataktis is the organization viceDirector or organization director */
-        if ( (this.requester.email === project.institute.diataktis.email) ||
+        /*if ( (this.requester.email === project.institute.diataktis.email) ||
              (this.requester.email === project.institute.organization.director.email) ||
              ((this.travellerEmail !== undefined) &&
-             ((this.travellerEmail === project.institute.diataktis.email) ||
-             (this.travellerEmail === project.institute.organization.director.email)) ) ) {
+              ((this.travellerEmail === project.institute.diataktis.email) ||
+              (this.travellerEmail === project.institute.organization.director.email)) ) ) {
             console.log('requester is diataktis!');
             this['5a'].stagePOIs = [];
             this['10'].stagePOIs = [];
-	    if ( (this.requester.email === project.institute.organization.director.email) ||
-	         ( (this.travellerEmail !== undefined) && (this.travellerEmail === project.institute.organization.director.email) ) ) {
-	      this['5a'].stagePOIs.push(project.institute.organization.viceDirector);
-	      this['10'].stagePOIs.push(project.institute.organization.viceDirector);
-	      console.log('diataktis is:', project.institute.organization.viceDirector);
-	    } else {
-	      this['5a'].stagePOIs.push(project.institute.organization.director);
-	      this['10'].stagePOIs.push(project.institute.organization.director);
-	      console.log('diataktis is:', project.institute.organization.director);
-	    }
+            if ( (this.requester.email === project.institute.organization.director.email) ||
+                 ( (this.travellerEmail !== undefined) && (this.travellerEmail === project.institute.organization.director.email) ) ) {
+                this['5a'].stagePOIs.push(project.institute.organization.viceDirector);
+                this['10'].stagePOIs.push(project.institute.organization.viceDirector);
+                // console.log('diataktis is:', project.institute.organization.viceDirector);
+            } else {
+                this['5a'].stagePOIs.push(project.institute.organization.director);
+                this['10'].stagePOIs.push(project.institute.organization.director);
+                // console.log('diataktis is:', project.institute.organization.director);
+            }
+        }*/
+
+        if ((this.requester.email === project.institute.organization.director.email) &&
+            (this.requester.email === project.institute.diataktis.email) ) {
+            console.log('requester is diataktis!');
+            this['5a'].stagePOIs = [];
+            this['5a'].stagePOIs.push(project.institute.organization.viceDirector);
+            console.log(this['5a'].stagePOIs);
+            this['10'].stagePOIs = [];
+            this['10'].stagePOIs.push(project.institute.organization.viceDirector);
+            console.log(this['10'].stagePOIs);
         }
 
     }

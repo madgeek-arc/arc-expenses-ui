@@ -253,9 +253,9 @@
                                             <tr *ngIf="noRequests">
                                                 <td colspan="7" class="uk-alert uk-width-1-1">{{noRequests}}</td>
                                             </tr>
-                                            <tr class="uk-link" *ngFor="let req of listOfRequests"
+                                            <tr class="uk-link" *ngFor="let req of listOfRequests; let i = index"
                                                 routerLink="/requests/{{(req.baseInfo.id).includes('a')? 'request-stage':'request-stage-payment'}}/{{req.baseInfo.id}}"
-                                                title="Μετάβαση στην σελίδα του αιτήματος" [style.backgroundColor]="getTrStyle(req)">
+                                                title="Μετάβαση στην σελίδα του αιτήματος" [style.backgroundColor]="listOfRowColors[i]">
                                                 <td>{{ req.baseInfo.id.includes('a') ? 'Α': 'Π' }}</td>
                                                 <td>{{ req.request.id }}<br>{{ reqTypes[req.request.type] }}</td>
                                                 <td>{{ req.request.project.acronym }}</td>

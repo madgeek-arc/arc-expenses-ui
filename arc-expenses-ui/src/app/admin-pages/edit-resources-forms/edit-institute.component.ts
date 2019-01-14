@@ -149,6 +149,7 @@ export class EditInstituteComponent extends EditResourcesComponent implements On
         } else {
             this.addInstitute();
         }
+        // console.log(JSON.stringify(this.exportFormValue(), null, 2));
     }
 
     exportFormValue() {

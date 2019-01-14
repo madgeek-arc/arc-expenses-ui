@@ -90,7 +90,7 @@ export class RequestStagePaymentComponent implements OnInit {
             },
             () => {
                 this.stages = paymentStages;
-		if (this.currentRequest.type === 'trip') {
+                if (this.currentRequest.type === 'trip') {
                     this.currentRequestInfo = new RequestInfo(this.currentRequestPayment.id,
                                                               this.currentRequest.id,
                                                               this.currentRequest.user,
@@ -102,6 +102,7 @@ export class RequestStagePaymentComponent implements OnInit {
                                                               this.currentRequest.user,
                                                               this.currentRequest.project);
                 }
+                // console.log('diataktis is', this.currentRequestInfo['5a'].stagePOIs);
                 this.checkIfStageIs7();
                 this.getIfUserCanEditRequest();
             }

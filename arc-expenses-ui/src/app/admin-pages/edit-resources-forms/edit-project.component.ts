@@ -67,6 +67,7 @@ export class EditProjectComponent extends EditResourcesComponent implements OnIn
         if (this.data && (this.data.length >= 2)) {
             this.executives = this.data[0];
             this.institutes = this.data[1];
+            this.resourceForm.get('scientificCoordinatorAsDiataktis').setValue(false);
             if (this.data[2]) {
                 this.inEditMode = true;
                 Object.keys(this.resourceFormDefinition).forEach(

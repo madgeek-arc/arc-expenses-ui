@@ -7,7 +7,7 @@ import { ManageRequestsService } from '../services/manage-requests.service';
 import { AuthenticationService } from '../services/authentication.service';
 import { isNullOrUndefined, isUndefined } from 'util';
 import { HttpErrorResponse, HttpEventType, HttpResponse } from '@angular/common/http';
-import { approvalStages, requestTypes, stageIds, stageTitles } from '../domain/stageDescriptions';
+import { approvalStages, requestTypes, stageTitles } from '../domain/stageDescriptions';
 import { printRequestPage } from './print-request-function';
 import { AnchorItem } from '../shared/dynamic-loader-anchor-components/anchor-item';
 import { RequestInfo } from '../domain/requestInfoClasses';
@@ -98,7 +98,7 @@ export class RequestStageComponent implements OnInit {
             },
             () => {
                 this.stages = approvalStages;
-		if (this.currentRequest.type === 'trip') {
+                if (this.currentRequest.type === 'trip') {
                     this.currentRequestInfo = new RequestInfo(this.currentRequestApproval.id,
                                                               this.currentRequest.id,
                                                               this.currentRequest.user,
@@ -110,6 +110,7 @@ export class RequestStageComponent implements OnInit {
                                                               this.currentRequest.user,
                                                               this.currentRequest.project);
                 }
+                // console.log('diataktis is', this.currentRequestInfo['5a'].stagePOIs);
                 this.checkIfStageIs5b();
                 this.getIfUserCanEditRequest();
                 if ((this.currentRequest.type !== 'contract') &&
@@ -406,11 +407,11 @@ export class RequestStageComponent implements OnInit {
 
     willShowStage(stage: string) {
         const stageField = 'stage' + stage;
-        if ( (stage === this.currentRequestApproval.stage) &&
-             (this.currentRequestApproval.status !== 'rejected') &&
-             (this.currentRequestApproval.status !== 'accepted') &&
-    	     (this.currentRequestApproval.status !== 'cancelled') &&
-             ( (this.authService.getUserRole().some(x => x.authority === 'ROLE_ADMIN')) || (this.canEdit === true) ) ) {
+        if ((stage === this.currentRequestApproval.stage) &&
+            (this.currentRequestApproval.status !== 'rejected') &&
+            (this.currentRequestApproval.status !== 'accepted') &&
+            (this.currentRequestApproval.status !== 'cancelled') &&
+            ( (this.authService.getUserRole().some(x => x.authority === 'ROLE_ADMIN')) || (this.canEdit === true) ) ) {
 
             if (this.currentRequestApproval.stage !== '1') {
                 this.stageLoaderItemList = [

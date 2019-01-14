@@ -2,12 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { Project, RequestSummary, User, Vocabulary } from '../domain/operation';
 import { ManageRequestsService } from '../services/manage-requests.service';
 import { AuthenticationService } from '../services/authentication.service';
-import { Paging, SearchParams } from '../domain/extraClasses';
+import { Paging } from '../domain/extraClasses';
 import { ActivatedRoute, Router } from '@angular/router';
 import { isNull, isNullOrUndefined } from 'util';
 import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
 import { approvalStages, paymentStages, requestTypes, stageTitles } from '../domain/stageDescriptions';
-import { printRequestPage } from '../request-stage/print-request-function';
 import { ManageResourcesService } from '../services/manage-resources.service';
 import { ManageProjectService } from '../services/manage-project.service';
 import { RequestInfo } from '../domain/requestInfoClasses';
@@ -65,9 +64,7 @@ export class RequestsComponent implements OnInit {
     /* search result vars */
     searchResults: Paging<RequestSummary>;
     listOfRequests: RequestSummary[] = [];
-
-    /* searchParams object */
-    currentSearchParams: SearchParams;
+    listOfRowColors: string[] = [];
 
     constructor(private requestService: ManageRequestsService,
                 private resourceService: ManageResourcesService,
@@ -255,9 +252,7 @@ export class RequestsComponent implements OnInit {
 
     setValueOfFormArrayControl(formArrayName: string, index: number, fieldName: string, val: any) {
         const tempFormArray = this.filtersForm.get(formArrayName) as FormArray;
-        /*if (tempFormArray.controls.length <= (index+1)) {*/
-            tempFormArray.at(index).get(fieldName).setValue(val);
-        /*}*/
+        tempFormArray.at(index).get(fieldName).setValue(val);
     }
 
     createFormArray(def: any, length: number) {
@@ -312,6 +307,9 @@ export class RequestsComponent implements OnInit {
                 if (this.listOfRequests.length === 0) {
                     this.noRequests = 'Δεν βρέθηκαν σχετικά αιτήματα.';
                 }
+                this.listOfRequests.forEach( x => this.listOfRowColors.push(this.getTrStyle(x)) );
+                // console.log(this.listOfRowColors.length);
+                // console.log(this.listOfRowColors);
                 this.setFormValues();
             }
         );
@@ -678,12 +676,13 @@ export class RequestsComponent implements OnInit {
         } else {
             newRequestInfo = new RequestInfo(id, requestId, requester, project);
         }
+        // console.log('diataktis of', requestId, ' is', newRequestInfo['5a'].stagePOIs);
         return (( this.authService.getUserRole().some(x => x.authority === 'ROLE_ADMIN')) ||
                 ( ((stage === '1') || (stage === '7')) && (this.authService.getUserProp('email') === newRequestInfo.requester.email) ) ||
                 ((stage !== '1') &&
                  newRequestInfo[stage].stagePOIs.some(
                         x => ( (x.email === this.authService.getUserProp('email')) ||
-                                        x.delegates.some(y => y.email === this.authService.getUserProp('email')) )
+                                         (x.delegates && x.delegates.some(y => y.email === this.authService.getUserProp('email'))) )
                     )
                 ) );
     }

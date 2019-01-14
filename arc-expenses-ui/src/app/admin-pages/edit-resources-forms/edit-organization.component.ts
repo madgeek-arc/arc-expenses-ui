@@ -118,6 +118,7 @@ export class EditOrganizationComponent extends EditResourcesComponent implements
         } else {
             this.addOrganization();
         }
+        // console.log(JSON.stringify(this.exportFormValue(), null, 2));
     }
 
     exportFormValue() {
