@@ -102,7 +102,7 @@
 
                 <!--end of 1st stage-->
                 <div *ngIf="(userIsAdmin() || userIsRequester()) && (currentRequestPayments.length === 0)"
-                     class="uk-text-right">
+                     class="uk-text-right no-print">
                   <button class="uk-button uk-button-primary" type="button" uk-toggle="target: #cancellationModal">
                     Ακύρωση Αιτήματος
                   </button>
