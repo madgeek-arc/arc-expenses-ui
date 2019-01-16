@@ -689,6 +689,8 @@ export class RequestsComponent implements OnInit {
 
     createSearchUrl() {
         const url = new URLSearchParams();
+
+        this.searchTerm = this.keywordField.get('keyword').value;
         this.statusesChoice.forEach( st => url.append('status', st) );
         this.stagesChoice.forEach( st => url.append('stage', st) );
         url.set('phase', this.phaseId.toString());

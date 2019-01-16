@@ -112,9 +112,6 @@ export class StageComponent implements OnInit {
     findCurrentPOI() {
         if ( (this.authService.getUserRole().some(x => x.authority === 'ROLE_ADMIN')) && (this.showStage === 1) ) {
             return this.currentStageInfo.stagePOIs[0];
-        } else if ( this.currentStageInfo.stagePOIs.length === 1 ) {
-            // console.log(`stage ${this.stageId}, stagePois: ${JSON.stringify(this.currentStageInfo.stagePOIs)}`);
-            return this.currentStageInfo.stagePOIs[0];
         } else {
             let curEmail: string;
             if ( this.showStage === 1 ) {
@@ -129,6 +126,7 @@ export class StageComponent implements OnInit {
                 }
             }
         }
+        return this.currentStageInfo.stagePOIs[0];
     }
 
     linkToFile() {
@@ -239,8 +237,8 @@ export class StageComponent implements OnInit {
             if (this.currentPOI.delegates &&
                 this.currentPOI.delegates.some(x => x.email === this.currentStage['user']['email'])) {
                 return this.currentPOI.delegates.filter(x => x.email === this.currentStage['user']['email'])[0].hidden;
-            /*} else {
-                return false;*/
+            } else {
+                return false;
             }
         }
     }

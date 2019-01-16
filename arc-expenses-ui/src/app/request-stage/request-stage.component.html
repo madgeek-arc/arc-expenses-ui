@@ -5,7 +5,7 @@
     <div class="uk-grid-margin uk-grid uk-grid-stack" uk-grid="">
       <div class="uk-width-1-1@m uk-first-column">
 
-        <h1 class="uk-h3 uk-heading-bullet uk-padding-small">
+        <h1 id="requestTitle" class="uk-h3 uk-heading-bullet uk-padding-small">
           Αίτημα {{currentRequest ? currentRequest.id : ''}}
           <span *ngIf="currentRequest" class="uk-text-small">[{{ reqTypes[currentRequest.type] }}]</span></h1>
 
@@ -23,13 +23,12 @@
             </aside-help-content>
 
             <!-- MIDDLE -->
-            <div class=" uk-width-expand@m">
+            <div id="printable-section" class=" uk-width-expand@m">
               <div *ngIf="errorMessage" class="uk-alert uk-alert-danger">{{ errorMessage }}</div>
               <div *ngIf="successMessage" class="uk-alert uk-alert-success">{{ successMessage }}</div>
               <div *ngIf="notFoundMessage" class="uk-alert">{{ notFoundMessage }}</div>
 
-              <div id="printable-section"
-                   *ngIf="!showSpinner && currentRequestApproval &&
+              <div *ngIf="!showSpinner && currentRequestApproval &&
                           currentRequest &&
                           currentRequest.user &&
                           currentRequest.project &&
@@ -75,7 +74,7 @@
                       <span>{{ currentRequest.stage1.subject }}</span>
                     </div>
 
-                    <div *ngIf="currentRequest.stage1.attachment" class="no-print">
+                    <div *ngIf="currentRequest.stage1.attachment" class="no-print" data-html2canvas-ignore>
                       <a class="uk-link uk-width-1-1@l uk-margin-small-top" (click)="linkToFile()">
                         Πατήστε εδώ για να κατεβάσετε τα σχετικά αρχεία
                       </a>
@@ -93,7 +92,7 @@
                 </div>
 
                 <!-- stage 1 form -->
-                <div *ngIf="willShowStage('1') === 1">
+                <div *ngIf="willShowStage('1') === 1" data-html2canvas-ignore>
                   <stage1-form [currentRequest]="currentRequest"
                                (emitFile)="getUploadedFile($event)"
                                (emitRequest)="getUpdatedRequest($event)"></stage1-form>
@@ -102,18 +101,19 @@
 
                 <!--end of 1st stage-->
                 <div *ngIf="(userIsAdmin() || userIsRequester()) && (currentRequestPayments.length === 0)"
-                     class="uk-text-right no-print">
+                     class="uk-text-right no-print" data-html2canvas-ignore>
                   <button class="uk-button uk-button-primary" type="button" uk-toggle="target: #cancellationModal">
                     Ακύρωση Αιτήματος
                   </button>
                 </div>
 
-                <!-- TODO: activate printing -->
-                <div class="uk-text-right uk-margin-small-top no-print">
+                <div class="uk-text-right uk-margin-small-top no-print" data-html2canvas-ignore>
+                  <!--<button class="uk-button uk-button-default" (click)="printRequest()"
+                          title="Προτείνεται η χρήση<br>Google Chrome" uk-tooltip>Εκτύπωση Αιτήματος-->
                   <button class="uk-button uk-button-default" (click)="printRequest()"
-                          title="Προτείνεται η χρήση<br>Google Chrome" uk-tooltip>Εκτύπωση Αιτήματος</button>
+                          title="Πατήστε για λήψη του<br>αιτήματος σε μορφή pdf" uk-tooltip>
+                    Λήψη σε Αρχείο PDF</button>
                 </div>
-
 
                 <!-- Submitted stages display -->
                   <hr>
@@ -167,8 +167,8 @@
 
 
                   <!-- Create/Edit pending stage -->
-                  <div class="uk-margin-medium-top no-print" *ngIf="(currentRequestApproval.stage !== '1') &&
-                                                              (currentRequestInfo[currentRequestApproval.stage].showStage === 1)">
+                  <div class="uk-margin-medium-top no-print" data-html2canvas-ignore
+                       *ngIf="(currentRequestApproval.stage !== '1') && (currentRequestInfo[currentRequestApproval.stage].showStage === 1)">
                       <!--<hr>-->
 
                       <app-stage-loader [stages]="stageLoaderItemList"
@@ -195,7 +195,7 @@
                 </div>
 
                 <div *ngIf="(currentRequestApproval.status === 'accepted') &&
-                            (currentRequest.type !== 'contract')" class="uk-margin-top">
+                            (currentRequest.type !== 'contract')" class="uk-margin-top" data-html2canvas-ignore>
                   <hr>
 
                     <!-- Create Payment button NOT needed - the first payment is created on the approval's completion -->
@@ -210,12 +210,12 @@
                     <div *ngIf="(currentRequestPayments && (currentRequestPayments.length > 0))">
 
                       <!-- Link to Payment -->
-                      <div *ngIf="(currentRequest.type !== 'services_contract')" class="no-print">
+                      <div *ngIf="(currentRequest.type !== 'services_contract')" class="no-print" data-html2canvas-ignore>
                           <a [routerLink]="['/requests/request-stage-payment', currentRequestPayments[0].id]">Προβολή Περαίωσης</a>
                       </div>
 
                       <!-- Payments list -->
-                      <div *ngIf="(currentRequest.type === 'services_contract')" class="no-print">
+                      <div *ngIf="(currentRequest.type === 'services_contract')" class="no-print" data-html2canvas-ignore>
 
                         <div>
                           <h4>Περαιώσεις του αιτήματος</h4>
