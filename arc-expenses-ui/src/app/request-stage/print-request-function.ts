@@ -80,8 +80,8 @@ export function printRequestPage(reqId: string, reqType: string) {
 
     data.insertBefore(imgDiv, data.childNodes[0]);
 
-    /* if windowWidth/Height are not set then the canvas is created according to the current browser resolution */
-    html2canvas(data, {windowWidth: 1240, windowHeight: 1754}).then(canvas => {
+    /* if windowWidth/Height are not set then the canvas is created according to the current browser aspect ratio */
+    html2canvas(data, {windowWidth: 1240, windowHeight: 1754, scale: 2}).then(canvas => {
         // Few necessary setting options
         const imgWidth = 190;
         const imgHeight = canvas.height * imgWidth / canvas.width;
