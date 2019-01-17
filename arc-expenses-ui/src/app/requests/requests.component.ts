@@ -4,7 +4,6 @@ import { ManageRequestsService } from '../services/manage-requests.service';
 import { AuthenticationService } from '../services/authentication.service';
 import { Paging } from '../domain/extraClasses';
 import { ActivatedRoute, Router } from '@angular/router';
-import { isNull, isNullOrUndefined } from 'util';
 import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
 import { approvalStages, paymentStages, requestTypes, stageTitles } from '../domain/stageDescriptions';
 import { ManageResourcesService } from '../services/manage-resources.service';
@@ -185,7 +184,7 @@ export class RequestsComponent implements OnInit {
                 this.setValueOfFormArrayControl('phases', 1, 'phase', true);
             }
         }
-        if ( !isNullOrUndefined(this.statusesChoice[0]) ) {
+        if ( this.statusesChoice[0] ) {
           if (this.statusesChoice[0] !== 'all') {
                 this.statusesChoice.forEach(
                     st => {
@@ -211,7 +210,7 @@ export class RequestsComponent implements OnInit {
                 }
             }
         }
-        if ( !isNullOrUndefined(this.stagesChoice[0]) ) {
+        if ( this.stagesChoice[0] ) {
             if ((this.stagesChoice[0] !== 'all') && (this.stagesChoice.length !== this.stages.length)) {
                 this.stagesChoice.forEach(
                     st => {
@@ -229,7 +228,7 @@ export class RequestsComponent implements OnInit {
                 }
             }
         }
-        if ( !isNullOrUndefined(this.typesChoice[0]) ) {
+        if ( this.typesChoice[0] ) {
             if (this.typesChoice[0] !== 'all') {
                 this.typesChoice.forEach(
                     t => {
@@ -281,11 +280,11 @@ export class RequestsComponent implements OnInit {
             this.orderField,
             this.authService.getUserProp('email')).subscribe(
             res => {
-                if (res && !isNull(res)) {
+                if (res) {
                     this.searchResults = res;
                     if (this.searchResults && this.searchResults.results &&
                         this.searchResults.results.length > 0 &&
-                        !this.searchResults.results.some(x => isNull(x))) {
+                        !this.searchResults.results.some(x => x === null)) {
 
                         this.listOfRequests = this.searchResults.results;
                         console.log(`searchAllRequests sent me ${this.listOfRequests.length} requests`);
@@ -625,7 +624,7 @@ export class RequestsComponent implements OnInit {
             () => {
                 this.showSpinner = false;
                 this.errorMessage = '';
-                if ( isNullOrUndefined(this.projects) || (this.projects.length === 0) ) {
+                if ( !this.projects || (this.projects.length === 0) ) {
                     this.errorMessage = 'Παρουσιάστηκε πρόβλημα με την ανάκτηση των απαραίτητων πληροφοριών.';
                 } else {
                     this.instituteIds = [];

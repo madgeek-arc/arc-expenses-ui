@@ -85,7 +85,7 @@ export function printRequestPage(reqId: string, reqType: string) {
         // Few necessary setting options
         const imgWidth = 190;
         const imgHeight = canvas.height * imgWidth / canvas.width;
-        const contentDataURL = canvas.toDataURL('image/jpeg');
+        const contentDataURL = canvas.toDataURL('image/png');
         const pdf = new jspdf(); // A4 size page of PDF, portrait, using millimeters
         pdf.addImage(contentDataURL, 8, 10, imgWidth, imgHeight);
         const filename = reqId + '.pdf';

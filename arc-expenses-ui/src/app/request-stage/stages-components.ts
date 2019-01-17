@@ -4,7 +4,6 @@ import { Attachment, User, PersonOfInterest } from '../domain/operation';
 import { commentDesc, FieldDescription } from '../domain/stageDescriptions';
 import { DatePipe } from '@angular/common';
 import { AuthenticationService } from '../services/authentication.service';
-import { isNullOrUndefined, isUndefined } from 'util';
 import { RequestInfo, StageInfo } from '../domain/requestInfoClasses';
 
 @Component ({
@@ -66,8 +65,7 @@ export class StageComponent implements OnInit {
 
         this.parseData();
 
-        if (!isNullOrUndefined(this.stageId) &&
-            !isNullOrUndefined(this.currentRequestInfo)) {
+        if ( this.stageId && this.currentRequestInfo ) {
 
             this.currentStageInfo = this.currentRequestInfo[this.stageId];
             this.showStage = this.currentStageInfo.showStage;
@@ -83,7 +81,7 @@ export class StageComponent implements OnInit {
     }
 
     parseData() {
-        if ( !isNullOrUndefined(this.data) ) {
+        if ( this.data ) {
             this.currentStage = this.data['currentStage'];
             this.currentRequestInfo = this.data['currentRequestInfo'];
         }
@@ -102,7 +100,7 @@ export class StageComponent implements OnInit {
 
             /* fill the form if the values exist */
             Object.keys(this.stageForm.controls).forEach(key => {
-                if (!isNullOrUndefined(this.currentStage[key.toString()])) {
+                if ( this.currentStage[key.toString()] ) {
                     this.stageForm.get(key).setValue(this.currentStage[key.toString()]);
                 }
             });
@@ -120,13 +118,14 @@ export class StageComponent implements OnInit {
                 curEmail = this.currentStage['user']['email'];
             }
             for ( const poi of this.currentStageInfo.stagePOIs ) {
-                if ( (poi.email === curEmail) || poi.delegates.some(x => x.email === curEmail) ) {
+                if ( (poi.email === curEmail) ||
+                     (poi.delegates && poi.delegates.some(x => x.email === curEmail)) ) {
                     // console.log(`stage ${this.stageId}, stagePoi: ${JSON.stringify(poi)}`);
                     return poi;
                 }
             }
         }
-        return this.currentStageInfo.stagePOIs[0];
+        // !!! if a poi is not found, currentPOI will remain undefined
     }
 
     linkToFile() {
@@ -180,7 +179,7 @@ export class StageComponent implements OnInit {
     submitForm() {
         this.stageFormError = '';
         if (this.stageForm && this.stageForm.valid ) {
-            if ( (isNullOrUndefined(this.uploadedFile) && isNullOrUndefined(this.currentStage['attachment'])) &&
+            if ( ( !this.uploadedFile && !this.currentStage['attachment'] ) &&
                  !this.choseToGoBack &&
                  ( (this.stageId === '6') || (this.stageId === '11') ||
                    ( (this.stageId === '7') && this.currentStage['approved']) ) ) {
@@ -234,11 +233,17 @@ export class StageComponent implements OnInit {
             (this.currentPOI.email === this.currentStage['user']['email'])) {
             return false;
         } else {
+            /* TODO:: WHEN WE ARE SURE ABOUT THE DATA:
+                      1.add line below to the if predicate,
+                      2. uncomment the else clause in order to also display unknown names  */
+            /* if (this.currentPOI && this.currentPOI.delegates && */
             if (this.currentPOI.delegates &&
                 this.currentPOI.delegates.some(x => x.email === this.currentStage['user']['email'])) {
+
                 return this.currentPOI.delegates.filter(x => x.email === this.currentStage['user']['email'])[0].hidden;
-            } else {
-                return false;
+
+            /*} else {
+                return false;*/
             }
         }
     }
@@ -247,7 +252,7 @@ export class StageComponent implements OnInit {
     getDelegateName() {
         /* stage 7 can also be completed by the user */
         if (this.stageId === '7') {
-            /* if a delegate has completed the stage and check if his/her name should be hidden*/
+            /* however, if a delegate has completed the stage, check if his/her name should be hidden */
             if (this.currentRequestInfo['7'].stagePOIs.some(x => x.delegates.some(y => y.email === this.currentStage['user']['email']))) {
                 if (this.getIsDelegateHidden()) {
                     return ' (' + this.currentPOI.firstname + ' ' + this.currentPOI.lastname + ')';
@@ -278,7 +283,7 @@ export class StageComponent implements OnInit {
     }
 
     getUserName() {
-        if (!isNullOrUndefined(this.currentRequestInfo.requester)) {
+        if ( this.currentRequestInfo.requester ) {
             return this.currentRequestInfo.requester.firstname + ' ' + this.currentRequestInfo.requester.lastname;
         } else {
             return '';
@@ -350,7 +355,7 @@ export class Stage3Component extends StageComponent implements OnInit {
     }
 
     onLoanToggle (completedLoan: boolean) {
-        if (completedLoan && !isUndefined(this.stageForm) ) {
+        if (completedLoan && (this.stageForm !== undefined) ) {
             this.stageForm.get('loanSource').enable();
             this.stageForm.get('loanSource').setValidators([Validators.required]);
             this.stageForm.get('loanSource').updateValueAndValidity();
@@ -411,7 +416,7 @@ export class Stage5bComponent extends StageComponent implements OnInit {
 
         super.ngOnInit();
 
-        if (!isUndefined(this.currentRequestInfo.supplier) && !isUndefined(this.currentRequestInfo.requestedAmount)) {
+        if ( this.currentRequestInfo.supplier && this.currentRequestInfo.requestedAmount) {
             this.showExtraFields = true;
             console.log('oldSupplierAndAmount are', this.currentRequestInfo.supplier, 'and', this.currentRequestInfo.requestedAmount);
         }
@@ -437,8 +442,7 @@ export class Stage5bComponent extends StageComponent implements OnInit {
         if ( this.showExtraFields ) {
 
             if (!approved) {
-                if (!isNullOrUndefined(this.currentRequestInfo.supplier) ||
-                    !isNullOrUndefined(this.currentRequestInfo.requestedAmount) ) {
+                if ( this.currentRequestInfo.supplier || this.currentRequestInfo.requestedAmount ) {
 
                     const newValArray = [];
                     newValArray.push(this.currentRequestInfo.supplier);
@@ -447,9 +451,7 @@ export class Stage5bComponent extends StageComponent implements OnInit {
                 }
                 this.approveRequest(approved);
 
-            } else if ( !isNullOrUndefined(this.currentRequestInfo.supplier) &&
-                        !isNullOrUndefined(this.currentRequestInfo.requestedAmount) &&
-                        !this.amountNaN &&
+            } else if ( this.currentRequestInfo.supplier && this.currentRequestInfo.requestedAmount && !this.amountNaN &&
                         (this.currentRequestInfo.supplier.length > 0) &&
                         (this.currentRequestInfo.requestedAmount.length > 0) ) {
 
@@ -470,8 +472,7 @@ export class Stage5bComponent extends StageComponent implements OnInit {
 
     emitNewValuesAndGoBack() {
         if ( this.showExtraFields ) {
-            if (!isNullOrUndefined(this.currentRequestInfo.supplier) ||
-                !isNullOrUndefined(this.currentRequestInfo.requestedAmount) ) {
+            if ( this.currentRequestInfo.supplier || this.currentRequestInfo.requestedAmount ) {
 
                 const newValArray = [];
                 newValArray.push(this.currentRequestInfo.supplier);
@@ -527,7 +528,7 @@ export class Stage7Component extends StageComponent implements OnInit {
 
         super.ngOnInit();
 
-        if (!isUndefined(this.currentRequestInfo.finalAmount)) {
+        if ( this.currentRequestInfo.finalAmount ) {
             this.showExtraFields = true;
             console.log('oldFinalAmount is', this.currentRequestInfo.finalAmount);
         }
@@ -551,8 +552,8 @@ export class Stage7Component extends StageComponent implements OnInit {
     emitNewValuesAndForward() {
         this.stageFormError = '';
         if ( this.showExtraFields ) {
-            if ( !isNullOrUndefined(this.currentRequestInfo.finalAmount) &&
-                !this.amountNaN && (this.currentRequestInfo.finalAmount.length > 0) ) {
+            if ( this.currentRequestInfo.finalAmount && !this.amountNaN &&
+                 (this.currentRequestInfo.finalAmount.length > 0) ) {
 
                 const newValArray = [];
                 newValArray.push(this.currentRequestInfo.finalAmount);

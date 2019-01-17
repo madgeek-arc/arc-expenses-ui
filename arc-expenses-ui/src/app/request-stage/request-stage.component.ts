@@ -5,7 +5,6 @@ import { BaseInfo, Request, RequestApproval, RequestPayment, RequestSummary,
 import { ActivatedRoute, Router } from '@angular/router';
 import { ManageRequestsService } from '../services/manage-requests.service';
 import { AuthenticationService } from '../services/authentication.service';
-import { isNullOrUndefined, isUndefined } from 'util';
 import { HttpErrorResponse, HttpEventType, HttpResponse } from '@angular/common/http';
 import { approvalStages, requestTypes, stageTitles } from '../domain/stageDescriptions';
 import { printRequestPage } from './print-request-function';
@@ -128,10 +127,10 @@ export class RequestStageComponent implements OnInit {
 
             this.currentRequestInfo.supplier = '';
             this.currentRequestInfo.requestedAmount = '';
-            if ( !isNullOrUndefined(this.currentRequest.stage1.supplier) ) {
+            if ( this.currentRequest.stage1.supplier ) {
                 this.currentRequestInfo.supplier = this.currentRequest.stage1.supplier;
             }
-            if ( !isNullOrUndefined(this.currentRequest.stage1.amountInEuros) ) {
+            if ( this.currentRequest.stage1.amountInEuros ) {
                 this.currentRequestInfo.requestedAmount = (this.currentRequest.stage1.amountInEuros).toString();
             }
         }
@@ -185,10 +184,10 @@ export class RequestStageComponent implements OnInit {
     }
 
     getNextStage(stage: string) {
-        if (isUndefined(this.currentRequestApproval['stage' + stage]['approved']) ||
+        if (!this.currentRequestApproval['stage' + stage]['approved'] ||
             (this.currentRequestApproval['stage' + stage]['approved'] === true)) {
             for (const nextStage of this.currentRequestInfo[ stage ][ 'next' ]) {
-                if (!isUndefined(this.currentRequestApproval[ 'stage' + nextStage ])) {
+                if (this.currentRequestApproval[ 'stage' + nextStage ]) {
                     return nextStage;
                 }
             }
@@ -199,7 +198,7 @@ export class RequestStageComponent implements OnInit {
 
     getPreviousStage(stage: string) {
         for (const prevStage of this.currentRequestInfo[stage]['prev']) {
-            if (!isUndefined(this.currentRequestApproval['stage' + prevStage])) {
+            if (this.currentRequestApproval['stage' + prevStage]) {
                 return prevStage;
             }
         }
@@ -250,7 +249,7 @@ export class RequestStageComponent implements OnInit {
         console.log('submitted status:', this.currentRequestApproval.status);
         console.log('next stage:', this.currentRequestApproval.stage);
 
-        if ( !isNullOrUndefined(this.uploadedFile) ) {
+        if ( this.uploadedFile ) {
             this.uploadMode = 'approval';
             this.uploadFile();
         } else {
@@ -270,10 +269,10 @@ export class RequestStageComponent implements OnInit {
         this.currentStageName = 'stage1';
 
         if ( (this.currentRequest.stage1.amountInEuros > this.amountLimit) &&
-             isUndefined(this.currentRequestApproval.stage5b) ) {
+             (!this.currentRequestApproval.stage5b) ) {
             this.currentRequestApproval.stage5b = new Stage5b();
         }
-        if ( !isNullOrUndefined(this.uploadedFile) ) {
+        if ( this.uploadedFile ) {
             this.uploadMode = 'request';
             this.uploadFile();
         } else {
@@ -287,7 +286,7 @@ export class RequestStageComponent implements OnInit {
         this.errorMessage = '';
         this.successMessage = '';
 
-        if ( !isNullOrUndefined(this.uploadedFile) ) {
+        if ( this.uploadedFile ) {
 
             this.currentRequest.stage1.attachment.url = this.uploadedFileURL;
             this.uploadedFileURL = '';
@@ -304,7 +303,7 @@ export class RequestStageComponent implements OnInit {
         this.errorMessage = '';
         this.successMessage = '';
 
-        if ( !isNullOrUndefined(this.uploadedFile) ) {
+        if ( this.uploadedFile ) {
 
             this.currentRequestApproval[this.currentStageName]['attachment']['url'] = this.uploadedFileURL;
             this.uploadedFileURL = '';
@@ -334,7 +333,7 @@ export class RequestStageComponent implements OnInit {
 
     updateRequestAndApproval() {
         console.log('updating request and approval');
-        if ( (!isNullOrUndefined(this.uploadedFile)) && (this.currentStageName !== 'stage1') ) {
+        if ( (this.uploadedFile) && (this.currentStageName !== 'stage1') ) {
 
             this.currentRequestApproval[this.currentStageName]['attachment']['url'] = this.uploadedFileURL;
             this.uploadedFileURL = '';
@@ -431,8 +430,8 @@ export class RequestStageComponent implements OnInit {
             if (stage === '1') {
                 return 2;
             }
-            if ( !isNullOrUndefined(this.currentRequestApproval[stageField]) &&
-                 !isNullOrUndefined(this.currentRequestApproval[stageField].date)) {
+            if ( (this.currentRequestApproval[stageField]) &&
+                 (this.currentRequestApproval[stageField].date)) {
 
                 if (!this.isSimpleUser || (stage === '2') ) {
 
@@ -443,15 +442,15 @@ export class RequestStageComponent implements OnInit {
                     if ( (stage === this.currentRequestApproval.stage) && (this.stages.indexOf(stage) > 0)) {
 
                         const prevStageField = 'stage' + this.stages[this.stages.indexOf(stage) - 1];
-                        if (!isNullOrUndefined(this.currentRequestApproval[prevStageField]) &&
-                            !isNullOrUndefined(this.currentRequestApproval[prevStageField].date) &&
+                        if ((this.currentRequestApproval[prevStageField]) &&
+                            (this.currentRequestApproval[prevStageField].date) &&
                             (this.currentRequestApproval[prevStageField].date > this.currentRequestApproval[stageField].date) ) {
 
                             return 4;
                         }
                     }
 
-                if ( (!isUndefined(this.currentRequestApproval[stageField]['approved']) &&
+                if ( (this.currentRequestApproval[stageField]['approved'] &&
                       this.currentRequestApproval[stageField]['approved'] === true ) ||
                       (stage === '6') ) {
 

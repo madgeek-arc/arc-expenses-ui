@@ -7,7 +7,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AuthenticationService } from '../services/authentication.service';
 import { DatePipe } from '@angular/common';
 import { ManageProjectService } from '../services/manage-project.service';
-import { isUndefined } from 'util';
 import { HttpEventType, HttpResponse } from '@angular/common/http';
 import { requestTypes, supplierSelectionMethodsMap } from '../domain/stageDescriptions';
 
@@ -184,7 +183,7 @@ export class NewRequestComponent implements OnInit {
                 window.scroll(1, 1);
 
             } else if ( (this.requestType !== 'services_contract') &&
-                        (+this.newRequestForm.get('amount').value > this.lowAmountLimit) && isUndefined(this.uploadedFile) ) {
+                        (+this.newRequestForm.get('amount').value > this.lowAmountLimit) && (!this.uploadedFile) ) {
 
                 // UIkit.modal.alert('Για αιτήματα άνω των 2.500 € η επισύναψη εγγράφων είναι υποχρεωτική.');
                 this.errorMessage = 'Για αιτήματα άνω των 2.500 € η επισύναψη εγγράφων είναι υποχρεωτική.';

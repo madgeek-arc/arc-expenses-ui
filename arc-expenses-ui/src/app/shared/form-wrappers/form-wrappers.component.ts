@@ -1,7 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FieldDescription } from '../../domain/stageDescriptions';
-import { Delegate } from '../../domain/operation';
-import { isNullOrUndefined } from 'util';
 
 @Component({
   selector: 'app-form-field',
@@ -59,7 +57,7 @@ export class FormUploadFileComponent implements OnInit {
   constructor() {}
 
   ngOnInit() {
-    if (isNullOrUndefined(this.uploadedFilename) || this.uploadedFilename.length === 0) {
+    if ((!this.uploadedFilename) || this.uploadedFilename.length === 0) {
       this.uploadedFilename = 'επιλέξτε αρχείο';
     }
   }

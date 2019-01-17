@@ -3,7 +3,6 @@ import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {AuthenticationService} from '../services/authentication.service';
 import {Router} from '@angular/router';
 import { Attachment } from '../domain/operation';
-import { isNullOrUndefined } from 'util';
 import { HttpEventType, HttpResponse } from '@angular/common/http';
 import { ManageUserService } from '../services/manage-user.service';
 
@@ -72,10 +71,6 @@ export class SignUpComponent implements OnInit {
           this.signUpForm.get('receiveEmails').setValue(true);
           this.signUpForm.get('immediateEmails').setValue(true);
           this.signUpForm.get('immediateEmails').enable();
-      }*/
-      /*if ( !isNullOrUndefined(this.authService.getSignatureAttachment()) ) {
-          this.userAttachment = this.authService.getSignatureAttachment();
-          this.signatureFilename = this.userAttachment.filename;
       }*/
     }
 
@@ -158,7 +153,7 @@ export class SignUpComponent implements OnInit {
           () => {
               this.errorMessage = '';
               this.showSpinner = false;
-              if ( !isNullOrUndefined(sessionStorage.getItem('state.location')) &&
+              if ( sessionStorage.getItem('state.location') &&
                   (sessionStorage.getItem('state.location') !== '/sign-up') ) {
                   const state = sessionStorage.getItem('state.location');
                   sessionStorage.removeItem('state.location');

@@ -1,6 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { isNullOrUndefined } from 'util';
 
 @Component({
     selector: 'app-edit-resources',
@@ -35,7 +34,7 @@ export class EditResourcesComponent implements OnInit {
     }
 
     createForm() {
-        if ( !isNullOrUndefined(this.resourceFormDefinition) ) {
+        if ( this.resourceFormDefinition ) {
             this.resourceForm = this.fb.group(this.resourceFormDefinition);
         }
     }

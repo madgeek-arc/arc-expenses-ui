@@ -114,7 +114,7 @@ export class AuthenticationService {
                         console.log(JSON.stringify(userInfo));
                         if ( userInfo ) {
                             this.isLoggedIn = true;
-                            // TODO: ALWAYS RESTORE ΒEFORE COMMIT!!
+                            // TODO: KEEP UNTIL KKARAMAL GETS A REAL ROLE_EXECUTIVE!!
                             if (userInfo['user'] && userInfo['user']['email'] &&
                                 (userInfo['user']['email'] === 'kkaramal@ipet.athena-innovation.gr')) {
                                 sessionStorage.setItem('role', '[{"authority":"ROLE_EXECUTIVE"}]');

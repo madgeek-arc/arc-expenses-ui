@@ -23,13 +23,12 @@
                         </aside-help-content>
 
                         <!-- MIDDLE -->
-                        <div class=" uk-width-expand@m">
+                        <div id="printable-section" class=" uk-width-expand@m">
                             <div *ngIf="errorMessage" class="uk-alert uk-alert-danger">{{ errorMessage }}</div>
                             <div *ngIf="successMessage" class="uk-alert uk-alert-success">{{ successMessage }}</div>
                             <div *ngIf="notFoundMessage" class="uk-alert">{{ notFoundMessage }}</div>
 
-                            <div id="printable-section"
-                                 *ngIf="!showSpinner && currentRequest && currentRequestPayment &&
+                            <div *ngIf="!showSpinner && currentRequest && currentRequestPayment &&
                                         (canEdit === true || canEdit === false)">
 
                                 <!--1st stage-->
@@ -96,8 +95,8 @@
                                     <!--<button class="uk-button uk-button-default" (click)="printRequest()"
                                             title="Προτείνεται η χρήση<br>Google Chrome" uk-tooltip>-->
                                     <button class="uk-button uk-button-default" (click)="printRequest()"
-                                            title="Πατήστε για λήψη του αιτήματος<br>>σε μορφή αρχείου pdf" uk-tooltip>
-                                        Λήψη Αιτήματος</button>
+                                            title="Πατήστε για λήψη του αιτήματος<br>σε μορφή αρχείου pdf" uk-tooltip>
+                                        Λήψη ως PDF</button>
                                 </div>
 
 

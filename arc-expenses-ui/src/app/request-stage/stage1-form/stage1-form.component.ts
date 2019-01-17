@@ -1,8 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Attachment, Request, Stage5b } from '../../domain/operation';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { supplierSelectionMethods, supplierSelectionMethodsMap } from '../../domain/stageDescriptions';
-import { isNullOrUndefined, isUndefined } from 'util';
+import { supplierSelectionMethodsMap } from '../../domain/stageDescriptions';
 
 @Component({
     selector: 'stage1-form',
@@ -53,7 +52,7 @@ export class Stage1FormComponent implements OnInit {
             this.updateStage1Form.get('supplierSelectionMethod').setValue(this.currentRequest.stage1.supplierSelectionMethod);
             this.updateStage1Form.get('supplierSelectionMethod').updateValueAndValidity();
         }
-        if ( !isNullOrUndefined(this.currentRequest.stage1.amountInEuros) ) {
+        if ( this.currentRequest.stage1.amountInEuros ) {
             this.updateStage1Form.get('amount').setValue( (this.currentRequest.stage1.amountInEuros).toString() );
             this.updateStage1Form.get('amount').updateValueAndValidity();
             this.updateStage1Form.get('amount').markAsTouched();
@@ -95,8 +94,7 @@ export class Stage1FormComponent implements OnInit {
             } else if ( (( this.updateStage1Form.get('supplierSelectionMethod').value !== this.selMethods['direct'] ) &&
                          ((this.currentRequest.type !== 'trip') &&
                           (this.currentRequest.type !== 'contract') )) &&
-                        (isNullOrUndefined(this.uploadedFile) &&
-                         isNullOrUndefined(this.currentRequest.stage1.attachment) )) {
+                        ((!this.uploadedFile) && (!this.currentRequest.stage1.attachment) )) {
 
                 this.errorMessage = 'Για αναθέσεις μέσω διαγωνισμού ή έρευνας αγοράς η επισύναψη εγγράφων είναι υποχρεωτική.';
             } else if ( (this.currentRequest.type !== 'services_contract') &&
@@ -111,7 +109,7 @@ export class Stage1FormComponent implements OnInit {
                 this.currentRequest.stage1.supplier = this.updateStage1Form.get('supplier').value;
                 this.currentRequest.stage1.supplierSelectionMethod = this.updateStage1Form.get('supplierSelectionMethod').value;
                 this.currentRequest.stage1.amountInEuros = +this.updateStage1Form.get('amount').value;
-                if ( !isNullOrUndefined(this.uploadedFile) ) {
+                if ( this.uploadedFile ) {
                     this.currentRequest.stage1.attachment = new Attachment(this.uploadedFile.name, this.uploadedFile.type,
                                                                            this.uploadedFile.size, '');
                 }
@@ -137,8 +135,8 @@ export class Stage1FormComponent implements OnInit {
 
     showAmount() {
 
-        if ( !isNullOrUndefined(this.updateStage1Form.get('amount').value.trim()) &&
-            this.updateStage1Form.get('amount').value.trim().includes(',')) {
+        if ( (this.updateStage1Form.get('amount').value.trim()) &&
+             this.updateStage1Form.get('amount').value.trim().includes(',')) {
 
             const temp = this.updateStage1Form.get('amount').value.replace(',', '.');
             this.updateStage1Form.get('amount').setValue(temp);
