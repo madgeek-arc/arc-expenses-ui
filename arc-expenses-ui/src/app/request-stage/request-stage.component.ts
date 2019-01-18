@@ -184,7 +184,7 @@ export class RequestStageComponent implements OnInit {
     }
 
     getNextStage(stage: string) {
-        if (!this.currentRequestApproval['stage' + stage]['approved'] ||
+        if ((this.currentRequestApproval['stage' + stage]['approved'] === undefined) ||
             (this.currentRequestApproval['stage' + stage]['approved'] === true)) {
             for (const nextStage of this.currentRequestInfo[ stage ][ 'next' ]) {
                 if (this.currentRequestApproval[ 'stage' + nextStage ]) {
@@ -232,6 +232,7 @@ export class RequestStageComponent implements OnInit {
                     this.requestNeedsUpdate = true;
                 }
             } else {
+                // console.log('will reject request');
                 this.currentRequestApproval.status = 'rejected';
                 this.currentRequest.requestStatus = 'rejected';
                 this.requestNeedsUpdate = true;
@@ -321,11 +322,12 @@ export class RequestStageComponent implements OnInit {
                 this.getCurrentRequest();
             },
             () => {
-                this.successMessage = 'Οι αλλαγές αποθηκεύτηκαν.';
-                this.showSpinner = false;
-                this.getIfUserCanEditRequest();
                 if ((this.currentRequestApproval.status === 'accepted') && (this.currentRequest.type !== 'contract')) {
                     this.createRequestPayment();
+                } else {
+                    this.successMessage = 'Οι αλλαγές αποθηκεύτηκαν.';
+                    // this.showSpinner = false;
+                    this.getIfUserCanEditRequest();
                 }
             }
         );
@@ -355,11 +357,12 @@ export class RequestStageComponent implements OnInit {
                 this.getCurrentRequest();
             },
             () => {
-                this.successMessage = 'Οι αλλαγές αποθηκεύτηκαν.';
-                this.showSpinner = false;
-                this.getIfUserCanEditRequest();
                 if ((this.currentRequestApproval.status === 'accepted') && (this.currentRequest.type !== 'contract')) {
                     this.createRequestPayment();
+                } else {
+                    this.successMessage = 'Οι αλλαγές αποθηκεύτηκαν.';
+                    // this.showSpinner = false;
+                    this.getIfUserCanEditRequest();
                 }
             }
         );
@@ -520,7 +523,17 @@ export class RequestStageComponent implements OnInit {
                     console.log(JSON.stringify(res));
                     this.router.navigate(['/requests/request-stage-payment', res.id]);
                 },
-            error => console.log(error)
+            error => {
+                console.log(error);
+                this.showSpinner = false;
+                this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
+                this.getCurrentRequest();
+            },
+            () => {
+                this.successMessage = 'Οι αλλαγές αποθηκεύτηκαν.';
+                this.showSpinner = false;
+                this.getIfUserCanEditRequest();
+            }
         );
     }
 
@@ -567,7 +580,7 @@ export class RequestStageComponent implements OnInit {
             () => {
                     this.successMessage = 'Το αίτημα ακυρώθηκε.';
                     this.showSpinner = false;
-		    this.getIfUserCanEditRequest();
+                    this.getIfUserCanEditRequest();
                     UIkit.modal('#cancellationModal').hide();
                 }
             );

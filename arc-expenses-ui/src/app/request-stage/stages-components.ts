@@ -65,7 +65,7 @@ export class StageComponent implements OnInit {
 
         this.parseData();
 
-        if ( this.stageId && this.currentRequestInfo ) {
+        if ( (this.stageId !== undefined) && (this.currentRequestInfo !== undefined) ) {
 
             this.currentStageInfo = this.currentRequestInfo[this.stageId];
             this.showStage = this.currentStageInfo.showStage;
@@ -179,7 +179,8 @@ export class StageComponent implements OnInit {
     submitForm() {
         this.stageFormError = '';
         if (this.stageForm && this.stageForm.valid ) {
-            if ( ( !this.uploadedFile && !this.currentStage['attachment'] ) &&
+            if ( ( (this.uploadedFile === undefined) &&
+                   (this.currentStage['attachment'] === undefined) ) &&
                  !this.choseToGoBack &&
                  ( (this.stageId === '6') || (this.stageId === '11') ||
                    ( (this.stageId === '7') && this.currentStage['approved']) ) ) {
@@ -416,7 +417,10 @@ export class Stage5bComponent extends StageComponent implements OnInit {
 
         super.ngOnInit();
 
-        if ( this.currentRequestInfo.supplier && this.currentRequestInfo.requestedAmount) {
+        if ( (this.currentRequestInfo.supplier !== undefined) &&
+             (this.currentRequestInfo.supplier !== null) &&
+             (this.currentRequestInfo.requestedAmount !== undefined) &&
+             (this.currentRequestInfo.requestedAmount !== null) ) {
             this.showExtraFields = true;
             console.log('oldSupplierAndAmount are', this.currentRequestInfo.supplier, 'and', this.currentRequestInfo.requestedAmount);
         }
@@ -451,7 +455,11 @@ export class Stage5bComponent extends StageComponent implements OnInit {
                 }
                 this.approveRequest(approved);
 
-            } else if ( this.currentRequestInfo.supplier && this.currentRequestInfo.requestedAmount && !this.amountNaN &&
+            } else if ( (this.currentRequestInfo.supplier !== undefined) &&
+                        (this.currentRequestInfo.supplier !== null) &&
+                        (this.currentRequestInfo.requestedAmount !== undefined) &&
+                        (this.currentRequestInfo.requestedAmount !== null) &&
+                        !this.amountNaN &&
                         (this.currentRequestInfo.supplier.length > 0) &&
                         (this.currentRequestInfo.requestedAmount.length > 0) ) {
 
@@ -472,7 +480,10 @@ export class Stage5bComponent extends StageComponent implements OnInit {
 
     emitNewValuesAndGoBack() {
         if ( this.showExtraFields ) {
-            if ( this.currentRequestInfo.supplier || this.currentRequestInfo.requestedAmount ) {
+            if (((this.currentRequestInfo.supplier !== undefined) &&
+                 (this.currentRequestInfo.supplier !== null)) ||
+                ((this.currentRequestInfo.requestedAmount !== undefined) &&
+                 (this.currentRequestInfo.requestedAmount !== null)) ) {
 
                 const newValArray = [];
                 newValArray.push(this.currentRequestInfo.supplier);

@@ -40,7 +40,7 @@ export class Stage1FormComponent implements OnInit {
             requestText: [''],
             supplier: [''],
             supplierSelectionMethod: [''],
-            amount: ['', [Validators.min(0), Validators.pattern('^\\d+(\\.\\d{1,2})?$')] ]
+            amount: ['', [Validators.min(1), Validators.pattern('^\\d+(\\.\\d{1,2})?$')] ]
         });
         this.updateStage1Form.get('requestText').setValue(this.currentRequest.stage1.subject);
         this.updateStage1Form.get('requestText').updateValueAndValidity();
@@ -109,6 +109,7 @@ export class Stage1FormComponent implements OnInit {
                 this.currentRequest.stage1.supplier = this.updateStage1Form.get('supplier').value;
                 this.currentRequest.stage1.supplierSelectionMethod = this.updateStage1Form.get('supplierSelectionMethod').value;
                 this.currentRequest.stage1.amountInEuros = +this.updateStage1Form.get('amount').value;
+                this.currentRequest.stage1.finalAmount = +this.updateStage1Form.get('amount').value;
                 if ( this.uploadedFile ) {
                     this.currentRequest.stage1.attachment = new Attachment(this.uploadedFile.name, this.uploadedFile.type,
                                                                            this.uploadedFile.size, '');
@@ -135,11 +136,12 @@ export class Stage1FormComponent implements OnInit {
 
     showAmount() {
 
-        if ( (this.updateStage1Form.get('amount').value.trim()) &&
-             this.updateStage1Form.get('amount').value.trim().includes(',')) {
+        if ( this.updateStage1Form.get('amount').value ) {
+             if (this.updateStage1Form.get('amount').value.trim().includes(',')) {
 
-            const temp = this.updateStage1Form.get('amount').value.replace(',', '.');
-            this.updateStage1Form.get('amount').setValue(temp);
+                 const temp = this.updateStage1Form.get('amount').value.replace(',', '.');
+                 this.updateStage1Form.get('amount').setValue(temp);
+             }
         }
 
         this.updateStage1Form.get('amount').updateValueAndValidity();
@@ -147,7 +149,7 @@ export class Stage1FormComponent implements OnInit {
             this.requestedAmount = this.updateStage1Form.get('amount').value.trim();
         }
 
-        if ( this.updateStage1Form.get('amount').value &&
+        if ( (this.updateStage1Form.get('amount').value !== '') &&
             (+this.updateStage1Form.get('amount').value > this.lowAmountLimit) &&
             (+this.updateStage1Form.get('amount').value <= this.amountLimit) &&
             (this.currentRequest.type === 'regular') ) {

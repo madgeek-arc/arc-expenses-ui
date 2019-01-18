@@ -183,7 +183,8 @@ export class NewRequestComponent implements OnInit {
                 window.scroll(1, 1);
 
             } else if ( (this.requestType !== 'services_contract') &&
-                        (+this.newRequestForm.get('amount').value > this.lowAmountLimit) && (!this.uploadedFile) ) {
+                        (+this.newRequestForm.get('amount').value > this.lowAmountLimit) &&
+                        (this.uploadedFile === undefined) ) {
 
                 // UIkit.modal.alert('Για αιτήματα άνω των 2.500 € η επισύναψη εγγράφων είναι υποχρεωτική.');
                 this.errorMessage = 'Για αιτήματα άνω των 2.500 € η επισύναψη εγγράφων είναι υποχρεωτική.';
