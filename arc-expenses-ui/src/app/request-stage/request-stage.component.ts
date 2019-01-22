@@ -78,7 +78,7 @@ export class RequestStageComponent implements OnInit {
                             mergeMap( res =>
                                 this.requestService.getRequestById(res.requestId, this.authService.getUserProp('email'))
                             ));
-        result.subscribe(
+        result.subscribe (
             req => {
                 this.currentRequest = req;
                 console.log(`The archiveid of the currentRequest is ${req.archiveId}`);

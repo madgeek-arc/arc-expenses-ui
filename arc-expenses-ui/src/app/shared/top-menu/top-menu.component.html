@@ -107,8 +107,8 @@
 </div>
 
 
-<div class="tm-header-mobile uk-hidden@m">
-    <div  class="uk-navbar-container" uk-sticky>
+<div class="uk-hidden@m">
+    <div class="uk-navbar-container" uk-sticky>
         <nav class="uk-navbar">
             <div class="uk-navbar-left">
                 <a class="uk-navbar-toggle" href="#tm-mobile" uk-toggle>
@@ -122,41 +122,115 @@
         </nav>
     </div>
     <div id="tm-mobile" uk-offcanvas="" mode="slide" overlay="" class="uk-offcanvas">
-        <div class="uk-offcanvas-bar">
-            <button class="uk-offcanvas-close uk-close uk-icon" type="button" style="color: #2d2e33" uk-close>
+        <div class="uk-offcanvas-bar" style="background-color: #1e3684 !important;">
+            <button class="uk-offcanvas-close uk-close uk-icon uk-margin-bottom" type="button" style="color: white !important;" uk-close>
             </button>
-            <div class="uk-child-width-1-1 uk-grid uk-grid-stack" uk-grid="">
-                <div>
-                    <div class="uk-panel" id="module-0">
-                        <ul class="uk-nav uk-nav-default">
-                            <li class="uk-nav-header" [routerLinkActive]="['uk-active']">
+            <!--<div class="uk-child-width-1-1 uk-grid uk-grid-stack" uk-grid="">-->
+                <div class="uk-margin-top">
+                    <!--<div class="uk-panel" id="module-0">-->
+                        <ul class="uk-nav" style="color: white !important;">
+                            <li class="uk-nav-header">
+                                <a class="loginLink uk-link" routerLinkActive="uk-active">
+                                    <a *ngIf="!loggedIn" class="uk-margin-right uk-link" (click)="login()">Εισοδος</a>
+                                    <span *ngIf="loggedIn" class="uk-margin-right">{{ getUserName() }}</span>
+                                    <span class="uk-margin-small-right uk-icon">
+                                        <svg height="20" ratio="1" viewBox="0 0 20 20" width="20"
+                                             xmlns="http://www.w3.org/2000/svg">
+                                            <circle cx="9.9" cy="6.4" fill="none" r="4.4" stroke="#000"
+                                                    stroke-width="1.1"></circle>
+                                            <path d="M1.5,19 C2.3,14.5 5.8,11.2 10,11.2 C14.2,11.2 17.7,14.6 18.5,19.2"
+                                                  fill="none" stroke="#000" stroke-width="1.1"></path>
+                                        </svg>
+                                    </span>
+                                </a>
+                            </li>
+                            <li class="uk-parent" [routerLinkActive]="['uk-active']">
                                 <a [routerLink]="['home']">
                                     Αρχική
                                 </a>
                             </li>
-                            <li class="uk-nav-header" [routerLinkActive]="['uk-active']">
-                                <a [routerLink]="['new-request']">
-                                    Νέο Αίτημα
+                            <li class="uk-parent">
+                                <a [routerLink]="['new-request']" [routerLinkActive]="['uk-active']">
+                                    Πρωτογενές αίτημα
                                 </a>
+                                <!--<div>
+                                    <div class="uk-first-column">-->
+                                        <ul class="uk-subnav uk-divider-vertical">
+                                            <li>
+                                                <a [routerLink]="['new-request', 'regular']" [routerLinkActive]="['uk-active']">
+                                                    {{ reqTypes['regular'] }}
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a [routerLink]="['new-request', 'trip']" [routerLinkActive]="['uk-active']">
+                                                    {{ reqTypes['trip'] }}
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a [routerLink]="['new-request', 'contract']" [routerLinkActive]="['uk-active']">
+                                                    {{ reqTypes['contract'] }}
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a [routerLink]="['new-request', 'services_contract']" [routerLinkActive]="['uk-active']">
+                                                    {{ reqTypes['services_contract'] }}
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    <!--</div>
+                                </div>-->
                             </li>
-                            <li class="uk-nav-header" [routerLinkActive]="['uk-active']">
-                                <a [routerLink]="['requests']">
+                            <li class="uk-parent" [routerLinkActive]="['uk-active']">
+                                <a [routerLink]="['requests']"
+                                   [queryParams] = "{ status: ['pending','under_review'],
+                                                   stage: ['all'],
+                                                   phase: 0,
+                                                   type: ['all'],
+                                                   page: 0,
+                                                   itemsPerPage: 10,
+                                                   orderField: 'creation_date',
+                                                   order: 'DESC',
+                                                   searchTerm: '' }" >
                                     Αιτήματα
                                 </a>
                             </li>
-                            <li class="uk-nav-header" [routerLinkActive]="['uk-active']">
+                            <li class="uk-parent" [routerLinkActive]="['uk-active']">
                                 <a [routerLink]="['about']">
                                     Σχετικά
                                 </a>
                             </li>
-                            <li class="uk-nav-header" [routerLinkActive]="['uk-active']">
-                                <a [routerLink]="['sign-up']">
-                                    Είσοδος
+                            <li class="uk-parent">
+                                <a (click)="showContactForm()">
+                                    Επικοινωνία
                                 </a>
                             </li>
                         </ul>
-                    </div>
-                </div>
+                        <div *ngIf="loggedIn" uk-dropdown>
+                            <ul class="uk-nav" style="color: white !important;">
+                                <li class="uk-parent">
+                                    <a [routerLink]="['/sign-up']" [routerLinkActive]="'uk-active'">
+                                        Στοιχεία χρήστη
+                                    </a>
+                                </li>
+                                <!-- TODO:: ADD OPERATORS WHEN DECIDED -->
+                                <!--<li *ngIf="isAdmin">
+                                    <a (click)="routeToPage('/resources/projects')">Επεξεργασία έργων</a>
+                                </li>
+                                <li *ngIf="isAdmin">
+                                    <a (click)="routeToPage('/resources/institutes')">Επεξεργασία ινστιτούτων</a>
+                                </li>
+                                <li *ngIf="isAdmin">
+                                    <a (click)="routeToPage('/resources/organizations')">Επεξεργασία οργανισμών</a>
+                                </li>-->
+                                <li class="uk-parent">
+                                    <a (click)="logout()">
+                                        Έξοδος
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    <!--</div>
+                </div>-->
             </div>
         </div>
     </div>

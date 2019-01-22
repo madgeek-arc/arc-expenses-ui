@@ -44,7 +44,7 @@
             <!--<aside-help-content #leftHelperContent [position]="'left'"
                                 [ngClass]="leftHelperContent.isPresent()?'tm-sidebar uk-width-1-4@m uk-first-column':'clear-style'">
             </aside-help-content>-->
-          <div>
+          <!--<div>-->
 
               <!-- FILTERS SIDEMENU -->
             <div *ngIf="filtersForm" [formGroup]="filtersForm"
@@ -161,10 +161,10 @@
                </div>-->
 
            </div>
-          </div>
+          <!--</div>-->
 
               <!-- MIDDLE -->
-            <div class=" uk-width-expand@m">
+            <div class="uk-width-expand">
                 <div>
                     <div *ngIf="errorMessage" class="uk-alert uk-alert-warning">{{errorMessage}}</div>
                     <div *ngIf="showSpinner" class="uk-inline uk-position-center uk-padding-large-top">

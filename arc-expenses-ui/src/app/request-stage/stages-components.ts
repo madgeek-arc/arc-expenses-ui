@@ -237,16 +237,14 @@ export class StageComponent implements OnInit {
             /* TODO:: WHEN WE ARE SURE ABOUT THE DATA:
                       1.add line below to the if predicate,
                       2. uncomment the else clause in order to also display unknown names  */
-            /* if (this.currentPOI && this.currentPOI.delegates && */
-            if (this.currentPOI.delegates &&
-                this.currentPOI.delegates.some(x => x.email === this.currentStage['user']['email'])) {
+             if (this.currentPOI && this.currentPOI.delegates &&
+                 this.currentPOI.delegates.some(x => x.email === this.currentStage['user']['email'])) {
 
                 return this.currentPOI.delegates.filter(x => x.email === this.currentStage['user']['email'])[0].hidden;
 
-            /*} else {
-                return false;*/
             }
         }
+        return false;
     }
 
     /* display full name of the submitted stage's editor */

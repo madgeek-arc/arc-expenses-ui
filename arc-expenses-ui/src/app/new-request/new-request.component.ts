@@ -246,6 +246,8 @@ export class NewRequestComponent implements OnInit {
                 this.requestApproval.stage6 = new Stage6();
 
                 window.scrollTo(0, 0);
+                // console.log(JSON.stringify(this.request, null, 2));
+                // console.log(JSON.stringify(this.requestApproval, null, 2));
                 this.showSpinner = true;
                 this.errorMessage = '';
                 this.requestService.addRequest(this.request).subscribe (
