@@ -40,13 +40,6 @@ export class AuthGuardService implements CanActivate, CanLoad {
             return true;
         }
 
-        /* TODO:: UNCOMMENT WHEN DECIDED TO OPEN EDIT PROJECTS TO OPERATORS */
-        /*if ( (this.authenticationService.getUserRole().some(x => x.authority === 'ROLE_OPERATOR')) &&
-             (window.location.pathname.includes('resources/projects')) ) {
-
-            return true;
-        }*/
-
         this.router.navigate(['/home']);
 
         return false;

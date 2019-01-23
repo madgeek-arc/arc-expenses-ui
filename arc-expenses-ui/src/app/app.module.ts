@@ -26,7 +26,6 @@ import { LOCALE_ID } from '@angular/core';
 import { registerLocaleData } from '@angular/common';
 import localeEL from '@angular/common/locales/el';
 import { Stage1FormComponent } from './request-stage/stage1-form/stage1-form.component';
-import { AnchorDirective } from './shared/dynamic-loader-anchor-components/anchor.directive';
 import { StagesLoaderComponent } from './request-stage/stages-dynamic-load/stages-loader.component';
 import { SharedComponentsModule } from './shared/shared-components.module';
 import { AuthenticationInterceptor } from './services/authentication-interceptor';

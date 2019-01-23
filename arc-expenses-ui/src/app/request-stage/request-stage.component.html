@@ -198,14 +198,14 @@
                             (currentRequest.type !== 'contract')" class="uk-margin-top" data-html2canvas-ignore>
                   <hr>
 
-                    <!-- Create Payment button NOT needed - the first payment is created on the approval's completion -->
-                    <!--<div *ngIf="(!currentRequestPayments || (currentRequestPayments.length === 0)) &&
-                                ((canEdit === true) || userIsAdmin() )"
+                    <!-- Create Payment button JUST FOR ADMINS -->
+                    <!-- Should NOT be needed - normally the first payment is created on the approval's completion -->
+                    <div *ngIf="(!currentRequestPayments || (currentRequestPayments.length === 0)) && userIsAdmin()"
                          class="uk-margin-top">
 
                         <button class="uk-button uk-button-primary"
                                 (click)="createRequestPayment()">Προσθήκη Περαίωσης</button>
-                    </div>-->
+                    </div>
 
                     <div *ngIf="(currentRequestPayments && (currentRequestPayments.length > 0))">
 
