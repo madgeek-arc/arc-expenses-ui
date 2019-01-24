@@ -86,7 +86,7 @@
                                     <li><a [routerLink]="['/sign-up']">Στοιχεία χρήστη</a></li>
                                     <!-- TODO:: ADD OPERATORS WHEN DECIDED -->
                                     <li *ngIf="isAdmin">
-                                        <a routerLink="/admin">Εφαρμογή διαχείρισης Έργων</a>
+                                        <a (click)="goToAdmin()">Εφαρμογή διαχείρισης έργων</a>
                                     </li>
                                     <li><a (click)="logout()">Έξοδος</a></li>
                                 </ul>
@@ -209,8 +209,8 @@
                                 </li>
                                 <!-- TODO:: ADD OPERATORS WHEN DECIDED -->
                                 <li *ngIf="isAdmin">
-                                    <a routerLink="/admin">
-                                        Εφαρμογή διαχείρισης Έργων
+                                    <a (click) = goToAdmin()>
+                                        Εφαρμογή διαχείρισης έργων
                                     </a>
                                 </li>
                                 <li class="uk-parent">
