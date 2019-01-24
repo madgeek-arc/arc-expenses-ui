@@ -30,7 +30,6 @@ import { StagesLoaderComponent } from './request-stage/stages-dynamic-load/stage
 import { SharedComponentsModule } from './shared/shared-components.module';
 import { AuthenticationInterceptor } from './services/authentication-interceptor';
 import { ForbiddenPageComponent } from './shared/403-forbidden-page.component';
-import { ManageUserService } from './services/manage-user.service';
 import { ManageResourcesService } from './services/manage-resources.service';
 import { RequestStagePaymentComponent } from './request-stage/request-stage-payment/request-stage-payment.component';
 import { CallHelpdeskPageComponent } from './error-pages/call-helpdesk-page.component';
@@ -89,7 +88,6 @@ const stagesList = [
         ManageResourcesService,
         ManageRequestsService,
         ManageProjectService,
-        ManageUserService,
         AuthenticationService,
         AuthGuardService
     ],

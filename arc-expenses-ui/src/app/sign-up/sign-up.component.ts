@@ -3,8 +3,6 @@ import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {AuthenticationService} from '../services/authentication.service';
 import {Router} from '@angular/router';
 import { Attachment } from '../domain/operation';
-import { HttpEventType, HttpResponse } from '@angular/common/http';
-import { ManageUserService } from '../services/manage-user.service';
 
 @Component({
   selector: 'app-sign-up',
@@ -21,13 +19,10 @@ export class SignUpComponent implements OnInit {
   firstnameLatin: string;
   lastnameLatin: string;
 
-  uploadedFile: File;
   userAttachment: Attachment;
-  signatureFilename = '';
 
   constructor(private fb: FormBuilder,
               private authService: AuthenticationService,
-              private userService: ManageUserService,
               private router: Router) {}
 
   ngOnInit() {
@@ -83,57 +78,13 @@ export class SignUpComponent implements OnInit {
       }
     }
 
-    createAttachment(): Attachment {
-        const tempAttachment: Attachment = new Attachment(this.uploadedFile.name, this.uploadedFile.type, this.uploadedFile.size, '');
-        /*if (this.uploadedFile) {
-            tempAttachment.filename = this.uploadedFile.name;
-            tempAttachment.mimetype = this.uploadedFile.type;
-            tempAttachment.size = this.uploadedFile.size;
-            tempAttachment.url = '';
-        }*/
-
-        return tempAttachment;
-    }
-
     submitChanges() {
         if (this.signUpForm.valid) {
-            if (this.uploadedFile) {
-                // SEND IT SOMEWHERE AND UPDATE USER
-                this.userAttachment = this.createAttachment();
-                this.uploadFile();
-            } else {
-                this.updateUser();
-            }
+            this.updateUser();
         } else {
             this.errorMessage = 'Είναι απαραίτητο να συμπληρώσετε το όνομα και το επίθετό σας στα ελληνικά.';
             this.showSpinner = false;
         }
-    }
-
-    uploadFile() {
-        this.errorMessage = '';
-        this.showSpinner = true;
-        this.userService.uploadSignature<string>(this.authService.getUserProp('email'), this.uploadedFile)
-            .subscribe(
-                event => {
-                    // console.log('uploadAttachment responded: ', JSON.stringify(event));
-                    if (event.type === HttpEventType.UploadProgress) {
-                        console.log('uploadAttachment responded: ', event);
-                    } else if ( event instanceof HttpResponse) {
-                        console.log('file url is:', event.body);
-                        this.userAttachment.url = event.body;
-                    }
-                },
-                error => {
-                    console.log(error);
-                    this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών';
-                    this.showSpinner = false;
-                },
-                () => {
-                    console.log('ready to update Request');
-                    this.updateUser();
-                }
-            );
     }
 
     updateUser() {
@@ -164,17 +115,6 @@ export class SignUpComponent implements OnInit {
               }
           }
       );
-    }
-
-
-    getUploadedFile(file: File) {
-        this.uploadedFile = file;
-    }
-
-    linkToFile() {
-        if (this.userAttachment && this.userAttachment.url) {
-            window.open(this.userAttachment.url, '_blank', 'enabledstatus=0,toolbar=0,menubar=0,location=0');
-        }
     }
 
 }
