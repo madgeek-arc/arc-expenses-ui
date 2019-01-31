@@ -89,11 +89,12 @@ export class AuthenticationService {
                         if ( (sessionStorage.getItem('userInfo') === undefined) ||
                              (sessionStorage.getItem('userInfo') === null) ||
                              (this.getUserProp('email') === null ) ) {
-                            console.log('received null userInfo');
+                            console.log('cant find userInfo in sessionStorage');
                             this.isLoggedIn = false;
                             this.removeUserProperties();
                             deleteCookie('arc_currentUser');
                             this.router.navigate(['/home']);
+                            // this.logout();
                         }
                     },
                     () => {

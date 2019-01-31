@@ -38,7 +38,7 @@ export class RequestStageComponent implements OnInit {
     currentRequestApproval: RequestApproval;
     currentRequestPayments: RequestPayment[] = [];
     currentStageName: string;
-    canEdit = false;
+    canEdit: boolean;
     wentBackOneStage: boolean;
     requestNeedsUpdate: boolean;
     stages: string[];

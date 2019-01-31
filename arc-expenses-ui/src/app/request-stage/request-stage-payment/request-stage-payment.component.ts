@@ -11,7 +11,7 @@ import { HttpErrorResponse, HttpEventType, HttpResponse } from '@angular/common/
 import { printRequestPage } from '../print-request-function';
 
 @Component({
-    selector: 'request-stage-payment',
+    selector: 'app-request-stage-payment',
     templateUrl: './request-stage-payment.component.html'
 })
 export class RequestStagePaymentComponent implements OnInit {
@@ -33,12 +33,16 @@ export class RequestStagePaymentComponent implements OnInit {
     currentRequest: Request;
     currentRequestPayment: RequestPayment;
     currentStageName: string;
-    canEdit = false;
+    canEdit: boolean;
     wentBackOneStage: boolean;
     requestNeedsUpdate: boolean;
     stages: string[];
     stateNames = {
-        pending: 'βρίσκεται σε εξέλιξη', under_review: 'βρίσκεται σε εξέλιξη', rejected: 'έχει απορριφθεί', accepted: 'έχει ολοκληρωθεί', cancelled: 'έχει ακυρωθεί'
+        pending: 'βρίσκεται σε εξέλιξη',
+        under_review: 'βρίσκεται σε εξέλιξη',
+        rejected: 'έχει απορριφθεί',
+        accepted: 'έχει ολοκληρωθεί',
+        cancelled: 'έχει ακυρωθεί'
     };
     reqTypes = requestTypes;
 
@@ -369,8 +373,10 @@ export class RequestStagePaymentComponent implements OnInit {
                     if ( (stage === this.currentRequestPayment.stage) && (this.stages.indexOf(stage) > 0) ) {
 
                         const prevStageField = 'stage' + this.stages[this.stages.indexOf(stage) - 1];
-                        if ( ((this.currentRequestPayment[prevStageField] !== undefined) && (this.currentRequestPayment[prevStageField] !== null)) &&
-                             ((this.currentRequestPayment[prevStageField].date !== undefined) && (this.currentRequestPayment[prevStageField].date !== null)) &&
+                        if ( ((this.currentRequestPayment[prevStageField] !== undefined) &&
+                              (this.currentRequestPayment[prevStageField] !== null)) &&
+                             ((this.currentRequestPayment[prevStageField].date !== undefined) &&
+                              (this.currentRequestPayment[prevStageField].date !== null)) &&
                              (this.currentRequestPayment[prevStageField].date > this.currentRequestPayment[stageField].date) ) {
 
                             return 4;
