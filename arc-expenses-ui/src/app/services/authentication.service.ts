@@ -26,15 +26,15 @@ export class AuthenticationService {
     // store the URL so we can redirect after logging in
     public redirectUrl: string;
 
-    private _storage: Storage = sessionStorage;
+    private _storage: Storage = localStorage;
 
     isLoggedIn = false;
 
     public loginWithState() {
-        if ( (sessionStorage.getItem('state.location') === undefined) ||
-             (sessionStorage.getItem('state.location') === null) ) {
+        if ( (localStorage.getItem('state.location') === undefined) ||
+             (localStorage.getItem('state.location') === null) ) {
             console.log(`logging in with state. Current url is: ${this.router.url}`);
-            sessionStorage.setItem('state.location', this.router.url );
+            localStorage.setItem('state.location', this.router.url );
         }
         console.log(`logging in. Current state.location is: ${this.router.url}`);
         console.log(`going to ${this.loginUrl}`);
@@ -43,15 +43,15 @@ export class AuthenticationService {
 
     clearSessionAndLoginWithState() {
         let state: string;
-        if (sessionStorage.getItem('state.location')) {
-            state = sessionStorage.getItem('state.location');
+        if (localStorage.getItem('state.location')) {
+            state = localStorage.getItem('state.location');
         }
         deleteCookie('arc_currentUser');
         this.isLoggedIn = false;
         this.removeUserProperties();
         console.log('trying to login again');
         if (state) {
-            sessionStorage.setItem('state.location', state);
+            localStorage.setItem('state.location', state);
         }
         this.loginWithState();
     }
@@ -74,7 +74,7 @@ export class AuthenticationService {
     }
 
     public tryLogin() {
-        console.log('entering tryLogin -> state.location is:', sessionStorage.getItem('state.location'));
+        console.log('entering tryLogin -> state.location is:', localStorage.getItem('state.location'));
         console.log('cookie is:', JSON.stringify(getCookie('arc_currentUser')));
         if (getCookie('arc_currentUser') && (getCookie('arc_currentUser') !== '')) {
 
@@ -82,19 +82,18 @@ export class AuthenticationService {
 
             /* SETTING INTERVAL TO REFRESH SESSION TIMEOUT COUNTER */
             setInterval(() => {
-                this.http.get(this.apiUrl + '/user/getUserInfo', headerOptions).subscribe (
+                this.http.get(this.apiUrl + '/user/getUserInfo', headerOptions).subscribe(
                     userInfo => {
                         console.log('User is still logged in');
                         console.log(userInfo);
-                        if ( (sessionStorage.getItem('userInfo') === undefined) ||
-                             (sessionStorage.getItem('userInfo') === null) ||
+                        if ( (localStorage.getItem('userInfo') == null) ||
                              (this.getUserProp('email') === null ) ) {
-                            console.log('cant find userInfo in sessionStorage');
-                            this.isLoggedIn = false;
+                            console.log('cant find userInfo in localStorage - logging out');
+                            /*this.isLoggedIn = false;
                             this.removeUserProperties();
                             deleteCookie('arc_currentUser');
-                            this.router.navigate(['/home']);
-                            // this.logout();
+                            this.router.navigate(['/home']);*/
+                            this.logout();
                         }
                     },
                     () => {
@@ -108,7 +107,7 @@ export class AuthenticationService {
                 );
             }, 1000 * 60 * 5);
             /*console.log('email is', this.getUserProp('email'));*/
-            if ( !sessionStorage.getItem('userInfo') ) {
+            if ( !localStorage.getItem('userInfo') ) {
                 console.log(`session.userInfo wasn't found --> logging in via arc-service!`);
                 this.http.get(this.apiUrl + '/user/getUserInfo', headerOptions).subscribe(
                     userInfo => {
@@ -118,45 +117,42 @@ export class AuthenticationService {
                             // TODO: KEEP UNTIL KKARAMAL GETS A REAL ROLE_EXECUTIVE!!
                             if (userInfo['user'] && userInfo['user']['email'] &&
                                 (userInfo['user']['email'] === 'kkaramal@ipet.athena-innovation.gr')) {
-                                sessionStorage.setItem('role', '[{"authority":"ROLE_EXECUTIVE"}]');
+                                localStorage.setItem('role', '[{"authority":"ROLE_EXECUTIVE"}]');
                             } else {
-                                sessionStorage.setItem('role', JSON.stringify(userInfo['role']));
-                                // sessionStorage.setItem('role', '[{"authority":"ROLE_ADMIN"}]');
+                                localStorage.setItem('role', JSON.stringify(userInfo['role']));
+                                // localStorage.setItem('role', '[{"authority":"ROLE_ADMIN"}]');
                             }
                             this.setUserProperties(userInfo['user']);
                         }
                     },
                     error => {
-                        console.log('login error!');
+                        console.log('login error or coming back after closing the browser!');
                         console.log(error);
-                        this.isLoggedIn = false;
+                        /*this.isLoggedIn = false;
                         this.removeUserProperties();
                         deleteCookie('arc_currentUser');
-                        this.router.navigate(['/home']);
+                        this.router.navigate(['/home']);*/
+                        this.loginWithState();
                     },
                     () => {
-                        if ( sessionStorage.getItem('userInfo') ) {
+                        if ( localStorage.getItem('userInfo') ) {
                             console.log(`the current user is: ${this.getUserProp('firstname')}, ` +
                                                              `${this.getUserProp('lastname')}, ` +
                                                              `${this.getUserProp('email')}`);
 
-                            if ( (this.getUserProp('email') === undefined) || (this.getUserProp('email') === null) ) {
+                            if ( (this.getUserProp('email') == null) ) {
                                 this.logout();
-                            } else if ( (this.getUserProp('firstname') === undefined) ||
-                                        (this.getUserProp('firstname') === null) ||
-                                        (this.getUserProp('firstname') === 'null') ||
-                                        (this.getUserProp('lastname') === undefined) ||
-                                        (this.getUserProp('lastname') === null) ||
-                                        (this.getUserProp('lastname') === 'null') ) {
+                            } else if ( (this.getUserProp('firstname') === null) ||
+                                        (this.getUserProp('lastname') === null) ) {
 
                                 console.log('in tryLogin navigating to sign-up');
                                 this.router.navigate(['/sign-up']);
 
                             } else {
                                 let state: string;
-                                if ( sessionStorage.getItem('state.location') ) {
-                                    state = sessionStorage.getItem('state.location');
-                                    sessionStorage.removeItem('state.location');
+                                if ( localStorage.getItem('state.location') ) {
+                                    state = localStorage.getItem('state.location');
+                                    localStorage.removeItem('state.location');
                                     console.log(`cleared state.location - returning to state: ${state}`);
                                     this.router.navigateByUrl(state);
                                 }
@@ -171,24 +167,24 @@ export class AuthenticationService {
 
     public getIsUserLoggedIn() {
         return (getCookie('arc_currentUser') && (getCookie('arc_currentUser') !== '') &&
-                sessionStorage.getItem('userInfo') && (sessionStorage.getItem('userInfo') !== ''));
+                localStorage.getItem('userInfo') && (localStorage.getItem('userInfo') !== ''));
     }
 
     public getUserRole() {
         if ( this.getIsUserLoggedIn() &&
-             sessionStorage.getItem('role') &&
-             (sessionStorage.getItem('role') !== 'null') ) {
+             localStorage.getItem('role') &&
+             (localStorage.getItem('role') !== 'null') ) {
 
-            return JSON.parse(sessionStorage.getItem('role'));
+            return JSON.parse(localStorage.getItem('role'));
         } else {
             return [];
         }
     }
 
     getUserProp(property: string) {
-        if (sessionStorage.getItem('userInfo')) {
-            const user = JSON.parse(sessionStorage.getItem('userInfo'));
-            if ( user && user[property] && (user[property] !== 'null') ) {
+        if (localStorage.getItem('userInfo')) {
+            const user = JSON.parse(localStorage.getItem('userInfo'));
+            if ( (user[property] != null) && (user[property] !== '') && (user[property] !== 'null') ) {
 
                 if ( (property === 'immediateEmails') || (property === 'receiveEmails') ) {
                     return (user[property] === 'true');
@@ -199,33 +195,12 @@ export class AuthenticationService {
         return null;
     }
 
-    getSignatureAttachment() {
-        const signature: Attachment = this.getUserProp('attachment');
-        if ( this.getIsUserLoggedIn() && signature ) {
-
-            return signature;
-        } else {
-            return null;
-        }
-    }
-
-    getSignatureAttachmentProp( property: string ) {
-        const signature: Attachment = this.getUserProp('attachment');
-        if ( this.getIsUserLoggedIn() && signature &&
-             signature[property] && (signature[property] !== 'null') ) {
-
-            return signature[property];
-        } else {
-            return '';
-        }
-    }
-
     setUserProperties (userInfo: any) {
-        sessionStorage.setItem('userInfo', JSON.stringify(userInfo));
+        localStorage.setItem('userInfo', JSON.stringify(userInfo));
     }
 
     removeUserProperties () {
-        sessionStorage.clear();
+        localStorage.clear();
     }
 
     updateUserInfo(firstname: string, lastname: string, receiveEmails: string, immediateEmails: string, attachment: Attachment) {

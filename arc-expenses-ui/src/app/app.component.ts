@@ -15,13 +15,13 @@ export class AppComponent implements OnInit, OnDestroy {
               private authService: AuthenticationService) {
 
     // TODO: DON'T FORGET TO UPDATE BEFORE COMMIT!!!
-    console.log('committed on: 31-01-2019 10:00 am');
+    console.log('committed on: 01-02-2019 15:30 pm');
 
     // hides the console logs in production
     if ( (environment.production === true) &&
          !window.location.origin.includes('aleka') &&
          !window.location.origin.includes('beta')) {
-        console.log = function () {};
+        window.console.log = function () {};
     }
 
       this.authService.tryLogin();

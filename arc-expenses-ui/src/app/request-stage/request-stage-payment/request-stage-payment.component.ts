@@ -59,7 +59,7 @@ export class RequestStagePaymentComponent implements OnInit {
     ngOnInit() {
         this.isSimpleUser = (this.authService.getUserRole().some(x => x.authority === 'ROLE_USER') &&
                              (this.authService.getUserRole().length === 1));
-        console.log(`current user role is: ${this.authService.getUserRole()}`);
+        console.log(`current user role is: ${JSON.stringify(this.authService.getUserRole())}`);
         this.getCurrentRequest();
     }
 

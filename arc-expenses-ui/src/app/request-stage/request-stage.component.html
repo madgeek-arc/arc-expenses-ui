@@ -28,19 +28,20 @@
               <div *ngIf="successMessage" class="uk-alert uk-alert-success">{{ successMessage }}</div>
               <div *ngIf="notFoundMessage" class="uk-alert">{{ notFoundMessage }}</div>
 
-              <div *ngIf="!showSpinner && currentRequestApproval &&
-                          currentRequest &&
-                          currentRequest.user &&
-                          currentRequest.project &&
-                          currentRequest.stage1 &&
-                          (canEdit === true || canEdit === false)">
+              <div *ngIf="!showSpinner &&
+                          (currentRequestApproval != null) &&
+                          (currentRequest != null) &&
+                          (currentRequest.stage1 != null) &&
+                          (canEdit != null)">
 
                 <!--1st stage-->
                 <div *ngIf="willShowStage('1') === 2" class="submittedRequest">
                   <div class="uk-margin-bottom uk-width-1-1 uk-grid">
                     <div class="uk-width-1-2@l">
                       <span class="uk-text-bold uk-margin-small-right">Πρόγραμμα: </span>
-                      <span>{{ currentRequest.project.acronym }} ({{currentRequest.project.institute.name}})</span>
+                      <span *ngIf="currentRequest.project">
+                        {{ currentRequest.project.acronym }} ({{currentRequest.project.institute.name}})
+                      </span>
                     </div>
                     <div class="uk-width-1-2@l">
                       <span class="uk-text-bold uk-margin-small-right">Ημερομηνία υποβολής: </span>
@@ -48,25 +49,21 @@
                     </div>
                     <div class="uk-width-1-1@l">
                       <span class="uk-text-bold uk-margin-small-right">Από: </span>
-                      <span>
+                      <span *ngIf="currentRequest.user">
                       {{ currentRequest.user.firstname }} {{ currentRequest.user.lastname }}
                        ({{ currentRequest.requesterPosition }})
                       </span>
                     </div>
 
-                    <div *ngIf="(currentRequest.type !== 'trip') &&
-                                (currentRequest.type !== 'contract') &&
-                                (currentRequest.type !== 'services_contract')" class="uk-width-1-2@l">
+                    <div *ngIf="(currentRequest.type !== 'trip') && (currentRequest.type !== 'contract')"
+                         class="uk-width-1-2@l">
                       <span class="uk-text-bold uk-margin-small-right">Προμηθευτής: </span>
                       <span>{{ currentRequest.stage1.supplier }} ({{ currentRequest.stage1.supplierSelectionMethod }})</span>
                     </div>
                     <div class="uk-width-1-2@l">
                       <span class="uk-text-bold uk-margin-small-right">
                         {{ (currentRequest.stage1.amountInEuros !== currentRequest.stage1.finalAmount) ? 'Τελικό ': '' }}Ποσό: </span>
-                      <span *ngIf="currentRequest.stage1.amountInEuros === currentRequest.stage1.finalAmount">
-                        {{ currentRequest.stage1.amountInEuros | currency: 'EUR': 'symbol-narrow' }}</span>
-                      <span *ngIf="currentRequest.stage1.amountInEuros !== currentRequest.stage1.finalAmount">
-                        {{ currentRequest.stage1.finalAmount | currency: 'EUR': 'symbol-narrow' }}</span>
+                      <span>{{ currentRequest.stage1.finalAmount | currency: 'EUR': 'symbol-narrow' }}</span>
                     </div>
 
                     <div class="uk-width-1-1@l">
@@ -79,10 +76,12 @@
                         Πατήστε εδώ για να κατεβάσετε τα σχετικά αρχεία
                       </a>
                     </div>
-                    <div *ngIf="(currentRequest.type === 'trip') && currentRequest.trip" class="uk-width-1-1@l uk-grid uk-margin-auto-vertical">
+                    <div *ngIf="(currentRequest.type === 'trip') && (currentRequest.trip != null)"
+                         class="uk-width-1-1@l uk-grid uk-margin-auto-vertical">
                       <div class="uk-text-bold uk-inline">Λεπτομέρειες ταξιδίου:</div>
                       <div class="uk-inline">
-                        <span class="uk-display-block" *ngIf="currentRequest.trip.email !== currentRequest.user.email">
+                        <span *ngIf="currentRequest.trip.email !== currentRequest.user.email"
+                              class="uk-display-block">
                           <u>Ονοματεπώνυμο:</u> {{ currentRequest.trip.firstname }} {{ currentRequest.trip.lastname }}
                         </span>
                         <span><u>Προορισμός:</u> {{ currentRequest.trip.destination }}</span>

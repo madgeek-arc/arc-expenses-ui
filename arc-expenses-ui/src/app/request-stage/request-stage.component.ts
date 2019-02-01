@@ -63,7 +63,7 @@ export class RequestStageComponent implements OnInit {
         this.getCurrentRequest();
         this.isSimpleUser = (this.authService.getUserRole().some(x => x.authority === 'ROLE_USER') &&
                              (this.authService.getUserRole().length === 1));
-        console.log(`current user role is: ${this.authService.getUserRole()}`);
+        console.log(`current user role is: ${JSON.stringify(this.authService.getUserRole())}`);
     }
 
     getCurrentRequest() {
@@ -413,7 +413,7 @@ export class RequestStageComponent implements OnInit {
             (this.currentRequestApproval.status !== 'rejected') &&
             (this.currentRequestApproval.status !== 'accepted') &&
             (this.currentRequestApproval.status !== 'cancelled') &&
-            ( (this.authService.getUserRole().some(x => x.authority === 'ROLE_ADMIN')) || (this.canEdit === true) ) ) {
+            ( (this.authService.getUserRole().some(x => x.authority === 'ROLE_ADMIN')) || this.canEdit ) ) {
 
             if (this.currentRequestApproval.stage !== '1') {
                 this.stageLoaderItemList = [

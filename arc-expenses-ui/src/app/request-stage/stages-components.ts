@@ -65,7 +65,7 @@ export class StageComponent implements OnInit {
 
         this.parseData();
 
-        if ( (this.stageId !== undefined) && (this.currentRequestInfo !== undefined) ) {
+        if ( (this.stageId != null) && (this.currentRequestInfo != null) ) {
 
             this.currentStageInfo = this.currentRequestInfo[this.stageId];
             this.showStage = this.currentStageInfo.showStage;
@@ -230,13 +230,10 @@ export class StageComponent implements OnInit {
     }
 
     getIsDelegateHidden() {
-        if (this.currentPOI &&
+        if ((this.currentPOI != null) &&
             (this.currentPOI.email === this.currentStage['user']['email'])) {
             return false;
         } else {
-            /* TODO:: WHEN WE ARE SURE ABOUT THE DATA:
-                      1.add line below to the if predicate,
-                      2. uncomment the else clause in order to also display unknown names  */
              if (this.currentPOI && this.currentPOI.delegates &&
                  this.currentPOI.delegates.some(x => x.email === this.currentStage['user']['email'])) {
 
