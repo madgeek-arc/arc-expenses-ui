@@ -26,15 +26,15 @@ export class AuthenticationService {
     // store the URL so we can redirect after logging in
     public redirectUrl: string;
 
-    private _storage: Storage = localStorage;
+    private _storage: Storage = sessionStorage;
 
     isLoggedIn = false;
 
     public loginWithState() {
-        if ( (localStorage.getItem('state.location') === undefined) ||
-             (localStorage.getItem('state.location') === null) ) {
+        if ( (sessionStorage.getItem('state.location') === undefined) ||
+             (sessionStorage.getItem('state.location') === null) ) {
             console.log(`logging in with state. Current url is: ${this.router.url}`);
-            localStorage.setItem('state.location', this.router.url );
+            sessionStorage.setItem('state.location', this.router.url );
         }
         console.log(`logging in. Current state.location is: ${this.router.url}`);
         console.log(`going to ${this.loginUrl}`);
@@ -43,15 +43,15 @@ export class AuthenticationService {
 
     clearSessionAndLoginWithState() {
         let state: string;
-        if (localStorage.getItem('state.location')) {
-            state = localStorage.getItem('state.location');
+        if (sessionStorage.getItem('state.location')) {
+            state = sessionStorage.getItem('state.location');
         }
         deleteCookie('arc_currentUser');
         this.isLoggedIn = false;
         this.removeUserProperties();
         console.log('trying to login again');
         if (state) {
-            localStorage.setItem('state.location', state);
+            sessionStorage.setItem('state.location', state);
         }
         this.loginWithState();
     }
@@ -74,7 +74,7 @@ export class AuthenticationService {
     }
 
     public tryLogin() {
-        console.log('entering tryLogin -> state.location is:', localStorage.getItem('state.location'));
+        console.log('entering tryLogin -> state.location is:', sessionStorage.getItem('state.location'));
         console.log('cookie is:', JSON.stringify(getCookie('arc_currentUser')));
         if (getCookie('arc_currentUser') && (getCookie('arc_currentUser') !== '')) {
 
@@ -86,9 +86,9 @@ export class AuthenticationService {
                     userInfo => {
                         console.log('User is still logged in');
                         console.log(userInfo);
-                        if ( (localStorage.getItem('userInfo') == null) ||
+                        if ( (sessionStorage.getItem('userInfo') == null) ||
                              (this.getUserProp('email') === null ) ) {
-                            console.log('cant find userInfo in localStorage - logging out');
+                            console.log('cant find userInfo in sessionStorage - logging out');
                             /*this.isLoggedIn = false;
                             this.removeUserProperties();
                             deleteCookie('arc_currentUser');
@@ -107,7 +107,7 @@ export class AuthenticationService {
                 );
             }, 1000 * 60 * 5);
             /*console.log('email is', this.getUserProp('email'));*/
-            if ( !localStorage.getItem('userInfo') ) {
+            if ( !sessionStorage.getItem('userInfo') ) {
                 console.log(`session.userInfo wasn't found --> logging in via arc-service!`);
                 this.http.get(this.apiUrl + '/user/getUserInfo', headerOptions).subscribe(
                     userInfo => {
@@ -117,10 +117,10 @@ export class AuthenticationService {
                             // TODO: KEEP UNTIL KKARAMAL GETS A REAL ROLE_EXECUTIVE!!
                             if (userInfo['user'] && userInfo['user']['email'] &&
                                 (userInfo['user']['email'] === 'kkaramal@ipet.athena-innovation.gr')) {
-                                localStorage.setItem('role', '[{"authority":"ROLE_EXECUTIVE"}]');
+                                sessionStorage.setItem('role', '[{"authority":"ROLE_EXECUTIVE"}]');
                             } else {
-                                localStorage.setItem('role', JSON.stringify(userInfo['role']));
-                                // localStorage.setItem('role', '[{"authority":"ROLE_ADMIN"}]');
+                                sessionStorage.setItem('role', JSON.stringify(userInfo['role']));
+                                // sessionStorage.setItem('role', '[{"authority":"ROLE_ADMIN"}]');
                             }
                             this.setUserProperties(userInfo['user']);
                         }
@@ -135,7 +135,7 @@ export class AuthenticationService {
                         this.loginWithState();
                     },
                     () => {
-                        if ( localStorage.getItem('userInfo') ) {
+                        if ( sessionStorage.getItem('userInfo') ) {
                             console.log(`the current user is: ${this.getUserProp('firstname')}, ` +
                                                              `${this.getUserProp('lastname')}, ` +
                                                              `${this.getUserProp('email')}`);
@@ -150,9 +150,9 @@ export class AuthenticationService {
 
                             } else {
                                 let state: string;
-                                if ( localStorage.getItem('state.location') ) {
-                                    state = localStorage.getItem('state.location');
-                                    localStorage.removeItem('state.location');
+                                if ( sessionStorage.getItem('state.location') ) {
+                                    state = sessionStorage.getItem('state.location');
+                                    sessionStorage.removeItem('state.location');
                                     console.log(`cleared state.location - returning to state: ${state}`);
                                     this.router.navigateByUrl(state);
                                 }
@@ -167,23 +167,23 @@ export class AuthenticationService {
 
     public getIsUserLoggedIn() {
         return (getCookie('arc_currentUser') && (getCookie('arc_currentUser') !== '') &&
-                localStorage.getItem('userInfo') && (localStorage.getItem('userInfo') !== ''));
+                sessionStorage.getItem('userInfo') && (sessionStorage.getItem('userInfo') !== ''));
     }
 
     public getUserRole() {
         if ( this.getIsUserLoggedIn() &&
-             localStorage.getItem('role') &&
-             (localStorage.getItem('role') !== 'null') ) {
+             sessionStorage.getItem('role') &&
+             (sessionStorage.getItem('role') !== 'null') ) {
 
-            return JSON.parse(localStorage.getItem('role'));
+            return JSON.parse(sessionStorage.getItem('role'));
         } else {
             return [];
         }
     }
 
     getUserProp(property: string) {
-        if (localStorage.getItem('userInfo')) {
-            const user = JSON.parse(localStorage.getItem('userInfo'));
+        if (sessionStorage.getItem('userInfo')) {
+            const user = JSON.parse(sessionStorage.getItem('userInfo'));
             if ( (user[property] != null) && (user[property] !== '') && (user[property] !== 'null') ) {
 
                 if ( (property === 'immediateEmails') || (property === 'receiveEmails') ) {
@@ -196,11 +196,11 @@ export class AuthenticationService {
     }
 
     setUserProperties (userInfo: any) {
-        localStorage.setItem('userInfo', JSON.stringify(userInfo));
+        sessionStorage.setItem('userInfo', JSON.stringify(userInfo));
     }
 
     removeUserProperties () {
-        localStorage.clear();
+        sessionStorage.clear();
     }
 
     updateUserInfo(firstname: string, lastname: string, receiveEmails: string, immediateEmails: string, attachment: Attachment) {

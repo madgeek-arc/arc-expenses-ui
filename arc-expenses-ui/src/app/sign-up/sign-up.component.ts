@@ -104,10 +104,10 @@ export class SignUpComponent implements OnInit {
           () => {
               this.errorMessage = '';
               this.showSpinner = false;
-              if ( localStorage.getItem('state.location') &&
-                  (localStorage.getItem('state.location') !== '/sign-up') ) {
-                  const state = localStorage.getItem('state.location');
-                  localStorage.removeItem('state.location');
+              if ( sessionStorage.getItem('state.location') &&
+                  (sessionStorage.getItem('state.location') !== '/sign-up') ) {
+                  const state = sessionStorage.getItem('state.location');
+                  sessionStorage.removeItem('state.location');
                   console.log('in sign-up returning to', state);
                   this.router.navigate([state]);
               } else {

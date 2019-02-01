@@ -24,8 +24,8 @@ export class AuthGuardService implements CanActivate, CanLoad {
         if ( getCookie('arc_currentUser') ) { return true; }
 
         // Store the attempted URL for redirecting
-        if ( !localStorage.getItem('state.location') ) {
-            localStorage.setItem('state.location', state.url);
+        if ( !sessionStorage.getItem('state.location') ) {
+            sessionStorage.setItem('state.location', state.url);
         }
 
         console.log('in authGuard -> going to login!');
