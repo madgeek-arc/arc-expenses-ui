@@ -1,27 +1,4 @@
 // Generated using typescript-generator version 2.1.406 on 2018-10-23 13:46:16.
-
-export class RequestFatClass {
-    request_id: string;
-    id: string;
-    user: User;
-    project: Project;
-    stage1: Stage1;
-    stage2: Stage2;
-    stage3: Stage3;
-    stage4: Stage4;
-    stage5: Stage5;
-    stage5a: Stage5a;
-    stage5b: Stage5b;
-    stage6: Stage6;
-    stage7: Stage7;
-    stage8: Stage8;
-    stage9: Stage9;
-    stage10: Stage10;
-    stage11: Stage11;
-    stage12: Stage12;
-    stage13: Stage13;
-}
-
 export class Vocabulary {
     projectID: string;
     projectAcronym: string;
@@ -155,7 +132,7 @@ export class Stage1 {
     supplierSelectionMethod: string;
     amountInEuros: number;
     finalAmount: number;
-    attachment: Attachment;
+    attachments: Attachment[];
 }
 
 export class Stage2 {
@@ -294,10 +271,8 @@ export class User {
     lastname: string;
     firstnameLatin: string;
     lastnameLatin: string;
-    signatureArchiveId: string;
     receiveEmails: string;
     immediateEmails: string;
-    attachment: Attachment;
 }
 
 export class Executive {

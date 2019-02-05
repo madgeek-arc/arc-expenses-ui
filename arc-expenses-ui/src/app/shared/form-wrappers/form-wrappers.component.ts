@@ -105,11 +105,13 @@ export class FormUploadFileComponent implements OnInit {
         </div>
     </div>
 </div>
-<button class="uk-button uk-button-link" (click)="clearList()">Διαγραφή όλων των αρχείων</button>
+<button class="uk-button uk-button-link" (click)="clearList()">Απόρριψη όλων των αρχείων</button>
 `
 })
 export class FormUploadFilesComponent implements OnInit {
 
+    /* the file list is updated and emitted to the parent component after every user action
+       (drop - open from explorer - delete one - delete all) */
     uploadedFiles: File[] = [];
 
     @Input() uploadedFilenames: string[] = [];

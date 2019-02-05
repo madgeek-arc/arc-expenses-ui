@@ -58,10 +58,10 @@ export class Stage1FormComponent implements OnInit {
             this.updateStage1Form.get('amount').markAsTouched();
         }
 
-        if (this.currentRequest.stage1.attachment) {
-            this.stage1AttachmentName = this.currentRequest.stage1.attachment.filename;
+        if (this.currentRequest.stage1.attachments) {
+            this.stage1AttachmentName = this.currentRequest.stage1.attachments[0].filename;
         }
-        this.isSupplierRequired = (this.currentRequest.type !== 'trip');
+        this.isSupplierRequired = (this.currentRequest.type !== 'TRIP');
     }
 
 
@@ -76,30 +76,30 @@ export class Stage1FormComponent implements OnInit {
         if (this.updateStage1Form.valid ) {
             if ( (+this.updateStage1Form.get('amount').value > this.lowAmountLimit) &&
                 (+this.updateStage1Form.get('amount').value <= this.amountLimit) &&
-                ( this.updateStage1Form.get('supplierSelectionMethod').value === this.selMethods['direct'] ) ) {
+                ( this.updateStage1Form.get('supplierSelectionMethod').value === this.selMethods['DIRECT'] ) ) {
 
                 this.errorMessage = 'Για αιτήματα άνω των 2.500 € η επιλογή προμηθευτή γίνεται μέσω διαγωνισμού ή έρευνας αγοράς.';
 
             } else if ( (+this.updateStage1Form.get('amount').value > this.amountLimit) &&
-                        ( ((this.currentRequest.type !== 'trip') &&
-                            (this.currentRequest.type !== 'contract') ) &&
-                            (this.updateStage1Form.get('supplierSelectionMethod').value !== this.selMethods['competition']) ) ) {
+                        ( ((this.currentRequest.type !== 'TRIP') &&
+                            (this.currentRequest.type !== 'CONTRACT') ) &&
+                            (this.updateStage1Form.get('supplierSelectionMethod').value !== this.selMethods['AWARD_PROCEDURE']) ) ) {
 
                 this.errorMessage = 'Για ποσά άνω των 20.000 € οι αναθέσεις πρέπει να γίνονται μέσω διαγωνισμού.';
-            } else if ( (this.currentRequest.type !== 'trip') && (this.currentRequest.type !== 'contract') &&
-                        ( this.updateStage1Form.get('supplierSelectionMethod').value !== this.selMethods['competition'] ) &&
+            } else if ( (this.currentRequest.type !== 'TRIP') && (this.currentRequest.type !== 'CONTRACT') &&
+                        ( this.updateStage1Form.get('supplierSelectionMethod').value !== this.selMethods['AWARD_PROCEDURE'] ) &&
                         !this.updateStage1Form.get('supplier').value ) {
 
                 this.errorMessage = 'Είναι υποχρεωτικό να προσθέσετε πληροφορίες για τον προμηθευτή.';
-            } else if ( (( this.updateStage1Form.get('supplierSelectionMethod').value !== this.selMethods['direct'] ) &&
-                         ((this.currentRequest.type !== 'trip') &&
-                          (this.currentRequest.type !== 'contract') )) &&
-                        ((!this.uploadedFile) && (!this.currentRequest.stage1.attachment) )) {
+            } else if ( (( this.updateStage1Form.get('supplierSelectionMethod').value !== this.selMethods['DIRECT'] ) &&
+                         ((this.currentRequest.type !== 'TRIP') &&
+                          (this.currentRequest.type !== 'CONTRACT') )) &&
+                        ((!this.uploadedFile) && (!this.currentRequest.stage1.attachments) )) {
 
                 this.errorMessage = 'Για αναθέσεις μέσω διαγωνισμού ή έρευνας αγοράς η επισύναψη εγγράφων είναι υποχρεωτική.';
-            } else if ( (this.currentRequest.type !== 'services_contract') &&
+            } else if ( (this.currentRequest.type !== 'SERVICES_CONTRACT') &&
                         (+this.updateStage1Form.get('amount').value > this.lowAmountLimit) &&
-                        (!this.currentRequest.stage1.attachment) &&
+                        (!this.currentRequest.stage1.attachments) &&
                         !this.uploadedFile ) {
 
                 this.errorMessage = 'Για αιτήματα άνω των 2.500 € η επισύναψη εγγράφων είναι υποχρεωτική.';
@@ -111,8 +111,8 @@ export class Stage1FormComponent implements OnInit {
                 this.currentRequest.stage1.amountInEuros = +this.updateStage1Form.get('amount').value;
                 this.currentRequest.stage1.finalAmount = +this.updateStage1Form.get('amount').value;
                 if ( this.uploadedFile ) {
-                    this.currentRequest.stage1.attachment = new Attachment(this.uploadedFile.name, this.uploadedFile.type,
-                                                                           this.uploadedFile.size, '');
+                    /*this.currentRequest.stage1.attachments = new Attachment(this.uploadedFile.name, this.uploadedFile.type,
+                                                                           this.uploadedFile.size, '');*/
                 }
 
                 this.emitRequest.emit(this.currentRequest);
@@ -152,7 +152,7 @@ export class Stage1FormComponent implements OnInit {
         if ( (this.updateStage1Form.get('amount').value !== '') &&
             (+this.updateStage1Form.get('amount').value > this.lowAmountLimit) &&
             (+this.updateStage1Form.get('amount').value <= this.amountLimit) &&
-            (this.currentRequest.type === 'regular') ) {
+            (this.currentRequest.type === 'REGULAR') ) {
 
             this.showWarning = true;
         } else {

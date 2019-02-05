@@ -43,9 +43,9 @@
                           <div class="uk-width-1-2@s">
                             <select class="uk-select" id="request-position" formControlName="position">
                               <option value="">-- επιλέξτε θέση στον φορέα (*) --</option>
-                              <option value="Ερευνητής-ΕΛΕ">Ερευνητής-ΕΛΕ</option>
-                              <option value="Συνεργαζόμενος Ερευνητής">Συνεργαζόμενος Ερευνητής</option>
-                              <option value="Διοικητικό-Τεχνικό-Βοηθητικό Προσωπικό">Διοικητικό-Τεχνικό-Βοηθητικό Προσωπικό</option>
+                              <option value="RESEARCHER">Ερευνητής-ΕΛΕ</option>
+                              <option value="COLLABORATIVE_RESEARCHER">Συνεργαζόμενος Ερευνητής</option>
+                              <option value="ADMINISTRATIVE">Διοικητικό-Τεχνικό-Βοηθητικό Προσωπικό</option>
                             </select>
                           </div>
                         </div>
@@ -117,9 +117,9 @@
                         <select class="uk-select" id="request-ssm"
                                 formControlName="supplierSelectionMethod" (change)="checkIfSupplierIsRequired()">
                           <option value="">-- επιλέξτε τρόπο --</option>
-                          <option value="direct">{{ selMethods['direct'] }}</option>
-                          <option value="market_investigation">{{ selMethods['market_investigation'] }}</option>
-                          <option value="competition">{{ selMethods['competition'] }}</option>
+                          <option value="DIRECT">{{ selMethods['DIRECT'] }}</option>
+                          <option value="MARKET_RESEARCH">{{ selMethods['MARKET_RESEARCH'] }}</option>
+                          <option value="AWARD_PROCEDURE">{{ selMethods['AWARD_PROCEDURE'] }}</option>
                         </select>
                       </div>
                     </div>
@@ -151,7 +151,7 @@
                         </div>
                       </div>
                     </div>
-                    <div *ngIf="(requestType === 'trip')" class="uk-margin">
+                    <div *ngIf="(requestType === 'TRIP')" class="uk-margin">
                       <label class="uk-form-label">Λεπτομέρειες ταξιδίου</label>
                       <div class="uk-form-controls">
 
@@ -187,16 +187,9 @@
                       </div>
                     </div>
 
-                    <!-- TODO:: DECIDE IF WE NEED FILE LIST HERE OR INSIDE THE UPLOAD COMPONENT -->
-                    <!--<div *ngIf="uploadedFile" class="uk-margin">
-                      <div class="uk-form-controls uk-form-controls-text">
-                        {{ uploadedFile.name }}
-                      </div>
-                    </div>-->
-
                     <div class="uk-margin">
                       <div class="uk-form-controls uk-form-controls-text">
-                        <app-form-upload-file (emitFile)="getUploadedFile($event)"></app-form-upload-file>
+                        <app-form-upload-files (emitFile)="getUploadedFiles($event)"></app-form-upload-files>
                       </div>
                     </div>
 

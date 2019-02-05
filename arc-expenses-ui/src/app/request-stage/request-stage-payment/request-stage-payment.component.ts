@@ -94,7 +94,7 @@ export class RequestStagePaymentComponent implements OnInit {
             },
             () => {
                 this.stages = paymentStages;
-                if (this.currentRequest.type === 'trip') {
+                if (this.currentRequest.type === 'TRIP') {
                     this.currentRequestInfo = new RequestInfo(this.currentRequestPayment.id,
                                                               this.currentRequest.id,
                                                               this.currentRequest.user,
@@ -115,7 +115,7 @@ export class RequestStagePaymentComponent implements OnInit {
 
     checkIfStageIs7() {
         if ( (this.currentRequestPayment.stage === '7') &&
-             ((this.currentRequest.type === 'regular') || (this.currentRequest.type === 'trip')) ) {
+             ((this.currentRequest.type === 'REGULAR') || (this.currentRequest.type === 'TRIP')) ) {
 
             this.currentRequestInfo.finalAmount = '';
             if ( (this.currentRequest.stage1.finalAmount !== undefined) &&
@@ -206,14 +206,14 @@ export class RequestStagePaymentComponent implements OnInit {
                  (newStage['approved'] === true) ) {
 
                 this.currentRequestPayment.status = 'accepted';
-                if (this.currentRequest.type !== 'services_contract') {
+                if (this.currentRequest.type !== 'SERVICES_CONTRACT') {
                     this.currentRequest.requestStatus = 'accepted';
                     this.requestNeedsUpdate = true;
                 }
             } else {
 
                 this.currentRequestPayment.status = 'rejected';
-                if (this.currentRequest.type !== 'services_contract') {
+                if (this.currentRequest.type !== 'SERVICES_CONTRACT') {
                     this.currentRequest.requestStatus = 'rejected';
                     this.requestNeedsUpdate = true;
                 }
@@ -406,10 +406,10 @@ export class RequestStagePaymentComponent implements OnInit {
     }
 
     linkToFile() {
-        if (this.currentRequest.stage1.attachment && this.currentRequest.stage1.attachment.url) {
-            /*window.open(this.currentRequest.stage1.attachment.url , '_blank', 'enabledstatus=0,toolbar=0,menubar=0,location=0');*/
-            window.open(`${window.location.origin}/arc-expenses-service/request/store/download?requestId=${this.currentRequest.id}&stage=1&mode=request`,
-                '_blank', 'enabledstatus=0,toolbar=0,menubar=0,location=0');
+        if (this.currentRequest.stage1.attachments && this.currentRequest.stage1.attachments[0].url) {
+            let url = `${window.location.origin}/arc-expenses-service/request/store/download?`;
+            url = `${url}requestId=${this.currentRequest.id}&stage=1&mode=request`;
+            window.open(url, '_blank', 'enabledstatus=0,toolbar=0,menubar=0,location=0');
         }
     }
 

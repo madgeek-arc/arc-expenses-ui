@@ -97,7 +97,7 @@ export class RequestStageComponent implements OnInit {
             },
             () => {
                 this.stages = approvalStages;
-                if (this.currentRequest.type === 'trip') {
+                if (this.currentRequest.type === 'TRIP') {
                     this.currentRequestInfo = new RequestInfo(this.currentRequestApproval.id,
                                                               this.currentRequest.id,
                                                               this.currentRequest.user,
@@ -112,7 +112,7 @@ export class RequestStageComponent implements OnInit {
                 // console.log('diataktis is', this.currentRequestInfo['5a'].stagePOIs);
                 this.checkIfStageIs5b();
                 this.getIfUserCanEditRequest();
-                if ((this.currentRequest.type !== 'contract') &&
+                if ((this.currentRequest.type !== 'CONTRACT') &&
                     (this.currentRequestApproval.status === 'accepted')) {
                     this.getRequestPayments();
                 }
@@ -227,7 +227,7 @@ export class RequestStageComponent implements OnInit {
         if (this.currentRequestApproval.stage === submittedStage) {
             if (this.stages.indexOf(this.currentRequestApproval.stage) === (this.stages.length - 1)) {
                 this.currentRequestApproval.status = 'accepted';
-                if (this.currentRequest.type === 'contract') {
+                if (this.currentRequest.type === 'CONTRACT') {
                     this.currentRequest.requestStatus = 'accepted';
                     this.requestNeedsUpdate = true;
                 }
@@ -289,7 +289,7 @@ export class RequestStageComponent implements OnInit {
 
         if ( this.uploadedFile ) {
 
-            this.currentRequest.stage1.attachment.url = this.uploadedFileURL;
+            this.currentRequest.stage1.attachments[0].url = this.uploadedFileURL;
             this.uploadedFileURL = '';
             this.uploadedFile = null;
         }
@@ -322,7 +322,7 @@ export class RequestStageComponent implements OnInit {
                 this.getCurrentRequest();
             },
             () => {
-                if ((this.currentRequestApproval.status === 'accepted') && (this.currentRequest.type !== 'contract')) {
+                if ((this.currentRequestApproval.status === 'accepted') && (this.currentRequest.type !== 'CONTRACT')) {
                     this.createRequestPayment();
                 } else {
                     this.successMessage = 'Οι αλλαγές αποθηκεύτηκαν.';
@@ -357,7 +357,7 @@ export class RequestStageComponent implements OnInit {
                 this.getCurrentRequest();
             },
             () => {
-                if ((this.currentRequestApproval.status === 'accepted') && (this.currentRequest.type !== 'contract')) {
+                if ((this.currentRequestApproval.status === 'accepted') && (this.currentRequest.type !== 'CONTRACT')) {
                     this.createRequestPayment();
                 } else {
                     this.successMessage = 'Οι αλλαγές αποθηκεύτηκαν.';
@@ -476,8 +476,7 @@ export class RequestStageComponent implements OnInit {
     }
 
     linkToFile() {
-        if (this.currentRequest.stage1.attachment && this.currentRequest.stage1.attachment.url) {
-            /*window.open(this.currentRequest.stage1.attachment.url , '_blank', 'enabledstatus=0,toolbar=0,menubar=0,location=0');*/
+        if (this.currentRequest.stage1.attachments && this.currentRequest.stage1.attachments[0].url) {
             let url = `${window.location.origin}/arc-expenses-service/request/store/download?`;
             url = `${url}requestId=${this.currentRequest.id}&stage=1&mode=request`;
             console.log(url);

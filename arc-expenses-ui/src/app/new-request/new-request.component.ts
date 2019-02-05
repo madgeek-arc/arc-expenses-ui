@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Attachment, Project, Request, Stage1, Stage2, Stage3, Stage5a, Stage5b, Stage4,
-         Stage6, User, Vocabulary, RequestApproval, Trip } from '../domain/operation';
+import { Project, User, Vocabulary } from '../domain/operation';
 import { ManageRequestsService } from '../services/manage-requests.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthenticationService } from '../services/authentication.service';
@@ -9,8 +8,6 @@ import { DatePipe } from '@angular/common';
 import { ManageProjectService } from '../services/manage-project.service';
 import { HttpEventType, HttpResponse } from '@angular/common/http';
 import { requestTypes, supplierSelectionMethodsMap } from '../domain/stageDescriptions';
-
-declare const UIkit: any;
 
 @Component({
     selector: 'app-new-request',
@@ -32,14 +29,11 @@ export class NewRequestComponent implements OnInit {
 
     newRequestForm: FormGroup;
 
-    uploadedFile: File;
+    uploadedFiles: File[];
 
     requestedAmount: string;
     showWarning: boolean;
     searchTerm = '';
-
-    request: Request;
-    requestApproval: RequestApproval;
 
     projects: Vocabulary[] = [];
     chosenProgramID: string;
@@ -66,6 +60,7 @@ export class NewRequestComponent implements OnInit {
     ngOnInit() {
         console.log('in new-request, request type is:', this.route.snapshot.url[this.route.snapshot.url.length - 1].path );
         this.requestType = this.route.snapshot.url[this.route.snapshot.url.length - 1].path;
+        this.requestType = this.requestType.toUpperCase();
         this.getUserInfo();
         this.getProjects();
     }
@@ -83,7 +78,7 @@ export class NewRequestComponent implements OnInit {
         console.log('current type is:', this.requestType);
         this.title = this.reqTypes[this.requestType];
         this.createForm();
-        if ( this.requestType === 'regular') {
+        if ( this.requestType === 'REGULAR') {
             this.isSupplierRequired = '(*)';
         }
 
@@ -133,7 +128,7 @@ export class NewRequestComponent implements OnInit {
         this.newRequestForm.get('name').setValue(`${this.currentUser.firstname} ${this.currentUser.lastname}`);
         this.newRequestForm.get('name').disable();
 
-        if (this.requestType === 'trip') {
+        if (this.requestType === 'TRIP') {
             this.newRequestForm.get('trip_firstname').setValidators([Validators.required]);
             this.newRequestForm.get('trip_lastname').setValidators([Validators.required]);
             this.newRequestForm.get('trip_email').setValidators([Validators.required]);
@@ -144,209 +139,100 @@ export class NewRequestComponent implements OnInit {
 
     submitRequest() {
         this.errorMessage = '';
-        if ((this.requestType === 'trip') && !this.isRequestOnBehalfOfOther) {
-            this.newRequestForm.get('trip_firstname').setValue(this.currentUser.firstname);
-            this.newRequestForm.get('trip_lastname').setValue(this.currentUser.lastname);
-            this.newRequestForm.get('trip_email').setValue(this.currentUser.email);
+        if ((this.requestType === 'TRIP') && !this.isRequestOnBehalfOfOther) {
+            this.newRequestForm.get('trip_firstname').clearValidators();
+            this.newRequestForm.get('trip_lastname').clearValidators();
+            this.newRequestForm.get('trip_email').clearValidators();
             this.newRequestForm.updateValueAndValidity();
         }
 
         if (this.newRequestForm.valid ) {
             if ( (+this.newRequestForm.get('amount').value > this.lowAmountLimit) &&
                  (+this.newRequestForm.get('amount').value <= this.amountLimit) &&
-                 ( this.newRequestForm.get('supplierSelectionMethod').value === 'direct' ) ) {
+                 ( this.newRequestForm.get('supplierSelectionMethod').value === 'DIRECT' ) ) {
 
-                // UIkit.modal.alert('Για αιτήματα άνω των 2.500 € η επιλογή προμηθευτή γίνεται μέσω διαγωνισμού ή έρευνας αγοράς.');
                 this.errorMessage = 'Για αιτήματα άνω των 2.500 € η επιλογή προμηθευτή γίνεται μέσω διαγωνισμού ή έρευνας αγοράς.';
-                window.scroll(1, 1);
 
             } else if ( ( +this.newRequestForm.get('amount').value > this.amountLimit) && this.checkIfTrip() &&
-                        ( this.newRequestForm.get('supplierSelectionMethod').value !== 'competition' ) ) {
+                        ( this.newRequestForm.get('supplierSelectionMethod').value !== 'AWARD_PROCEDURE' ) ) {
 
-                // UIkit.modal.alert('Για ποσά άνω των 20.000 € οι αναθέσεις πρέπει να γίνονται μέσω διαγωνισμού.');
                 this.errorMessage = 'Για ποσά άνω των 20.000 € οι αναθέσεις πρέπει να γίνονται μέσω διαγωνισμού.';
-                window.scroll(1, 1);
 
             } else if ( this.checkIfTrip() &&
-                        ( (this.newRequestForm.get('supplierSelectionMethod').value !== 'competition') &&
+                        ( (this.newRequestForm.get('supplierSelectionMethod').value !== 'AWARD_PROCEDURE') &&
                           !this.newRequestForm.get('supplier').value )) {
 
-                // UIkit.modal.alert('Τα πεδία που σημειώνονται με (*) είναι υποχρεωτικά.');
                 this.errorMessage = 'Τα πεδία που σημειώνονται με (*) είναι υποχρεωτικά.';
-                window.scroll(1, 1);
 
-            } else if ( (( this.newRequestForm.get('supplierSelectionMethod').value !== 'direct' ) &&
-                           this.checkIfTrip() ) && (!this.uploadedFile) ) {
+            } else if ( (( this.newRequestForm.get('supplierSelectionMethod').value !== 'DIRECT' ) &&
+                           this.checkIfTrip() ) && (!this.uploadedFiles) ) {
 
-                // UIkit.modal.alert('Για αναθέσεις μέσω διαγωνισμού ή έρευνας αγοράς η επισύναψη εγγράφων είναι υποχρεωτική.');
                 this.errorMessage = 'Για αναθέσεις μέσω διαγωνισμού ή έρευνας αγοράς η επισύναψη εγγράφων είναι υποχρεωτική.';
-                window.scroll(1, 1);
 
-            } else if ( (this.requestType !== 'services_contract') &&
+            } else if ( (this.requestType !== 'SERVICES_CONTRACT') &&
                         (+this.newRequestForm.get('amount').value > this.lowAmountLimit) &&
-                        (this.uploadedFile === undefined) ) {
+                        (this.uploadedFiles == null) ) {
 
-                // UIkit.modal.alert('Για αιτήματα άνω των 2.500 € η επισύναψη εγγράφων είναι υποχρεωτική.');
                 this.errorMessage = 'Για αιτήματα άνω των 2.500 € η επισύναψη εγγράφων είναι υποχρεωτική.';
-                window.scroll(1, 1);
 
             } else {
-                this.request = new Request();
-                this.request.id = '';
-                this.request.type = this.requestType;
-                this.request.project = this.chosenProject;
-                this.request.user = this.currentUser;
-                this.request.requesterPosition = this.newRequestForm.get('position').value;
-                this.request.stage1 = new Stage1();
-                this.request.stage1.requestDate = Date.now().toString();
-                this.request.stage1.subject = this.newRequestForm.get('requestText').value;
+                const newRequest = new FormData();
+                newRequest.append('type', this.requestType);
+                newRequest.append('projectId', this.chosenProgramID);
+                newRequest.append('requester_position', this.newRequestForm.get('position').value);
+                newRequest.append('subject', this.newRequestForm.get('requestText').value);
                 if ( this.checkIfTrip() ) {
-                    this.request.stage1.supplier = this.newRequestForm.get('supplier').value;
-                    this.request.stage1.supplierSelectionMethod = this.selMethods[this.newRequestForm.get('supplierSelectionMethod').value];
+                    newRequest.append('supplier', this.newRequestForm.get('supplier').value);
+                    newRequest.append('supplier_selection_method', this.newRequestForm.get('supplierSelectionMethod').value);
                 }
-                this.request.stage1.amountInEuros = +this.newRequestForm.get('amount').value;
-                this.request.stage1.finalAmount = +this.newRequestForm.get('amount').value;
-                if (this.uploadedFile) {
-                    this.request.stage1.attachment = new Attachment(this.uploadedFile.name, this.uploadedFile.type,
-                                                                    this.uploadedFile.size, '');
+                newRequest.append('amount', this.newRequestForm.get('amount').value);
+
+                if (this.requestType === 'TRIP') {
+                    newRequest.append('destination', this.newRequestForm.get('trip_destination').value);
+                    if (this.isRequestOnBehalfOfOther) {
+                        newRequest.append('firstName', this.newRequestForm.get('trip_firstname').value);
+                        newRequest.append('lastName', this.newRequestForm.get('trip_lastname').value);
+                        newRequest.append('email', this.newRequestForm.get('trip_email').value);
+                    }
                 }
-
-                if (this.requestType === 'trip') {
-                    const newTrip = new Trip();
-                    newTrip.firstname = this.newRequestForm.get('trip_firstname').value;
-                    newTrip.lastname = this.newRequestForm.get('trip_lastname').value;
-                    newTrip.email = this.newRequestForm.get('trip_email').value;
-                    newTrip.destination = this.newRequestForm.get('trip_destination').value;
-                    this.request.trip = newTrip;
+                if (this.uploadedFiles) {
+                    for (const file of this.uploadedFiles) {
+                        newRequest.append('files[]', file, file.name);
+                    }
                 }
-
-                this.request.requestStatus = 'pending';
-
-                this.requestApproval = new RequestApproval();
-                this.requestApproval.id = '';
-                this.requestApproval.creationDate = Date.now().toString();
-                this.requestApproval.stage = '2';
-                this.requestApproval.status = 'pending';
-                this.requestApproval.stage2 = new Stage2();
-                this.requestApproval.stage3 = new Stage3();
-                this.requestApproval.stage4 = new Stage4();
-
-                /*TODO: Uncomment this and remove the line below when we clarify
-                        the case when the scientific coordinator becomes diataktis*/
-                /* if (this.request.stage1.amountInEuros <= this.lowAmount) {
-                    this.requestApproval.stage5a = new Stage5a();
-                } */
-                this.requestApproval.stage5a = new Stage5a();
-
-                if ( (this.requestType === 'contract') || (this.requestType === 'services_contract') ||
-                     (this.request.stage1.amountInEuros > this.amountLimit) ||
-                     (this.request.stage1.supplierSelectionMethod === 'Διαγωνισμός') ) {
-                    this.requestApproval.stage5b = new Stage5b();
-                }
-                this.requestApproval.stage6 = new Stage6();
-
-                window.scrollTo(0, 0);
-                // console.log(JSON.stringify(this.request, null, 2));
-                // console.log(JSON.stringify(this.requestApproval, null, 2));
                 this.showSpinner = true;
                 this.errorMessage = '';
-                this.requestService.addRequest(this.request).subscribe (
-                    res => {
-                            this.request = res;
-                            this.requestApproval.requestId = this.request.id;
-                            console.log(res);
-                        },
+                this.requestService.add(newRequest).subscribe (
+                    event => {
+                        if (event.type === HttpEventType.UploadProgress) {
+                            console.log('uploadAttachment responded: ', event);
+                        } else if ( event instanceof HttpResponse) {
+                            console.log('final event:', event.body);
+                        }
+                    },
                     error => {
                         console.log(error);
-                        // UIkit.modal.alert('Παρουσιάστηκε πρόβλημα με την υποβολή της φόρμας.');
                         this.errorMessage = 'Παρουσιάστηκε πρόβλημα με την υποβολή της φόρμας.';
                         this.showSpinner = false;
                         window.scroll(1, 1);
                     },
                     () => {
-                        if (this.uploadedFile) {
-                            this.uploadFile();
-                        } else {
-                            this.submitRequestApproval();
-                        }
+                        this.errorMessage = '';
+                        this.showSpinner = false;
+                        this.router.navigate(['/requests']);
                     }
                 );
             }
 
         } else {
-            // UIkit.modal.alert('Τα πεδία που σημειώνονται με (*) είναι υποχρεωτικά.');
             this.errorMessage = 'Τα πεδία που σημειώνονται με (*) είναι υποχρεωτικά.';
-            window.scroll(1, 1);
         }
-    }
-
-    submitRequestApproval() {
-        this.errorMessage = '';
-        this.requestService.addRequestApproval(this.requestApproval).subscribe(
-            res => this.requestApproval = res,
-            error => {
-                console.log(error);
-                this.showSpinner = false;
-                // UIkit.modal.alert('Παρουσιάστηκε πρόβλημα με την υποβολή της φόρμας.');
-                this.errorMessage = 'Παρουσιάστηκε πρόβλημα με την υποβολή της φόρμας.';
-                window.scroll(1, 1);
-            },
-            () => {
-                this.errorMessage = '';
-                this.showSpinner = false;
-                this.router.navigate(['/requests']);
-            }
-        );
-    }
-
-    uploadFile() {
-        // this.showSpinner = true;
-        this.errorMessage = '';
-        this.requestService.uploadAttachment<string>(this.request.archiveId, 'stage1', this.uploadedFile, 'request')
-            .subscribe(
-                event => {
-                    // console.log('uploadAttachment responded: ', JSON.stringify(event));
-                    if (event.type === HttpEventType.UploadProgress) {
-                        console.log('uploadAttachment responded: ', event);
-                    } else if ( event instanceof HttpResponse) {
-                        console.log('final event:', event.body);
-                        this.request.stage1.attachment.url = event.body;
-                    }
-                },
-                error => {
-                    console.log(error);
-                    this.showSpinner = false;
-                    // UIkit.modal.alert('Παρουσιάστηκε πρόβλημα με την επισύναψη του αρχείου.');
-                    this.errorMessage = 'Παρουσιάστηκε πρόβλημα με την επισύναψη του αρχείου.';
-                    window.scroll(1, 1);
-                },
-                () => {
-                    this.errorMessage = '';
-                    console.log('ready to update Request');
-                    this.requestService.updateRequest(this.request, this.authService.getUserProp('email')).subscribe(
-                        res => console.log('updated new request: ', res.requestStatus, res.stage1),
-                        error => {
-                            console.log('from update new request', error);
-                            this.showSpinner = false;
-                            // UIkit.modal.alert('Παρουσιάστηκε πρόβλημα με την επισύναψη του αρχείου.');
-                            this.errorMessage = 'Παρουσιάστηκε πρόβλημα με την επισύναψη του αρχείου.';
-                            window.scroll(1, 1);
-                        },
-                        () => {
-                            this.errorMessage = '';
-                            this.submitRequestApproval();
-                            /*this.showSpinner = false;
-                            this.router.navigate(['/requests']);*/
-                        }
-                    );
-                }
-            );
+        window.scroll(1, 1);
     }
 
     getProject() {
         this.errorMessage = '';
         if (this.newRequestForm.get('program').value) {
-            this.chosenProject = new Project();
             this.showSpinner = true;
 
             this.newRequestForm.get('institute').setValue('');
@@ -365,7 +251,7 @@ export class NewRequestComponent implements OnInit {
                 },
                 () => {
                     this.errorMessage = '';
-                    if ( (this.chosenProject !== null) && (this.chosenProject !== undefined) ) {
+                    if ( this.chosenProject ) {
                         this.programSelected = true;
                         if (this.chosenProject.institute && this.chosenProject.institute.name) {
                             this.newRequestForm.get('institute').setValue(this.chosenProject.institute.name);
@@ -413,9 +299,8 @@ export class NewRequestComponent implements OnInit {
         }
     }
 
-    getUploadedFile(file: File) {
-        // this.uploadedFile = file;
-        this.uploadedFile = file;
+    getUploadedFiles(files: File[]) {
+        this.uploadedFiles = files;
     }
 
     showAmount() {
@@ -435,7 +320,7 @@ export class NewRequestComponent implements OnInit {
         if ( this.newRequestForm.get('amount').value &&
             (+this.newRequestForm.get('amount').value > this.lowAmountLimit) &&
             (+this.newRequestForm.get('amount').value <= this.amountLimit) &&
-            (this.requestType === 'regular') ) {
+            (this.requestType === 'REGULAR') ) {
 
             this.showWarning = true;
         } else {
@@ -444,13 +329,13 @@ export class NewRequestComponent implements OnInit {
     }
 
     checkIfTrip() {
-        return ((this.requestType !== 'trip') &&
-                (this.requestType !== 'contract'));
+        return ((this.requestType !== 'TRIP') &&
+                (this.requestType !== 'CONTRACT'));
     }
 
     checkIfSupplierIsRequired() {
         if ((this.newRequestForm.get('supplierSelectionMethod').value &&
-            (this.newRequestForm.get('supplierSelectionMethod').value === 'competition')) ) {
+            (this.newRequestForm.get('supplierSelectionMethod').value === 'AWARD_PROCEDURE')) ) {
 
                 this.isSupplierRequired = '';
         } else {

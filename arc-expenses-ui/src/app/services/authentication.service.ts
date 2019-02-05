@@ -203,7 +203,7 @@ export class AuthenticationService {
         sessionStorage.clear();
     }
 
-    updateUserInfo(firstname: string, lastname: string, receiveEmails: string, immediateEmails: string, attachment: Attachment) {
+    updateUserInfo(firstname: string, lastname: string, receiveEmails: string, immediateEmails: string) {
 
         const url = `${this.apiUrl}/user/update`;
         console.log(`calling ${url}`);
@@ -216,9 +216,7 @@ export class AuthenticationService {
             lastname: lastname,
             lastnameLatin: this.getUserProp('lastnameLatin'),
             receiveEmails: receiveEmails,
-            immediateEmails: immediateEmails,
-            signatureArchiveId: this.getUserProp('signatureArchiveId'),
-            attachment: attachment
+            immediateEmails: immediateEmails
         };
 
         console.log(`sending: ${JSON.stringify(updatedUser)}`);

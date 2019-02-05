@@ -1,17 +1,12 @@
 /* shared constants */
 
-/* NEXT TIME WE EMPTY THE DB REMEMBER TO:
-    CHANGE 'regular' TO 'supply' AND USE supplierSelectionMethod terms in english
-    CHANGE 'accepted' status TO 'completed'
-    ADD english terms as values in supplierSelectionMethops (see supplierSelectionMethodsMap) */
-
-export const requestTypes = {regular: 'Προμήθεια', trip: 'Ταξίδι', contract: 'Σύμβαση Έργου', services_contract: 'Σύμβαση Υπηρεσίας'};
+export const requestTypes = {REGULAR: 'Προμήθεια', TRIP: 'Ταξίδι', CONTRACT: 'Σύμβαση Έργου', SERVICES_CONTRACT: 'Σύμβαση Υπηρεσίας'};
 
 export const statesList = ['all', 'accepted', 'pending', 'under_review', 'rejected', 'cancelled'];
 
 export const supplierSelectionMethods = ['Απ\' ευθείας ανάθεση', 'Έρευνα αγοράς', 'Διαγωνισμός'];
 export const supplierSelectionMethodsMap = {
-    direct: 'Απ\' ευθείας ανάθεση', market_investigation: 'Έρευνα αγοράς', competition: 'Διαγωνισμός' };
+    DIRECT: 'Απ\' ευθείας ανάθεση', MARKET_RESEARCH: 'Έρευνα αγοράς', AWARD_PROCEDURE: 'Διαγωνισμός' };
 
 /* field descriptions for the stages forms */
 export class FieldDescription {

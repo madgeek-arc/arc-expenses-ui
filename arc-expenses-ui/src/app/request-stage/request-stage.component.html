@@ -55,7 +55,7 @@
                       </span>
                     </div>
 
-                    <div *ngIf="(currentRequest.type !== 'trip') && (currentRequest.type !== 'contract')"
+                    <div *ngIf="(currentRequest.type !== 'TRIP') && (currentRequest.type !== 'CONTRACT')"
                          class="uk-width-1-2@l">
                       <span class="uk-text-bold uk-margin-small-right">Προμηθευτής: </span>
                       <span>{{ currentRequest.stage1.supplier }} ({{ currentRequest.stage1.supplierSelectionMethod }})</span>
@@ -71,12 +71,12 @@
                       <span>{{ currentRequest.stage1.subject }}</span>
                     </div>
 
-                    <div *ngIf="currentRequest.stage1.attachment" class="no-print" data-html2canvas-ignore>
+                    <div *ngIf="currentRequest.stage1.attachments" class="no-print" data-html2canvas-ignore>
                       <a class="uk-link uk-width-1-1@l uk-margin-small-top" (click)="linkToFile()">
                         Πατήστε εδώ για να κατεβάσετε τα σχετικά αρχεία
                       </a>
                     </div>
-                    <div *ngIf="(currentRequest.type === 'trip') && (currentRequest.trip != null)"
+                    <div *ngIf="(currentRequest.type === 'TRIP') && (currentRequest.trip != null)"
                          class="uk-width-1-1@l uk-grid uk-margin-auto-vertical">
                       <div class="uk-text-bold uk-inline">Λεπτομέρειες ταξιδίου:</div>
                       <div class="uk-inline">
@@ -194,7 +194,7 @@
                 </div>
 
                 <div *ngIf="(currentRequestApproval.status === 'accepted') &&
-                            (currentRequest.type !== 'contract')" class="uk-margin-top" data-html2canvas-ignore>
+                            (currentRequest.type !== 'CONTRACT')" class="uk-margin-top" data-html2canvas-ignore>
                   <hr>
 
                     <!-- Create Payment button JUST FOR ADMINS -->
@@ -209,12 +209,12 @@
                     <div *ngIf="(currentRequestPayments && (currentRequestPayments.length > 0))">
 
                       <!-- Link to Payment -->
-                      <div *ngIf="(currentRequest.type !== 'services_contract')" class="no-print" data-html2canvas-ignore>
+                      <div *ngIf="(currentRequest.type !== 'SERVICES_CONTRACT')" class="no-print" data-html2canvas-ignore>
                           <a [routerLink]="['/requests/request-stage-payment', currentRequestPayments[0].id]">Προβολή Περαίωσης</a>
                       </div>
 
                       <!-- Payments list -->
-                      <div *ngIf="(currentRequest.type === 'services_contract')" class="no-print" data-html2canvas-ignore>
+                      <div *ngIf="(currentRequest.type === 'SERVICES_CONTRACT')" class="no-print" data-html2canvas-ignore>
 
                         <div>
                           <h4>Περαιώσεις του αιτήματος</h4>

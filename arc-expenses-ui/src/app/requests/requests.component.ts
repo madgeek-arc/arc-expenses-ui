@@ -29,8 +29,8 @@ export class RequestsComponent implements OnInit {
                    rejected: 'Απορριφθέντα', accepted: 'Ολοκληρωθέντα', cancelled: 'Ακυρωθέντα'};
     stages: string[] = [];
     stagesMap = stageTitles;
-    requestTypeIds = ['regular', 'contract', 'services_contract', 'trip'];
     reqTypes = requestTypes;
+    requestTypeIds = ['REGULAR', 'CONTRACT', 'SERVICES_CONTRACT', 'TRIP'];
     institutes: Map<string, string> = new Map<string, string>();
     instituteIds: string[] = [];
     projects: Vocabulary[] = [];

@@ -19,8 +19,6 @@ export class SignUpComponent implements OnInit {
   firstnameLatin: string;
   lastnameLatin: string;
 
-  userAttachment: Attachment;
-
   constructor(private fb: FormBuilder,
               private authService: AuthenticationService,
               private router: Router) {}
@@ -94,8 +92,7 @@ export class SignUpComponent implements OnInit {
       this.authService.updateUserInfo( this.signUpForm.get('name').value,
                                        this.signUpForm.get('surname').value,
                                        (this.signUpForm.get('receiveEmails').value).toString(),
-                                       (this.signUpForm.get('immediateEmails').value).toString(),
-                                       this.userAttachment ).subscribe(
+                                       (this.signUpForm.get('immediateEmails').value).toString() ).subscribe(
           user => console.log(`updateUser responded: ${JSON.stringify(user)}`),
           error => {
               this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών';

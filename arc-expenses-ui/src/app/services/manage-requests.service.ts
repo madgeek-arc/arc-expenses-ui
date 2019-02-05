@@ -26,6 +26,18 @@ export class ManageRequestsService {
 
     constructor(private http: HttpClient) {}
 
+    add(newRequest: FormData) {
+        const url = `${this.apiUrl}/add`;
+        console.log(`calling ${url}`);
+
+        const req = new HttpRequest('POST', url, newRequest, {
+            reportProgress: true,
+            responseType: 'text',
+            withCredentials: true
+        });
+        return this.http.request(req).pipe(catchError(this.handleError));
+    }
+
     addRequest(newRequest: Request): Observable<Request> {
         const url = `${this.apiUrl}addRequest`;
         console.log(`calling ${url}`);
