@@ -26,7 +26,7 @@ export class ManageRequestsService {
 
     constructor(private http: HttpClient) {}
 
-    add(newRequest: FormData) {
+    add<T>(newRequest: FormData): Observable<HttpEvent<T>> {
         const url = `${this.apiUrl}/add`;
         console.log(`calling ${url}`);
 

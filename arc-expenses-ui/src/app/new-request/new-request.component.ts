@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Project, User, Vocabulary } from '../domain/operation';
+import { Request, Project, User, Vocabulary } from '../domain/operation';
 import { ManageRequestsService } from '../services/manage-requests.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthenticationService } from '../services/authentication.service';
@@ -202,10 +202,10 @@ export class NewRequestComponent implements OnInit {
                 }
                 this.showSpinner = true;
                 this.errorMessage = '';
-                this.requestService.add(newRequest).subscribe (
+                this.requestService.add<Request>(newRequest).subscribe (
                     event => {
                         if (event.type === HttpEventType.UploadProgress) {
-                            console.log('uploadAttachment responded: ', event);
+                            console.log('uploadAttachment responded: ', event.loaded);
                         } else if ( event instanceof HttpResponse) {
                             console.log('final event:', event.body);
                         }
