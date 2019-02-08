@@ -48,4 +48,4 @@ Thumbs.db
 /app//*.js
 
 #json
-package-lock.json
+#package-lock.json
