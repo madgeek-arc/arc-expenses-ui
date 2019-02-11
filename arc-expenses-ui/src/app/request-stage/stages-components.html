@@ -75,9 +75,9 @@
             </app-form-field>
         </div>
 
-        <!--ATTACHMENT FIELD-->
-        <app-form-upload-file [uploadedFilename]="uploadedFilename"
-                                    (emitFile)="getAttachmentInput($event)"></app-form-upload-file>
+        <!--ATTACHMENT FIELDS-->
+        <app-form-upload-files [uploadedFilenames]="uploadedFilenames"
+                                    (emitFiles)="getAttachmentsInput($event)"></app-form-upload-files>
 
         <!--BUTTONS-->
         <div *ngIf="stageId !== '6' && stageId !== '11'">

@@ -38,6 +38,21 @@ export class ManageRequestsService {
         return this.http.request(req).pipe(catchError(this.handleError));
     }
 
+    submitUpdate<T>(mode: string, requestId: string, submittedStage?: FormData): Observable<HttpEvent<T>> {
+        /* AVAILABLE MODES: approve, reject, downgrade, cancel */
+        const url = `${this.apiUrl}/${mode}/${requestId}`;
+        console.log(`calling ${url}`);
+
+        const formData = submittedStage ? submittedStage : new FormData();
+
+        const req = new HttpRequest('POST', url, formData, {
+            reportProgress: true,
+            responseType: 'text',
+            withCredentials: true
+        });
+        return this.http.request(req).pipe(catchError(this.handleError));
+    }
+
     addRequest(newRequest: Request): Observable<Request> {
         const url = `${this.apiUrl}addRequest`;
         console.log(`calling ${url}`);

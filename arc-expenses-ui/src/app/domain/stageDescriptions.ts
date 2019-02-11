@@ -2,6 +2,10 @@
 
 export const requestTypes = {REGULAR: 'Προμήθεια', TRIP: 'Ταξίδι', CONTRACT: 'Σύμβαση Έργου', SERVICES_CONTRACT: 'Σύμβαση Υπηρεσίας'};
 
+export const requesterPositions = {RESEARCHER: 'Ερευνητής-ΕΛΕ',
+                                   COLLABORATIVE_RESEARCHER: 'Συνεργαζόμενος Ερευνητής',
+                                   ADMINISTRATIVE: 'Διοικητικό-Τεχνικό-Βοηθητικό Προσωπικό'};
+
 export const statesList = ['all', 'accepted', 'pending', 'under_review', 'rejected', 'cancelled'];
 
 export const supplierSelectionMethods = ['Απ\' ευθείας ανάθεση', 'Έρευνα αγοράς', 'Διαγωνισμός'];
@@ -75,7 +79,7 @@ export const checkFeasibilityDesc = {
 
 export  const loanDesc = {
     id: 'loan',
-    label: 'Έγινε δανεισμός',
+    label: 'Έγινε ταμειακή διευκόλυνση',
     type: 'checkbox',
     description: '',
     required: true
@@ -100,7 +104,6 @@ export class StageDescription {
 export const stageIds = ['1', '2', '3', '4', '5a', '5b', '6', '7', '8', '9', '10', '11', '12', '13'];
 export const approvalStages = ['1', '2', '3', '4', '5a', '5b', '6'];
 export const paymentStages = ['7', '8', '9', '10', '11', '12', '13'];
-/*export const stagesIfLowCost = ['1', '2', '3', '4', '5a', 'UploadInvoice', '5b', '8', '6', '12', '13'];*/
 
 export const stageTitles = {
     '1': 'Υποβολή αιτήματος',
@@ -108,7 +111,6 @@ export const stageTitles = {
     '3': 'Έλεγχος χειριστή έργου',
     '4': 'Βεβαίωση Π.Ο.Υ.',
     '5a': 'Έγκριση Διατάκτη',
-    // 'UploadInvoice': 'Υποβολή τιμολογίου',
     '5b': 'Έγκριση Διοικητικού Συμβουλίου',
     '6': 'Ανάρτηση στην Διαύγεια',
     '7': 'Καταχώρηση συνοδευτικού υλικού',

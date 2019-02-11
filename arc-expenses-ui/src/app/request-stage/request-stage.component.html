@@ -50,19 +50,17 @@
                     <div class="uk-width-1-1@l">
                       <span class="uk-text-bold uk-margin-small-right">Από: </span>
                       <span *ngIf="currentRequest.user">
-                      {{ currentRequest.user.firstname }} {{ currentRequest.user.lastname }}
-                       ({{ currentRequest.requesterPosition }})
+                      {{ currentRequest.user.firstname }} {{ currentRequest.user.lastname }} ({{ reqPositions[currentRequest.requesterPosition] }})
                       </span>
                     </div>
 
-                    <div *ngIf="(currentRequest.type !== 'TRIP') && (currentRequest.type !== 'CONTRACT')"
-                         class="uk-width-1-2@l">
+                    <div *ngIf="(currentRequest.type !== 'TRIP') && (currentRequest.type !== 'CONTRACT')" class="uk-width-1-2@l">
                       <span class="uk-text-bold uk-margin-small-right">Προμηθευτής: </span>
-                      <span>{{ currentRequest.stage1.supplier }} ({{ currentRequest.stage1.supplierSelectionMethod }})</span>
+                      <span>{{ currentRequest.stage1.supplier }} ({{ selMethods[currentRequest.stage1.supplierSelectionMethod] }})</span>
                     </div>
                     <div class="uk-width-1-2@l">
                       <span class="uk-text-bold uk-margin-small-right">
-                        {{ (currentRequest.stage1.amountInEuros !== currentRequest.stage1.finalAmount) ? 'Τελικό ': '' }}Ποσό: </span>
+                        {{ (currentRequest.stage1.amountInEuros !== currentRequest.stage1.finalAmount) ? 'Τελικό π': 'Π' }}οσό: </span>
                       <span>{{ currentRequest.stage1.finalAmount | currency: 'EUR': 'symbol-narrow' }}</span>
                     </div>
 
@@ -71,9 +69,12 @@
                       <span>{{ currentRequest.stage1.subject }}</span>
                     </div>
 
-                    <div *ngIf="currentRequest.stage1.attachments" class="no-print" data-html2canvas-ignore>
-                      <a class="uk-link uk-width-1-1@l uk-margin-small-top" (click)="linkToFile()">
-                        Πατήστε εδώ για να κατεβάσετε τα σχετικά αρχεία
+                    <div *ngIf="currentRequest.stage1.attachments" class="uk-margin-small-top no-print" data-html2canvas-ignore>
+                      Πατήστε τους συνδέσμους για να κατεβάσετε τα σχετικά αρχεία
+                      <a *ngFor="let f of currentRequest.stage1.attachments; let i = index"
+                         class="uk-link uk-width-1-1@l"
+                         (click)="linkToFile(i)">
+                        {{ f.filename }}
                       </a>
                     </div>
                     <div *ngIf="(currentRequest.type === 'TRIP') && (currentRequest.trip != null)"
@@ -93,7 +94,6 @@
                 <!-- stage 1 form -->
                 <div *ngIf="willShowStage('1') === 1" data-html2canvas-ignore>
                   <stage1-form [currentRequest]="currentRequest"
-                               (emitFile)="getUploadedFile($event)"
                                (emitRequest)="getUpdatedRequest($event)"></stage1-form>
                 </div>
 
@@ -171,9 +171,7 @@
                       <!--<hr>-->
 
                       <app-stage-loader [stages]="stageLoaderItemList"
-                                        (emitGoBack)="getRequestToGoBack($event)"
                                         (emitStage)="getSubmittedStage($event)"
-                                        (emitFile)="getUploadedFile($event)"
                                         (newValues)="getNewSupplierAndAmount($event)"></app-stage-loader>
 
                   </div>
@@ -186,14 +184,14 @@
                 </div>
 
                 <!-- Message to user -->
-                <div *ngIf=" (currentRequest.requestStatus === 'accepted') ||
-                             (currentRequest.requestStatus === 'rejected') ||
-                             (currentRequest.requestStatus === 'cancelled')"
+                <div *ngIf=" (currentRequest.requestStatus === 'ACCEPTED') ||
+                             (currentRequest.requestStatus === 'REJECTED') ||
+                             (currentRequest.requestStatus === 'CANCELLED')"
                      class="uk-alert uk-alert-primary uk-text-center uk-margin-top">
                   Το αίτημα {{ stateNames[currentRequest.requestStatus] }}.
                 </div>
 
-                <div *ngIf="(currentRequestApproval.status === 'accepted') &&
+                <div *ngIf="(currentRequestApproval.status === 'ACCEPTED') &&
                             (currentRequest.type !== 'CONTRACT')" class="uk-margin-top" data-html2canvas-ignore>
                   <hr>
 

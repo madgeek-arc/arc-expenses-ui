@@ -1,4 +1,16 @@
-// Generated using typescript-generator version 2.1.406 on 2018-10-23 13:46:16.
+// Generated using typescript-generator version 2.1.406 on 2019-02-07 12:55:25.
+
+export class Executive {
+    firstname: string;
+    lastname: string;
+    email: string;
+}
+
+export class RequestSummary {
+    baseInfo: BaseInfo;
+    request: Request;
+}
+
 export class Vocabulary {
     projectID: string;
     projectAcronym: string;
@@ -10,13 +22,6 @@ export class Attachment {
     mimetype: string;
     size: number;
     url: string;
-
-    constructor(filename: string, mimetype: string, size: number, url?: string) {
-        this.filename = filename;
-        this.mimetype = mimetype;
-        this.size = size;
-        this.url = url ? url : '';
-    }
 }
 
 export class BaseInfo {
@@ -24,7 +29,7 @@ export class BaseInfo {
     requestId: string;
     creationDate: string;
     stage: string;
-    status: string;
+    status: Status;
 }
 
 export class ContactUsMail {
@@ -83,28 +88,28 @@ export class Project {
     operator: PersonOfInterest[];
     startDate: string;
     endDate: string;
-    totalCost: number;
+    totalCost: string;
     scientificCoordinatorAsDiataktis: boolean;
 }
 
 export class Request {
+    currentState: string;
     stage1: Stage1;
     id: string;
-    type: string;
+    type: Type;
     archiveId: string;
     project: Project;
     user: User;
-    requesterPosition: string;
-    requestStatus: string;
-    trip: Trip;
+    requesterPosition: RequesterPosition;
+    requestStatus: RequestStatus;
     scientificCoordinatorAsDiataktis: boolean;
+    trip: Trip;
 }
 
 export class RequestApproval extends BaseInfo {
     stage2: Stage2;
     stage3: Stage3;
     stage4: Stage4;
-    stage5: Stage5;
     stage5a: Stage5a;
     stage5b: Stage5b;
     stage6: Stage6;
@@ -120,141 +125,83 @@ export class RequestPayment extends BaseInfo {
     stage13: Stage13;
 }
 
-export class RequestSummary {
-    baseInfo: BaseInfo;
-    request: Request;
-}
-
-export class Stage1 {
-    requestDate: string;
-    subject: string;
-    supplier: string;
-    supplierSelectionMethod: string;
-    amountInEuros: number;
-    finalAmount: number;
+export class Stage {
+    type: string;
+    user: User;
+    date: string;
+    comment: string;
     attachments: Attachment[];
 }
 
-export class Stage2 {
-    user: User;
-    date: string;
+export class Stage1 extends Stage {
+    requestDate: string;
+    subject: string;
+    supplier: string;
+    supplierSelectionMethod: SupplierSelectionMethod;
+    amountInEuros: number;
+    finalAmount: number;
+}
+
+export class Stage10 extends Stage {
+    approved: boolean;
+}
+
+export class Stage11 extends Stage {
+}
+
+export class Stage12 extends Stage {
+    approved: boolean;
+}
+
+export class Stage13 extends Stage {
+    approved: boolean;
+}
+
+export class Stage2 extends Stage {
     checkFeasibility: boolean;
     checkNecessity: boolean;
     approved: boolean;
-    comment: string;
-    attachment: Attachment;
 }
 
-export class Stage3 {
-    user: User;
-    date: string;
+export class Stage3 extends Stage {
     analiftheiYpoxrewsi: boolean;
     fundsAvailable: boolean;
     loan: boolean;
     loanSource: string;
     approved: boolean;
-    comment: string;
-    attachment: Attachment;
 }
 
-export class Stage4 {
-    user: User;
-    date: string;
+export class Stage4 extends Stage {
     analiftheiYpoxrewsi: boolean;
     fundsAvailable: boolean;
     approved: boolean;
-    comment: string;
-    attachment: Attachment;
 }
 
-export class Stage5 {
-    user: User;
-    date: string;
+export class Stage5a extends Stage {
     approved: boolean;
-    comment: string;
-    attachment: Attachment;
 }
 
-export class Stage5a {
-    user: User;
-    date: string;
+export class Stage5b extends Stage {
     approved: boolean;
-    comment: string;
-    attachment: Attachment;
 }
 
-export class Stage5b {
-    user: User;
-    date: string;
+export class Stage6 extends Stage {
+}
+
+export class Stage7 extends Stage {
     approved: boolean;
-    comment: string;
-    attachment: Attachment;
 }
 
-export class Stage6 {
-    user: User;
-    date: string;
-    comment: string;
-    attachment: Attachment;
-}
-
-export class Stage7 {
-    user: User;
-    date: string;
-    approved: boolean;
-    comment: string;
-    attachment: Attachment;
-}
-
-export class Stage8 {
-    user: User;
-    date: string;
+export class Stage8 extends Stage {
     checkRegularity: boolean;
     checkLegality: boolean;
     approved: boolean;
-    comment: string;
-    attachment: Attachment;
 }
 
-export class Stage9 {
-    user: User;
-    date: string;
+export class Stage9 extends Stage {
     checkRegularity: boolean;
     checkLegality: boolean;
     approved: boolean;
-    comment: string;
-    attachment: Attachment;
-}
-
-export class Stage10 {
-    user: User;
-    date: string;
-    approved: boolean;
-    comment: string;
-    attachment: Attachment;
-}
-
-export class Stage11 {
-    user: User;
-    date: string;
-    comment: string;
-    attachment: Attachment;
-}
-
-export class Stage12 {
-    user: User;
-    date: string;
-    approved: boolean;
-    comment: string;
-    attachment: Attachment;
-}
-
-export class Stage13 {
-    user: User;
-    date: string;
-    approved: boolean;
-    comment: string;
-    attachment: Attachment;
 }
 
 export class Trip {
@@ -275,9 +222,17 @@ export class User {
     immediateEmails: string;
 }
 
-export class Executive {
-    email: string;
-    firstname: string;
-    lastname: string;
-}
+export type StageEvents = 'APPROVE' | 'REJECT' | 'DOWNGRADE' | 'CANCEL';
 
+export type Stages = 'Stage1' | 'Stage2' | 'Stage3' | 'Stage4' | 'Stage5a' | 'Stage5b' | 'Stage6' |
+                     'Stage7' | 'Stage8' | 'Stage9' | 'Stage10' | 'Stage11' | 'Stage12' | 'Stage13';
+
+export type Type = 'REGULAR' | 'CONTRACT' | 'SERVICES_CONTRACT' | 'TRIP';
+
+export type Status = 'CANCELLED' | 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'UNDER_REVIEW';
+
+export type RequesterPosition = 'RESEARCHER' | 'COLLABORATIVE_RESEARCHER' | 'ADMINISTRATIVE';
+
+export type RequestStatus = 'CANCELLED' | 'PENDING' | 'ACCEPTED' | 'REJECTED';
+
+export type SupplierSelectionMethod = 'DIRECT' | 'MARKET_RESEARCH' | 'AWARD_PROCEDURE';

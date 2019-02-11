@@ -99,8 +99,7 @@ export class FormUploadFileComponent implements OnInit {
              class="uk-text-bold uk-grid uk-child-width-1-4@l uk-child-width-1-2@s uk-flex-center">
             <div>{{ f }}</div>
             <div>
-                <a class="uk-link uk-margin-small-left" uk-icon="icon: close"
-                       (click)="deleteItem(i)"></a>
+                <a class="uk-link uk-margin-small-left" uk-icon="icon: close" (click)="deleteItem(i)"></a>
             </div>
         </div>
     </div>
@@ -116,7 +115,7 @@ export class FormUploadFilesComponent implements OnInit {
 
     @Input() uploadedFilenames: string[] = [];
 
-    @Output() emitFile: EventEmitter<File[]> = new EventEmitter<File[]>();
+    @Output() emitFiles: EventEmitter<File[]> = new EventEmitter<File[]>();
 
     constructor() {}
 
@@ -131,7 +130,7 @@ export class FormUploadFilesComponent implements OnInit {
             this.uploadedFiles.push(files[i]);
         }
         console.log('droppedFiles are:', JSON.stringify(this.uploadedFilenames));
-        this.emitFile.emit(this.uploadedFiles);
+        this.emitFiles.emit(this.uploadedFiles);
     }
 
     getInput(event: any) {
@@ -141,7 +140,7 @@ export class FormUploadFilesComponent implements OnInit {
             this.uploadedFiles.push(files[i]);
         }
         console.log('inputFiles are: ', JSON.stringify(this.uploadedFilenames));
-        this.emitFile.emit(this.uploadedFiles);
+        this.emitFiles.emit(this.uploadedFiles);
     }
 
     allowDrop(event: any) {
@@ -153,13 +152,13 @@ export class FormUploadFilesComponent implements OnInit {
         this.uploadedFilenames.splice(i, 1);
         this.uploadedFiles.splice(i, 1);
         console.log(this.uploadedFiles);
-        this.emitFile.emit(this.uploadedFiles);
+        this.emitFiles.emit(this.uploadedFiles);
     }
 
     clearList() {
         this.uploadedFiles = [];
         this.uploadedFilenames = [];
-        this.emitFile.emit(this.uploadedFiles);
+        this.emitFiles.emit(this.uploadedFiles);
     }
 
 

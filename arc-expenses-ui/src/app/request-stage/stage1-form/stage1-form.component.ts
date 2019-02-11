@@ -14,13 +14,12 @@ export class Stage1FormComponent implements OnInit {
 
     /* output variable that sends the new Stage back to the parent component
      * in order to call the api and update the request */
-    @Output() emitRequest: EventEmitter<any> = new EventEmitter<any>();
-    @Output() emitFile: EventEmitter<File> = new EventEmitter<File>();
+    @Output() emitRequest: EventEmitter<FormData> = new EventEmitter<FormData>();
 
 
     updateStage1Form: FormGroup;
-    stage1AttachmentName = '';
-    uploadedFile: File;
+    stage1AttachmentNames: string[] = [];
+    uploadedFiles: File[];
     requestedAmount: string;
     readonly amountLimit = 20000;
     readonly lowAmountLimit = 2500;
@@ -59,15 +58,16 @@ export class Stage1FormComponent implements OnInit {
         }
 
         if (this.currentRequest.stage1.attachments) {
-            this.stage1AttachmentName = this.currentRequest.stage1.attachments[0].filename;
+            for (const at of this.currentRequest.stage1.attachments) {
+                this.stage1AttachmentNames.push(at.filename);
+            }
         }
         this.isSupplierRequired = (this.currentRequest.type !== 'TRIP');
     }
 
 
-    getUploadedFile(file: File) {
-        this.uploadedFile = file;
-        this.emitFile.emit(this.uploadedFile);
+    getUploadedFiles(files: File[]) {
+        this.uploadedFiles = files;
     }
 
     updateStage1() {
@@ -76,46 +76,48 @@ export class Stage1FormComponent implements OnInit {
         if (this.updateStage1Form.valid ) {
             if ( (+this.updateStage1Form.get('amount').value > this.lowAmountLimit) &&
                 (+this.updateStage1Form.get('amount').value <= this.amountLimit) &&
-                ( this.updateStage1Form.get('supplierSelectionMethod').value === this.selMethods['DIRECT'] ) ) {
+                ( this.updateStage1Form.get('supplierSelectionMethod').value === 'DIRECT' ) ) {
 
                 this.errorMessage = 'Για αιτήματα άνω των 2.500 € η επιλογή προμηθευτή γίνεται μέσω διαγωνισμού ή έρευνας αγοράς.';
 
             } else if ( (+this.updateStage1Form.get('amount').value > this.amountLimit) &&
                         ( ((this.currentRequest.type !== 'TRIP') &&
                             (this.currentRequest.type !== 'CONTRACT') ) &&
-                            (this.updateStage1Form.get('supplierSelectionMethod').value !== this.selMethods['AWARD_PROCEDURE']) ) ) {
+                            (this.updateStage1Form.get('supplierSelectionMethod').value !== 'AWARD_PROCEDURE') ) ) {
 
                 this.errorMessage = 'Για ποσά άνω των 20.000 € οι αναθέσεις πρέπει να γίνονται μέσω διαγωνισμού.';
             } else if ( (this.currentRequest.type !== 'TRIP') && (this.currentRequest.type !== 'CONTRACT') &&
-                        ( this.updateStage1Form.get('supplierSelectionMethod').value !== this.selMethods['AWARD_PROCEDURE'] ) &&
+                        ( this.updateStage1Form.get('supplierSelectionMethod').value !== 'AWARD_PROCEDURE' ) &&
                         !this.updateStage1Form.get('supplier').value ) {
 
                 this.errorMessage = 'Είναι υποχρεωτικό να προσθέσετε πληροφορίες για τον προμηθευτή.';
-            } else if ( (( this.updateStage1Form.get('supplierSelectionMethod').value !== this.selMethods['DIRECT'] ) &&
+            } else if ( (( this.updateStage1Form.get('supplierSelectionMethod').value !== 'DIRECT' ) &&
                          ((this.currentRequest.type !== 'TRIP') &&
                           (this.currentRequest.type !== 'CONTRACT') )) &&
-                        ((!this.uploadedFile) && (!this.currentRequest.stage1.attachments) )) {
+                        ((!this.uploadedFiles) && (!this.currentRequest.stage1.attachments) )) {
 
                 this.errorMessage = 'Για αναθέσεις μέσω διαγωνισμού ή έρευνας αγοράς η επισύναψη εγγράφων είναι υποχρεωτική.';
             } else if ( (this.currentRequest.type !== 'SERVICES_CONTRACT') &&
                         (+this.updateStage1Form.get('amount').value > this.lowAmountLimit) &&
                         (!this.currentRequest.stage1.attachments) &&
-                        !this.uploadedFile ) {
+                        !this.uploadedFiles ) {
 
                 this.errorMessage = 'Για αιτήματα άνω των 2.500 € η επισύναψη εγγράφων είναι υποχρεωτική.';
             } else {
-                this.currentRequest.stage1.requestDate = Date.now().toString();
-                this.currentRequest.stage1.subject = this.updateStage1Form.get('requestText').value;
-                this.currentRequest.stage1.supplier = this.updateStage1Form.get('supplier').value;
-                this.currentRequest.stage1.supplierSelectionMethod = this.updateStage1Form.get('supplierSelectionMethod').value;
-                this.currentRequest.stage1.amountInEuros = +this.updateStage1Form.get('amount').value;
-                this.currentRequest.stage1.finalAmount = +this.updateStage1Form.get('amount').value;
-                if ( this.uploadedFile ) {
-                    /*this.currentRequest.stage1.attachments = new Attachment(this.uploadedFile.name, this.uploadedFile.type,
-                                                                           this.uploadedFile.size, '');*/
+                const updatedRequest = new FormData();
+                updatedRequest.append('subject', this.updateStage1Form.get('requestText').value);
+                updatedRequest.append('amount', this.updateStage1Form.get('amount').value);
+                if ((this.currentRequest.type !== 'CONTRACT') && (this.currentRequest.type !== 'TRIP')) {
+                    updatedRequest.append('supplier', this.updateStage1Form.get('supplier').value);
+                    updatedRequest.append('supplier_selection_method', this.updateStage1Form.get('supplierSelectionMethod').value);
+                }
+                if ( this.uploadedFiles ) {
+                    for (const file of this.uploadedFiles) {
+                        updatedRequest.append('files', file, file.name);
+                    }
                 }
 
-                this.emitRequest.emit(this.currentRequest);
+                this.emitRequest.emit(updatedRequest);
 
             }
 
@@ -130,7 +132,7 @@ export class Stage1FormComponent implements OnInit {
 
     checkIfSupplierIsRequired() {
         if (this.updateStage1Form.get('supplierSelectionMethod').value) {
-            this.setIsSupplierReq( (this.updateStage1Form.get('supplierSelectionMethod').value !== 'Διαγωνισμός' ) );
+            this.setIsSupplierReq( (this.updateStage1Form.get('supplierSelectionMethod').value !== 'AWARD_PROCEDURE' ) );
         }
     }
 

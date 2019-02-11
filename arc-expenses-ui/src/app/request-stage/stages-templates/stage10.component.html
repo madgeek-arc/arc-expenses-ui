@@ -15,8 +15,8 @@
             <span> {{ currentStage['comment'] }} </span>
         </div>
 
-        <!-- display link to attachment -->
-        <div *ngIf="currentStage['attachment']">
+        <!-- display link to attachments -->
+        <div *ngIf="currentStage['attachments']">
             <a class="uk-link uk-width-1-1@l uk-margin-small-top" (click)="linkToFile()">
                 Πατήστε εδώ για να κατεβάσετε τα σχετικά αρχεία
             </a>
@@ -37,9 +37,9 @@
             <textarea formControlName="comment" class="uk-form-controls uk-textarea" rows="2"></textarea>
         </app-form-field>
 
-        <!--ATTACHMENT FIELD-->
-        <app-form-upload-file [uploadedFilename]="uploadedFilename" (emitFile)="getAttachmentInput($event)">
-        </app-form-upload-file>
+        <!--ATTACHMENTs FIELD-->
+        <app-form-upload-files [uploadedFilenames]="uploadedFilenames" (emitFile)="getAttachmentsInput($event)">
+        </app-form-upload-files>
 
         <!--BUTTONS-->
         <button class="uk-button uk-button-primary" (click)="approveRequest(true)">Εγκρίνεται</button>

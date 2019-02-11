@@ -7,7 +7,7 @@ import { AuthenticationService } from '../services/authentication.service';
 import { DatePipe } from '@angular/common';
 import { ManageProjectService } from '../services/manage-project.service';
 import { HttpEventType, HttpResponse } from '@angular/common/http';
-import { requestTypes, supplierSelectionMethodsMap } from '../domain/stageDescriptions';
+import { requesterPositions, requestTypes, supplierSelectionMethodsMap } from '../domain/stageDescriptions';
 
 @Component({
     selector: 'app-new-request',
@@ -41,6 +41,7 @@ export class NewRequestComponent implements OnInit {
     chosenProject: Project;
 
     selMethods = supplierSelectionMethodsMap;
+    reqPositions = requesterPositions;
 
     programSelected = false;
     isRequestOnBehalfOfOther = false;
@@ -197,12 +198,12 @@ export class NewRequestComponent implements OnInit {
                 }
                 if (this.uploadedFiles) {
                     for (const file of this.uploadedFiles) {
-                        newRequest.append('files[]', file, file.name);
+                        newRequest.append('files', file, file.name);
                     }
                 }
                 this.showSpinner = true;
                 this.errorMessage = '';
-                this.requestService.add<Request>(newRequest).subscribe (
+                this.requestService.add<any>(newRequest).subscribe (
                     event => {
                         if (event.type === HttpEventType.UploadProgress) {
                             console.log('uploadAttachment responded: ', event.loaded);
@@ -317,15 +318,10 @@ export class NewRequestComponent implements OnInit {
             this.requestedAmount = this.newRequestForm.get('amount').value.trim();
         }
 
-        if ( this.newRequestForm.get('amount').value &&
-            (+this.newRequestForm.get('amount').value > this.lowAmountLimit) &&
-            (+this.newRequestForm.get('amount').value <= this.amountLimit) &&
-            (this.requestType === 'REGULAR') ) {
-
-            this.showWarning = true;
-        } else {
-            this.showWarning = false;
-        }
+        this.showWarning = ( this.newRequestForm.get('amount').value &&
+                             (+this.newRequestForm.get('amount').value > this.lowAmountLimit) &&
+                             (+this.newRequestForm.get('amount').value <= this.amountLimit) &&
+                             (this.requestType === 'REGULAR') );
     }
 
     checkIfTrip() {

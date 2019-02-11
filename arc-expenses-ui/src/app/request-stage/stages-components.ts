@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Attachment, User, PersonOfInterest } from '../domain/operation';
+import { PersonOfInterest, Stage } from '../domain/operation';
 import { commentDesc, FieldDescription } from '../domain/stageDescriptions';
 import { DatePipe } from '@angular/common';
 import { AuthenticationService } from '../services/authentication.service';
@@ -17,13 +17,9 @@ export class StageComponent implements OnInit {
 
     /* output variable that sends the new Stage back to the parent component
      * in order to call the api and update the request */
-    @Output() emitStage: EventEmitter<any> = new EventEmitter<any>();
-    @Output() emitFile: EventEmitter<File> = new EventEmitter<File>();
+    @Output() emitStage: EventEmitter<any[]> = new EventEmitter<any[]>();
 
-    /* output variable that sends back to the parent an alert that the user
-     * chose to go back to the previous stage */
-    @Output() emitGoBack: EventEmitter<any> = new EventEmitter<any>();
-    choseToGoBack: boolean;
+    updateMode: string; /* approve, reject or downgrade */
 
     /* input variable that defines the status of the current stage */
     showStage: number; /* values:  0 -> don't show
@@ -47,10 +43,10 @@ export class StageComponent implements OnInit {
     stageId: string;
     stageFields: FieldDescription[];
 
-    uploadedFile: File;
-    uploadedFilename = ''; /*a filename to send to the attachment wrapper*/
+    uploadedFiles: File[] = [];
+    uploadedFilenames: string[] = [];
 
-    currentStage: any;
+    currentStage: Stage;
     currentRequestInfo: RequestInfo;
     currentStageInfo: StageInfo;
 
@@ -91,8 +87,10 @@ export class StageComponent implements OnInit {
         if (this.showStage === 1) {
 
             /* set filename if exists */
-            if ( this.currentStage['attachment'] ) {
-                this.uploadedFilename = this.currentStage['attachment']['filename'];
+            if ( this.currentStage.attachments ) {
+                for (const f of this.currentStage.attachments) {
+                    this.uploadedFilenames.push(f.filename);
+                }
             }
 
             /* create form */
@@ -128,8 +126,8 @@ export class StageComponent implements OnInit {
         // !!! if a poi is not found, currentPOI will remain undefined
     }
 
-    linkToFile() {
-        if (this.currentStage['attachment'] && this.currentStage['attachment']['url'].length > 0 ) {
+    linkToFile(i: number) {
+        if (this.currentStage.attachments && this.currentStage.attachments[i] ) {
             /* direct link to the storeService */
             /*window.open(this.currentStage['attachment']['url'], '_blank', 'enabledstatus=0,toolbar=0,menubar=0,location=0');*/
             const mode: string = (this.currentRequestInfo.phaseId.includes('a') ? 'approval' : 'payment');
@@ -142,10 +140,10 @@ export class StageComponent implements OnInit {
         }
     }
 
-    getAttachmentInput(newFile: File) {
+    getAttachmentsInput(newFiles: File[]) {
         this.stageFormError = '';
-        this.uploadedFile = newFile;
-        console.log('this.uploadedFile is : ', this.uploadedFile);
+        this.uploadedFiles = newFiles;
+        console.log(`${this.uploadedFiles.length} files were chosen`);
     }
 
     approveRequest( approved: boolean ) {
@@ -155,8 +153,14 @@ export class StageComponent implements OnInit {
                 this.stageForm.get(key).clearValidators();
                 this.stageForm.get(key).updateValueAndValidity();
             });
+            this.updateMode = 'reject';
+        } else {
+            this.updateMode = 'approve';
         }
-        this.currentStage['approved'] = approved;
+
+        if ((this.stageId !== '6') && (this.stageId !== '11')) {
+            this.currentStage['approved'] = approved;
+        }
 
         this.submitForm();
     }
@@ -170,8 +174,7 @@ export class StageComponent implements OnInit {
                 this.stageForm.get(key).clearValidators();
                 this.stageForm.get(key).updateValueAndValidity();
             });
-            this.choseToGoBack = true;
-            this.emitGoBack.emit( this.choseToGoBack );
+            this.updateMode = 'downgrade';
             this.submitForm();
         }
     }
@@ -179,54 +182,32 @@ export class StageComponent implements OnInit {
     submitForm() {
         this.stageFormError = '';
         if (this.stageForm && this.stageForm.valid ) {
-            if ( ( (this.uploadedFile === undefined) &&
-                   (this.currentStage['attachment'] === undefined) ) &&
-                 !this.choseToGoBack &&
+            if ( ( ((this.uploadedFiles == null) || (this.uploadedFiles.length === 0)) &&
+                   ((this.currentStage['attachments'] == null) || (this.currentStage.attachments.length === 0)) ) &&
+                 (this.updateMode === 'downgrade') &&
                  ( (this.stageId === '6') || (this.stageId === '11') ||
                    ( (this.stageId === '7') && this.currentStage['approved']) ) ) {
 
                 this.stageFormError = 'Η επισύναψη εγγράφων είναι υποχρεωτική.';
 
             } else {
-
-                this.currentStage['user'] = this.createUser();
-
-                this.currentStage['date'] = Date.now().toString();
+                const stageToSubmit = new FormData();
                 Object.keys(this.stageForm.controls).forEach(key => {
-                    this.currentStage[key.toString()] = this.stageForm.get(key).value;
+                    stageToSubmit.append(key, this.stageForm.get(key).value);
                 });
 
-                if (this.uploadedFile) {
-                    this.currentStage['attachment'] = this.createAttachment();
-                    this.emitFile.emit(this.uploadedFile);
-
+                if (this.uploadedFiles) {
+                    for (const f of this.uploadedFiles) {
+                        stageToSubmit.append('file', f, f.name);
+                    }
                 }
-                this.emitStage.emit(this.currentStage);
+                this.emitStage.emit([this.updateMode, this.currentStage]);
 
             }
 
         } else {
-
             this.stageFormError = 'Πρέπει να έχουν γίνει όλοι οι έλεγχοι για να προχωρήσει το αίτημα.';
         }
-    }
-
-    createUser(): User {
-        const tempUser: User = new User();
-        if ( (this.authService.getUserRole().some(x => x.authority === 'ROLE_ADMIN')) &&
-             ((this.stageId !== '7') ||
-             (this.authService.getUserProp('email') !== this.currentRequestInfo.requester.email)) ) {
-            tempUser.id = this.authService.getUserProp('id');
-            tempUser.email = this.currentPOI.email;
-            tempUser.firstname = this.currentPOI.firstname;
-            tempUser.lastname = this.currentPOI.lastname;
-        } else {
-            tempUser.id = this.authService.getUserProp('id');
-            tempUser.email = this.authService.getUserProp('email');
-            tempUser.firstname = this.authService.getUserProp('firstname');
-            tempUser.lastname = this.authService.getUserProp('lastname');
-        }
-        return tempUser;
     }
 
     getIsDelegateHidden() {
@@ -276,29 +257,6 @@ export class StageComponent implements OnInit {
             }
 
         }
-    }
-
-    getUserName() {
-        if ( this.currentRequestInfo.requester ) {
-            return this.currentRequestInfo.requester.firstname + ' ' + this.currentRequestInfo.requester.lastname;
-        } else {
-            return '';
-        }
-    }
-
-    createAttachment(): Attachment {
-        const tempAttachment: Attachment = new Attachment(this.uploadedFile.name,
-                                                          this.uploadedFile.type,
-                                                          this.uploadedFile.size,
-                                                          '');
-        /*if (this.uploadedFile) {
-            tempAttachment.filename = this.uploadedFile.name;
-            tempAttachment.mimetype = this.uploadedFile.type;
-            tempAttachment.size = this.uploadedFile.size;
-            tempAttachment.url = '';
-        }*/
-
-        return tempAttachment;
     }
 
     getCurrentDateString() {
