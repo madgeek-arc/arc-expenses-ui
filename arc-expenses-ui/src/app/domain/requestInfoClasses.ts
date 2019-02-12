@@ -103,8 +103,8 @@ export class RequestInfo {
 
         /* TODO::if requester or traveller is also diataktis ->
                  diataktis is the organization viceDirector or organization director */
-        /*if ( (this.requester.email === project.institute.diataktis.email) ||
-             ((this.travellerEmail !== undefined) && (this.travellerEmail === project.institute.diataktis.email) ) ) {
+        if ( (this.requester.email === project.institute.diataktis.email) ||
+             ((this.travellerEmail != null) && (this.travellerEmail === project.institute.diataktis.email) ) ) {
             console.log('requester is diataktis!');
             this['5a'].stagePOIs = [];
             this['10'].stagePOIs = [];
@@ -118,9 +118,9 @@ export class RequestInfo {
                 this['10'].stagePOIs.push(project.institute.organization.director);
                 // console.log('diataktis is:', project.institute.organization.director);
             }
-        }*/
+        }
 
-        if ((this.requester.email === project.institute.organization.director.email) &&
+        /*if ((this.requester.email === project.institute.organization.director.email) &&
             (this.requester.email === project.institute.diataktis.email) ) {
             console.log('requester is diataktis!');
             this['5a'].stagePOIs = [];
@@ -129,7 +129,7 @@ export class RequestInfo {
             this['10'].stagePOIs = [];
             this['10'].stagePOIs.push(project.institute.organization.viceDirector);
             console.log(this['10'].stagePOIs);
-        }
+        }*/
 
     }
 
