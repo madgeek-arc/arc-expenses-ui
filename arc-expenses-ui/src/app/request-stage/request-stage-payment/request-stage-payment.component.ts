@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { BaseInfo, Request, RequestPayment, RequestSummary } from '../../domain/operation';
-import { paymentStages, requestTypes } from '../../domain/stageDescriptions';
+import { paymentStages, requesterPositions, requestTypes, supplierSelectionMethodsMap } from '../../domain/stageDescriptions';
 import { RequestInfo } from '../../domain/requestInfoClasses';
 import { AnchorItem } from '../../shared/dynamic-loader-anchor-components/anchor-item';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ManageRequestsService } from '../../services/manage-requests.service';
 import { AuthenticationService } from '../../services/authentication.service';
-import { concatMap, mergeMap, tap } from 'rxjs/operators';
+import { mergeMap, tap } from 'rxjs/operators';
 import { HttpErrorResponse, HttpEventType, HttpResponse } from '@angular/common/http';
 import { printRequestPage } from '../print-request-function';
 
@@ -20,29 +20,20 @@ export class RequestStagePaymentComponent implements OnInit {
     successMessage: string;
     showSpinner: boolean;
 
-    readonly amountLimit = 20000;
-    readonly lowAmountLimit = 2500;
-
-    uploadedFile: File;
-    uploadedFileURL: string;
-
-    updatedFinalAmount: number;
-
     isSimpleUser: boolean;
     requestId: string;
     currentRequest: Request;
     currentRequestPayment: RequestPayment;
-    currentStageName: string;
     canEdit: boolean;
-    wentBackOneStage: boolean;
-    requestNeedsUpdate: boolean;
     stages: string[];
+    reqPositions = requesterPositions;
+    selMethods = supplierSelectionMethodsMap;
     stateNames = {
-        pending: 'βρίσκεται σε εξέλιξη',
-        under_review: 'βρίσκεται σε εξέλιξη',
-        rejected: 'έχει απορριφθεί',
-        accepted: 'έχει ολοκληρωθεί',
-        cancelled: 'έχει ακυρωθεί'
+        PENDING: 'βρίσκεται σε εξέλιξη',
+        UNDER_REVIEW: 'βρίσκεται σε εξέλιξη',
+        REJECTED: 'έχει απορριφθεί',
+        ACCEPTED: 'έχει ολοκληρωθεί',
+        CANCELLED: 'έχει ακυρωθεί'
     };
     reqTypes = requestTypes;
 
@@ -94,19 +85,7 @@ export class RequestStagePaymentComponent implements OnInit {
             },
             () => {
                 this.stages = paymentStages;
-                if (this.currentRequest.type === 'TRIP') {
-                    this.currentRequestInfo = new RequestInfo(this.currentRequestPayment.id,
-                                                              this.currentRequest.id,
-                                                              this.currentRequest.user,
-                                                              this.currentRequest.project,
-                                                              this.currentRequest.trip.email);
-                } else {
-                    this.currentRequestInfo = new RequestInfo(this.currentRequestPayment.id,
-                                                              this.currentRequest.id,
-                                                              this.currentRequest.user,
-                                                              this.currentRequest.project);
-                }
-                // console.log('diataktis is', this.currentRequestInfo['5a'].stagePOIs);
+                this.currentRequestInfo = new RequestInfo(this.currentRequestPayment.id, this.currentRequest.id);
                 this.checkIfStageIs7();
                 this.getIfUserCanEditRequest();
             }
@@ -118,8 +97,7 @@ export class RequestStagePaymentComponent implements OnInit {
              ((this.currentRequest.type === 'REGULAR') || (this.currentRequest.type === 'TRIP')) ) {
 
             this.currentRequestInfo.finalAmount = '';
-            if ( (this.currentRequest.stage1.finalAmount !== undefined) &&
-                 (this.currentRequest.stage1.finalAmount !== null) ) {
+            if ( this.currentRequest.stage1.finalAmount ) {
                 this.currentRequestInfo.finalAmount = (this.currentRequest.stage1.finalAmount).toString();
             }
         }
@@ -154,195 +132,59 @@ export class RequestStagePaymentComponent implements OnInit {
         );
     }
 
-    getRequestToGoBack(event: any) {
-        this.wentBackOneStage = true;
-    }
-
-    getNextStage(stage: string) {
-        if ((this.currentRequestPayment['stage' + stage]['approved'] === undefined) ||
-            (this.currentRequestPayment['stage' + stage]['approved'] === true)) {
-            for (const nextStage of this.currentRequestInfo[stage]['next']) {
-                if (this.currentRequestPayment['stage' + nextStage] !== undefined) {
-                    return nextStage;
-                }
-            }
-        }
-        return this.currentRequestPayment.stage;
-    }
-
-    getPreviousStage(stage: string) {
-        for (const prevStage of this.currentRequestInfo[stage]['prev']) {
-            if (this.currentRequestPayment['stage' + prevStage] !== undefined) {
-                return prevStage;
-            }
-        }
-        return this.currentRequestPayment.stage;
+    getSubmittedStage(submittedData: any[]) {
+        console.log(`got ${JSON.stringify(submittedData, null, 1)}`);
+        this.updateRequest(submittedData[0], submittedData[1]);
     }
 
     getFinalAmount(newVals: string[]) {
         if (newVals && newVals.length === 1) {
-            this.updatedFinalAmount = +newVals[0];
-            // this.currentRequest.stage1.finalAmount = +newVals[0];
-            this.requestNeedsUpdate = true;
+            this.currentRequest.stage1.finalAmount = +newVals[0];
         }
     }
 
-    getSubmittedStage(newStage: any) {
-        console.log(`got ${JSON.stringify(newStage, null, 1)}`);
-        this.currentStageName = 'stage' + this.currentRequestPayment.stage;
-        console.log(`submitting as ${this.currentStageName}`);
-        this.currentRequestPayment[this.currentStageName] = newStage;
-
-        const submittedStage = this.currentRequestPayment.stage;
-        if (this.wentBackOneStage === true) {
-            this.currentRequestPayment.stage = this.getPreviousStage(this.currentRequestPayment.stage);
-        } else {
-            this.currentRequestPayment.stage = this.getNextStage(this.currentRequestPayment.stage);
-        }
-
-        // if the pending stage has not changed, the request has been finalized
-        if (this.currentRequestPayment.stage === submittedStage) {
-            if ( (this.stages.indexOf(this.currentRequestPayment.stage) === (this.stages.length - 1)) &&
-                 (newStage['approved'] === true) ) {
-
-                this.currentRequestPayment.status = 'accepted';
-                if (this.currentRequest.type !== 'SERVICES_CONTRACT') {
-                    this.currentRequest.requestStatus = 'accepted';
-                    this.requestNeedsUpdate = true;
-                }
-            } else {
-
-                this.currentRequestPayment.status = 'rejected';
-                if (this.currentRequest.type !== 'SERVICES_CONTRACT') {
-                    this.currentRequest.requestStatus = 'rejected';
-                    this.requestNeedsUpdate = true;
-                }
-            }
-        } else {
-            if ( this.wentBackOneStage === true ) {
-                this.currentRequestPayment.status = 'under_review';
-            } else {
-                this.currentRequestPayment.status = 'pending';
-            }
-        }
-
-        this.checkIfStageIs7();
-        this.wentBackOneStage = false;
-        console.log('submitted status:', this.currentRequestPayment.status);
-
-        if ( (this.uploadedFile !== undefined) && (this.uploadedFile !== null) ) {
-            this.uploadFile();
-        } else {
-            if (this.requestNeedsUpdate) {
-                this.requestNeedsUpdate = false;
-                this.submitRequestAndPayment();
-            } else {
-                this.submitRequestPayment();
-            }
-        }
-    }
-
-    submitRequestPayment() {
+    updateRequest(mode: string, submitted: FormData) {
         window.scrollTo(0, 0);
         this.showSpinner = true;
         this.errorMessage = '';
         this.successMessage = '';
-
-        if ( this.uploadedFile ) {
-            this.currentRequestPayment[this.currentStageName]['attachment']['url'] = this.uploadedFileURL;
-            this.uploadedFileURL = '';
-            this.uploadedFile = null;
+        if (this.currentRequestPayment.stage === '7') {
+            submitted.append('finalAmount', this.currentRequest.stage1.finalAmount.toString());
         }
-        console.log(`sending ${JSON.stringify(this.currentRequestPayment[this.currentStageName], null, 1)} to updateRequestPayment`);
-        /*update this.currentRequest*/
-        this.requestService.updateRequestPayment(this.currentRequestPayment).subscribe (
-            res => console.log(`update RequestPayment responded: ${res.id}, status=${res.status}, stage=${res.stage}`),
-            error => {
-                console.log(error);
-                this.showSpinner = false;
-                this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
-            },
-            () => {
-                this.successMessage = 'Οι αλλαγές αποθηκεύτηκαν.';
-                this.showSpinner = false;
-                this.getIfUserCanEditRequest();
-            }
-        );
-    }
-
-    uploadFile() {
-        this.showSpinner = true;
-        this.errorMessage = '';
-        this.requestService.uploadAttachment<string>(this.currentRequest.archiveId,
-                                                     this.currentStageName,
-                                                     this.uploadedFile,
-                                                     'payment')
-            .subscribe (
-                event => {
-                    // console.log('uploadAttachment responded: ', JSON.stringify(event));
-                    if (event.type === HttpEventType.UploadProgress) {
-                        console.log('uploadAttachment responded: ', event);
-                    } else if ( event instanceof HttpResponse) {
-                        console.log('final event:', event.body);
-                        this.uploadedFileURL = event.body;
-                    }
-                },
-                error => {
-                    console.log(error);
-                    this.uploadedFile = null;
-                    this.showSpinner = false;
-                    this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
-                },
-                () => {
-                    console.log('ready to update RequestPayment');
-                    if (this.requestNeedsUpdate) {
-                        this.requestNeedsUpdate = false;
-                        this.submitRequestAndPayment();
-                    } else {
-                        this.submitRequestPayment();
-                    }
+        this.requestService.submitUpdate<any>(mode, this.currentRequest.id, submitted).subscribe(
+            event => {
+                if (event.type === HttpEventType.UploadProgress) {
+                    console.log('uploadAttachment responded: ', event.loaded);
+                } else if ( event instanceof HttpResponse) {
+                    console.log('final event:', event.body);
                 }
-            );
-    }
-
-    submitRequestAndPayment() {
-        if ( (this.uploadedFile !== undefined) && (this.uploadedFile !== null) ) {
-            this.currentRequestPayment[this.currentStageName]['attachment']['url'] = this.uploadedFileURL;
-            this.uploadedFileURL = '';
-            this.uploadedFile = null;
-        }
-
-        if ( (this.updatedFinalAmount !== undefined) && (this.updatedFinalAmount !== null) ) {
-            this.currentRequest.stage1.finalAmount = this.updatedFinalAmount;
-            this.updatedFinalAmount = null;
-        }
-
-        this.requestService.updateRequest(this.currentRequest, this.authService.getUserProp('email')).pipe(
-            tap(res => this.currentRequest = res),
-            concatMap(res => this.requestService.updateRequestPayment(this.currentRequestPayment))
-        ).subscribe(
-            res => this.currentRequestPayment = res,
+            },
             error => {
                 console.log(error);
                 this.showSpinner = false;
                 this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
+                this.getCurrentRequest();
             },
             () => {
                 this.successMessage = 'Οι αλλαγές αποθηκεύτηκαν.';
-                this.showSpinner = false;
-                this.getIfUserCanEditRequest();
+                this.getCurrentRequest();
             }
         );
     }
 
 
+    updateShowStageFields() {
+        for ( let i = 0; i < this.stages.length; i++ ) {
+            this.currentRequestInfo[this.stages[i]].showStage = this.willShowStage(this.stages[i]);
+        }
+    }
 
     willShowStage(stage: string) {
         const stageField = 'stage' + stage;
         if ( (stage === this.currentRequestPayment.stage) &&
-            (this.currentRequestPayment.status !== 'rejected') &&
-            (this.currentRequestPayment.status !== 'accepted') &&
-            (this.currentRequestPayment.status !== 'cancelled') &&
+            (this.currentRequestPayment.status !== 'REJECTED') &&
+            (this.currentRequestPayment.status !== 'ACCEPTED') &&
+            (this.currentRequestPayment.status !== 'CANCELLED') &&
             ( (this.authService.getUserRole().some(x => x.authority === 'ROLE_ADMIN')) || (this.canEdit === true) ) ) {
 
             this.stageLoaderItemList = [
@@ -361,8 +203,7 @@ export class RequestStagePaymentComponent implements OnInit {
             if (stage === '1') {
                 return 2;
             }
-            if ( ((this.currentRequestPayment[stageField] !== undefined) && (this.currentRequestPayment[stageField] !== null)) &&
-                 ((this.currentRequestPayment[stageField].date !== undefined) && (this.currentRequestPayment[stageField].date !== null)) ) {
+            if ( (this.currentRequestPayment[stageField]) && (this.currentRequestPayment[stageField].date) ) {
 
                 if ( !this.isSimpleUser || (stage === '7') ) {
 
@@ -373,19 +214,17 @@ export class RequestStagePaymentComponent implements OnInit {
                     if ( (stage === this.currentRequestPayment.stage) && (this.stages.indexOf(stage) > 0) ) {
 
                         const prevStageField = 'stage' + this.stages[this.stages.indexOf(stage) - 1];
-                        if ( ((this.currentRequestPayment[prevStageField] !== undefined) &&
-                              (this.currentRequestPayment[prevStageField] !== null)) &&
-                             ((this.currentRequestPayment[prevStageField].date !== undefined) &&
-                              (this.currentRequestPayment[prevStageField].date !== null)) &&
+                        if ( (this.currentRequestPayment[prevStageField]) &&
+                             (this.currentRequestPayment[prevStageField].date) &&
                              (this.currentRequestPayment[prevStageField].date > this.currentRequestPayment[stageField].date) ) {
 
                             return 4;
                         }
                     }
 
-                    if ( ((this.currentRequestPayment[stageField]['approved'] !== undefined) &&
+                    if ( ((this.currentRequestPayment[stageField]['approved']) &&
                           this.currentRequestPayment[stageField]['approved'] === true ) ||
-                         (stage === '11') ) {
+                          (stage === '11') ) {
 
                         return 2;
 
@@ -399,22 +238,13 @@ export class RequestStagePaymentComponent implements OnInit {
         return 0;
     }
 
-    updateShowStageFields() {
-        for ( let i = 0; i < this.stages.length; i++ ) {
-            this.currentRequestInfo[this.stages[i]].showStage = this.willShowStage(this.stages[i]);
-        }
-    }
-
-    linkToFile() {
-        if (this.currentRequest.stage1.attachments && this.currentRequest.stage1.attachments[0].url) {
+    linkToFile(fileIndex: number) {
+        if (this.currentRequest.stage1.attachments && this.currentRequest.stage1.attachments[fileIndex].url) {
             let url = `${window.location.origin}/arc-expenses-service/request/store/download?`;
             url = `${url}requestId=${this.currentRequest.id}&stage=1&mode=request`;
+            console.log(url);
             window.open(url, '_blank', 'enabledstatus=0,toolbar=0,menubar=0,location=0');
         }
-    }
-
-    getUploadedFile(file: File) {
-        this.uploadedFile = file;
     }
 
     printRequest(): void {

@@ -27,7 +27,7 @@ export class ManageRequestsService {
     constructor(private http: HttpClient) {}
 
     add<T>(newRequest: FormData): Observable<HttpEvent<T>> {
-        const url = `${this.apiUrl}/add`;
+        const url = `${this.apiUrl}add`;
         console.log(`calling ${url}`);
 
         const req = new HttpRequest('POST', url, newRequest, {
@@ -40,7 +40,7 @@ export class ManageRequestsService {
 
     submitUpdate<T>(mode: string, requestId: string, submittedStage?: FormData): Observable<HttpEvent<T>> {
         /* AVAILABLE MODES: approve, reject, downgrade, cancel */
-        const url = `${this.apiUrl}/${mode}/${requestId}`;
+        const url = `${this.apiUrl}${mode}/${requestId}`;
         console.log(`calling ${url}`);
 
         const formData = submittedStage ? submittedStage : new FormData();

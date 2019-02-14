@@ -35,14 +35,15 @@
                                         (canEdit != null)">
 
                                 <!--1st stage-->
-
                                 <div class="submittedRequest">
                                     <div class="uk-margin-bottom uk-width-1-1 uk-grid">
                                         <div class="uk-width-1-2@l">
                                             <span class="uk-text-bold uk-margin-small-right">Πρόγραμμα: </span>
-                                            <span *ngIf="currentRequest.project">
-                                                {{ currentRequest.project.acronym }} ({{currentRequest.project.institute.name}})
-                                            </span>
+                                            <!-- TODO: DISPLAY ACRONYM AND INSTITUTE NAME WHEN THEY BECOME AVAILABLE -->
+                                            <span *ngIf="currentRequest.projectId">{{ currentRequest.projectId }}</span>
+                                            <!--<span *ngIf="currentRequest.projectId">-->
+                                                <!--{{ currentRequest.project.acronym }} ({{currentRequest.project.institute.name}})-->
+                                            <!--</span>-->
                                         </div>
                                         <div class="uk-width-1-2@l">
                                             <span class="uk-text-bold uk-margin-small-right">Ημερομηνία υποβολής: </span>
@@ -51,15 +52,13 @@
                                         <div class="uk-width-1-1@l">
                                             <span class="uk-text-bold uk-margin-small-right">Από: </span>
                                             <span *ngIf="currentRequest.user">
-                                              {{ currentRequest.user.firstname }} {{ currentRequest.user.lastname }}
-                                               ({{ currentRequest.requesterPosition }})
-                                              </span>
+                                              {{ currentRequest.user.firstname }} {{ currentRequest.user.lastname }} ({{ reqPositions[currentRequest.requesterPosition] }})
+                                            </span>
                                         </div>
 
-                                        <div *ngIf="(currentRequest.type !== 'TRIP') && (currentRequest.type !== 'CONTRACT')"
-                                             class="uk-width-1-2@l">
+                                        <div *ngIf="currentRequest.type !== 'TRIP'" class="uk-width-1-2@l">
                                             <span class="uk-text-bold uk-margin-small-right">Προμηθευτής: </span>
-                                            <span>{{ currentRequest.stage1.supplier }} ({{ currentRequest.stage1.supplierSelectionMethod }})</span>
+                                            <span>{{ currentRequest.stage1.supplier }} ({{ selMethods[currentRequest.stage1.supplierSelectionMethod] }})</span>
                                         </div>
                                         <div class="uk-width-1-2@l">
                                           <span class="uk-text-bold uk-margin-small-right">
@@ -72,12 +71,16 @@
                                             <span>{{ currentRequest.stage1.subject }}</span>
                                         </div>
 
-                                        <div *ngIf="currentRequest.stage1.attachments" class="no-print" data-html2canvas-ignore>
-                                            <a class="uk-link uk-width-1-1@l uk-margin-small-top" (click)="linkToFile()">
-                                                Πατήστε εδώ για να κατεβάσετε τα σχετικά αρχεία
+                                        <div *ngIf="currentRequest.stage1.attachments" class="uk-margin-small-top no-print" data-html2canvas-ignore>
+                                            Πατήστε τους συνδέσμους για να κατεβάσετε τα σχετικά αρχεία
+                                            <a *ngFor="let f of currentRequest.stage1.attachments; let i = index"
+                                               class="uk-link uk-width-1-1@l"
+                                               (click)="linkToFile(i)">
+                                                {{ f.filename }}
                                             </a>
                                         </div>
-                                        <div *ngIf="(currentRequest.type === 'TRIP') && (currentRequest.trip != null)" class="uk-width-1-1@l uk-grid uk-margin-auto-vertical">
+                                        <div *ngIf="(currentRequest.type === 'TRIP') && (currentRequest.trip != null)"
+                                             class="uk-width-1-1@l uk-grid uk-margin-auto-vertical">
                                             <div class="uk-text-bold uk-inline">Λεπτομέρειες ταξιδίου:</div>
                                             <div class="uk-inline">
                                                 <span class="uk-display-block" *ngIf="currentRequest.trip.email !== currentRequest.user.email">
@@ -95,17 +98,14 @@
                                 </div>
 
                                 <div class="uk-text-right uk-margin-small-top no-print" data-html2canvas-ignore>
-                                    <!--<button class="uk-button uk-button-default" (click)="printRequest()"
-                                            title="Προτείνεται η χρήση<br>Google Chrome" uk-tooltip>-->
                                     <button class="uk-button uk-button-default" (click)="printRequest()"
                                             title="Πατήστε για λήψη του αιτήματος<br>σε μορφή αρχείου pdf" uk-tooltip>
                                         Λήψη ως PDF</button>
                                 </div>
 
-
+                                <!-- Submitted stages display -->
                                 <hr>
-                                <div class="uk-margin-top" *ngIf="((currentRequestPayment.stage7 && currentRequestPayment.stage7.date) ||
-                                                                  ( (currentRequestPayment.stage === '7') && ((canEdit === true) || userIsAdmin())) )">
+                                <div class="uk-margin-top" *ngIf="currentRequestInfo['7'].showStage >= 1">
                                   <h4>Εξόφληση Δαπάνης</h4>
                                 </div>
 
@@ -168,9 +168,7 @@
                                     <!--<hr>-->
 
                                     <app-stage-loader [stages]="stageLoaderItemList"
-                                                      (emitGoBack)="getRequestToGoBack($event)"
                                                       (emitStage)="getSubmittedStage($event)"
-                                                      (emitFile)="getUploadedFile($event)"
                                                       (newValues)="getFinalAmount($event)"></app-stage-loader>
 
                                 </div>

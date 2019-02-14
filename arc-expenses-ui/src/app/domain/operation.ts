@@ -1,4 +1,4 @@
-// Generated using typescript-generator version 2.1.406 on 2019-02-07 12:55:25.
+// Generated using typescript-generator version 2.1.406 on 2019-02-14 12:09:11.
 
 export class Executive {
     firstname: string;
@@ -14,6 +14,7 @@ export class RequestSummary {
 export class Vocabulary {
     projectID: string;
     projectAcronym: string;
+    instituteId: string;
     instituteName: string;
 }
 
@@ -50,7 +51,7 @@ export class Delegate {
 export class Institute {
     id: string;
     name: string;
-    organization: Organization;
+    organizationId: string;
     director: PersonOfInterest;
     accountingRegistration: PersonOfInterest;
     accountingPayment: PersonOfInterest;
@@ -82,7 +83,7 @@ export class Project {
     id: string;
     name: string;
     acronym: string;
-    institute: Institute;
+    instituteId: string;
     parentProject: string;
     scientificCoordinator: PersonOfInterest;
     operator: PersonOfInterest[];
@@ -93,12 +94,12 @@ export class Project {
 }
 
 export class Request {
-    currentState: string;
+    currentStage: string;
     stage1: Stage1;
     id: string;
     type: Type;
     archiveId: string;
-    project: Project;
+    projectId: string;
     user: User;
     requesterPosition: RequesterPosition;
     requestStatus: RequestStatus;
@@ -222,14 +223,17 @@ export class User {
     immediateEmails: string;
 }
 
+export type OrderByField = 'REQUEST_PROJECT_ACRONYM' | 'REQUEST_INSTITUTE' | 'CREATION_DATE';
+
+export type OrderByType = 'ASC' | 'DSC';
+
 export type StageEvents = 'APPROVE' | 'REJECT' | 'DOWNGRADE' | 'CANCEL';
 
-export type Stages = 'Stage1' | 'Stage2' | 'Stage3' | 'Stage4' | 'Stage5a' | 'Stage5b' | 'Stage6' |
-                     'Stage7' | 'Stage8' | 'Stage9' | 'Stage10' | 'Stage11' | 'Stage12' | 'Stage13';
+export type Stages = 'CANCELLED' | 'REJECTED' | 'Stage1' | 'Stage2' | 'Stage3' | 'Stage4' | 'Stage5a' | 'Stage5b' | 'Stage6' | 'Stage7' | 'Stage8' | 'Stage9' | 'Stage10' | 'Stage11' | 'Stage12' | 'Stage13';
 
 export type Type = 'REGULAR' | 'CONTRACT' | 'SERVICES_CONTRACT' | 'TRIP';
 
-export type Status = 'CANCELLED' | 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'UNDER_REVIEW';
+export type Status = 'CANCELLED' | 'PENDING' | 'ACCEPTED' | 'UNDER_REVIEW' | 'REJECTED';
 
 export type RequesterPosition = 'RESEARCHER' | 'COLLABORATIVE_RESEARCHER' | 'ADMINISTRATIVE';
 

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Project, RequestSummary, User, Vocabulary } from '../domain/operation';
+import { RequestSummary, Vocabulary } from '../domain/operation';
 import { ManageRequestsService } from '../services/manage-requests.service';
 import { AuthenticationService } from '../services/authentication.service';
 import { Paging } from '../domain/extraClasses';
@@ -8,7 +8,6 @@ import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
 import { approvalStages, paymentStages, requestTypes, stageTitles } from '../domain/stageDescriptions';
 import { ManageResourcesService } from '../services/manage-resources.service';
 import { ManageProjectService } from '../services/manage-project.service';
-import { RequestInfo } from '../domain/requestInfoClasses';
 
 @Component({
     selector: 'app-requests',
@@ -306,7 +305,7 @@ export class RequestsComponent implements OnInit {
                 if (this.listOfRequests.length === 0) {
                     this.noRequests = 'Δεν βρέθηκαν σχετικά αιτήματα.';
                 }
-                this.listOfRequests.forEach( x => this.listOfRowColors.push(this.getTrStyle(x)) );
+                // this.listOfRequests.forEach( x => this.listOfRowColors.push(this.getTrStyle(x)) );
                 // console.log(this.listOfRowColors.length);
                 // console.log(this.listOfRowColors);
                 this.setFormValues();
@@ -659,31 +658,13 @@ export class RequestsComponent implements OnInit {
         if ( req.request.trip ) {
             travellerEmail = req.request.trip.email;
         }
-        if (this.getIfUserCanEdit(req.baseInfo.id, req.request.id,
+        /*if (this.getIfUserCanEdit(req.baseInfo.id, req.request.id,
                                   req.request.user, req.request.project,
-                                  req.baseInfo.stage, travellerEmail)) {
+                                  req.baseInfo.stage, travellerEmail)) {*/
             return '#f7f7f7';
-        } else {
+        /*} else {
             return '';
-        }
-    }
-
-    getIfUserCanEdit(id: string, requestId: string, requester: User, project: Project, stage: string, travellerEmail?: string) {
-        let newRequestInfo: RequestInfo;
-        if (travellerEmail) {
-            newRequestInfo = new RequestInfo(id, requestId, requester, project, travellerEmail);
-        } else {
-            newRequestInfo = new RequestInfo(id, requestId, requester, project);
-        }
-        // console.log('diataktis of', requestId, ' is', newRequestInfo['5a'].stagePOIs);
-        return (( this.authService.getUserRole().some(x => x.authority === 'ROLE_ADMIN')) ||
-                ( ((stage === '1') || (stage === '7')) && (this.authService.getUserProp('email') === newRequestInfo.requester.email) ) ||
-                ((stage !== '1') &&
-                 newRequestInfo[stage].stagePOIs.some(
-                        x => ( (x.email === this.authService.getUserProp('email')) ||
-                                         (x.delegates && x.delegates.some(y => y.email === this.authService.getUserProp('email'))) )
-                    )
-                ) );
+        }*/
     }
 
     createSearchUrl() {

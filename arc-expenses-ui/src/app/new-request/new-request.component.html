@@ -55,8 +55,7 @@
                       <label class="uk-form-label" for="request-program">Επιλέξτε έργο <span>(*)</span></label>
                       <div class="uk-form-controls">
                         <input class="uk-input" type="text" id="request-program"
-                               (keyup)="updateSearchTerm($event)"
-                               formControlName="program">
+                               (keyup)="updateSearchTerm($event)" formControlName="program">
                         <div class="uk-comment-body uk-text-small uk-text-muted">
                           <i>Ξεκινήστε να γράφετε το όνομα του έργου και επιλέξτε το από την λίστα που θα εμφανιστεί.</i>
                         </div>
@@ -98,7 +97,7 @@
                         </div>
                       </div>
                     </div>
-                    <div *ngIf="checkIfTrip()" class="uk-margin">
+                    <div *ngIf="isRegularOrServicesContract()" class="uk-margin">
                       <label class="uk-form-label" for="request-supplier">Προμηθευτής
                         <span class="uk-display-inline">{{ isSupplierRequired }}</span>
                       </label>
@@ -111,7 +110,7 @@
                         </div>
                       </div>
                     </div>
-                    <div *ngIf="checkIfTrip()" class="uk-margin">
+                    <div *ngIf="isRegularOrServicesContract()" class="uk-margin">
                       <label class="uk-form-label" for="request-ssm">Τρόπος επιλογής προμηθευτή <span>(*)</span></label>
                       <div class="uk-form-controls">
                         <select class="uk-select" id="request-ssm"
@@ -189,7 +188,7 @@
 
                     <div class="uk-margin">
                       <div class="uk-form-controls uk-form-controls-text">
-                        <app-form-upload-files (emitFile)="getUploadedFiles($event)"></app-form-upload-files>
+                        <app-form-upload-files (emitFiles)="getUploadedFiles($event)"></app-form-upload-files>
                       </div>
                     </div>
 

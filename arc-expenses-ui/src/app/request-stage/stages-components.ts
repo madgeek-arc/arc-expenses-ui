@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { PersonOfInterest, Stage } from '../domain/operation';
+import { Stage } from '../domain/operation';
 import { commentDesc, FieldDescription } from '../domain/stageDescriptions';
 import { DatePipe } from '@angular/common';
 import { AuthenticationService } from '../services/authentication.service';
@@ -50,12 +50,9 @@ export class StageComponent implements OnInit {
     currentRequestInfo: RequestInfo;
     currentStageInfo: StageInfo;
 
-    currentPOI: PersonOfInterest;
-
     datePipe = new DatePipe('el');
 
-    constructor(private fb: FormBuilder,
-                private authService: AuthenticationService) {}
+    constructor(private fb: FormBuilder) {}
 
     ngOnInit() {
 
@@ -72,7 +69,6 @@ export class StageComponent implements OnInit {
             }
 
             this.initializeView();
-            this.currentPOI = this.findCurrentPOI();
         }
     }
 
@@ -103,27 +99,6 @@ export class StageComponent implements OnInit {
                 }
             });
         }
-    }
-
-    findCurrentPOI() {
-        if ( (this.authService.getUserRole().some(x => x.authority === 'ROLE_ADMIN')) && (this.showStage === 1) ) {
-            return this.currentStageInfo.stagePOIs[0];
-        } else {
-            let curEmail: string;
-            if ( this.showStage === 1 ) {
-                curEmail = this.authService.getUserProp('email');
-            } else {
-                curEmail = this.currentStage['user']['email'];
-            }
-            for ( const poi of this.currentStageInfo.stagePOIs ) {
-                if ( (poi.email === curEmail) ||
-                     (poi.delegates && poi.delegates.some(x => x.email === curEmail)) ) {
-                    // console.log(`stage ${this.stageId}, stagePoi: ${JSON.stringify(poi)}`);
-                    return poi;
-                }
-            }
-        }
-        // !!! if a poi is not found, currentPOI will remain undefined
     }
 
     linkToFile(i: number) {
@@ -210,53 +185,9 @@ export class StageComponent implements OnInit {
         }
     }
 
-    getIsDelegateHidden() {
-        if ((this.currentPOI != null) &&
-            (this.currentPOI.email === this.currentStage['user']['email'])) {
-            return false;
-        } else {
-             if (this.currentPOI && this.currentPOI.delegates &&
-                 this.currentPOI.delegates.some(x => x.email === this.currentStage['user']['email'])) {
-
-                return this.currentPOI.delegates.filter(x => x.email === this.currentStage['user']['email'])[0].hidden;
-
-            }
-        }
-        return false;
-    }
-
     /* display full name of the submitted stage's editor */
     getDelegateName() {
-        /* stage 7 can also be completed by the user */
-        if (this.stageId === '7') {
-            /* however, if a delegate has completed the stage, check if his/her name should be hidden */
-            if (this.currentRequestInfo['7'].stagePOIs.some(x => x.delegates.some(y => y.email === this.currentStage['user']['email']))) {
-                if (this.getIsDelegateHidden()) {
-                    return ' (' + this.currentPOI.firstname + ' ' + this.currentPOI.lastname + ')';
-                } else {
-                    return ' (' + this.currentStage['user']['firstname'] + ' ' + this.currentStage['user']['lastname'] + ')';
-                }
-            } else {
-                return ' (' + this.currentStage['user']['firstname'] + ' ' + this.currentStage['user']['lastname'] + ')';
-            }
-
-        /* in stages 4 and 9 the name will always be hidden */
-        } else if ( (this.stageId !== '4') && (this.stageId !== '9') ) {
-
-            /* the name of the Inspection Team member that edited stage8 will only be shown to the POY and the Admins */
-            if ((this.stageId !== '8') ||
-                ((this.stageId === '8') &&
-                 ((this.authService.getUserRole().some(x => x.authority === 'ROLE_ADMIN')) ||
-                  this.currentRequestInfo['4'].stagePOIs.some(x => x.email === this.authService.getUserProp('email'))) )) {
-
-                if ( this.getIsDelegateHidden() ) {
-                    return ' (' + this.currentPOI.firstname + ' ' + this.currentPOI.lastname + ')';
-                } else {
-                    return ' (' + this.currentStage['user']['firstname'] + ' ' + this.currentStage['user']['lastname'] + ')';
-                }
-            }
-
-        }
+        return ' (' + this.currentStage['user']['firstname'] + ' ' + this.currentStage['user']['lastname'] + ')';
     }
 
     getCurrentDateString() {
@@ -303,7 +234,7 @@ export class Stage3Component extends StageComponent implements OnInit {
 
         super.ngOnInit();
 
-        if (this.stageForm) {
+        if (this.stageForm && !this.stageForm.get('loan').value ) {
             this.stageForm.get('loanSource').disable();
         }
     }

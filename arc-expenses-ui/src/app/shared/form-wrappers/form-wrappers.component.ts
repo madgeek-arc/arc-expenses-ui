@@ -96,10 +96,12 @@ export class FormUploadFileComponent implements OnInit {
         <span class="uk-link">Επισυνάψτε τα αρχεία σας ρίχνοντάς τα εδώ ή πατώντας εδώ</span>
         <div *ngIf="uploadedFilenames.length === 0">επιλέξτε αρχείο</div>
         <div *ngFor="let f of uploadedFilenames; let i = index"
-             class="uk-text-bold uk-grid uk-child-width-1-4@l uk-child-width-1-2@s uk-flex-center">
-            <div>{{ f }}</div>
-            <div>
-                <a class="uk-link uk-margin-small-left" uk-icon="icon: close" (click)="deleteItem(i)"></a>
+             class="uk-text-bold uk-flex-center">
+            <div class="uk-grid uk-child-width-1-4@l uk-child-width-1-2@s">
+                <div>{{ f }}</div>
+                <div>
+                    <a class="uk-link uk-margin-small-left" uk-icon="icon: close" (click)="deleteItem(i)"></a>
+                </div>
             </div>
         </div>
     </div>
@@ -135,7 +137,7 @@ export class FormUploadFilesComponent implements OnInit {
 
     getInput(event: any) {
         const files = event.target.files;
-        for (let i = 0; i < files; i++) {
+        for (let i = 0; i < files.length; i++) {
             this.uploadedFilenames.push(files[i].name);
             this.uploadedFiles.push(files[i]);
         }

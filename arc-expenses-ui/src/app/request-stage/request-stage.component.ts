@@ -30,7 +30,6 @@ export class RequestStageComponent implements OnInit {
     currentRequestApproval: RequestApproval;
     currentRequestPayments: RequestPayment[] = [];
     canEdit: boolean;
-    requestNeedsUpdate: boolean;
     stages: string[];
     stagesMap = stageTitles;
     reqPositions = requesterPositions;
@@ -89,19 +88,7 @@ export class RequestStageComponent implements OnInit {
             },
             () => {
                 this.stages = approvalStages;
-                if (this.currentRequest.type === 'TRIP') {
-                    this.currentRequestInfo = new RequestInfo(this.currentRequestApproval.id,
-                                                              this.currentRequest.id,
-                                                              this.currentRequest.user,
-                                                              this.currentRequest.project,
-                                                              this.currentRequest.trip.email);
-                } else {
-                    this.currentRequestInfo = new RequestInfo(this.currentRequestApproval.id,
-                                                              this.currentRequest.id,
-                                                              this.currentRequest.user,
-                                                              this.currentRequest.project);
-                }
-                // console.log('diataktis is', this.currentRequestInfo['5a'].stagePOIs);
+                this.currentRequestInfo = new RequestInfo(this.currentRequestApproval.id, this.currentRequest.id);
                 this.checkIfStageIs5b();
                 this.getIfUserCanEditRequest();
                 if ((this.currentRequest.type !== 'CONTRACT') &&
@@ -189,7 +176,6 @@ export class RequestStageComponent implements OnInit {
             this.currentRequest.stage1.supplier = newVals[0];
             this.currentRequest.stage1.amountInEuros = +newVals[1];
             this.currentRequest.stage1.finalAmount = +newVals[1];
-            this.requestNeedsUpdate = true;
         }
     }
 
@@ -235,7 +221,7 @@ export class RequestStageComponent implements OnInit {
             (this.currentRequestApproval.status !== 'REJECTED') &&
             (this.currentRequestApproval.status !== 'ACCEPTED') &&
             (this.currentRequestApproval.status !== 'CANCELLED') &&
-            ( (this.authService.getUserRole().some(x => x.authority === 'ROLE_ADMIN')) || this.canEdit ) ) {
+            ( (this.authService.getUserRole().some(x => x.authority === 'ROLE_ADMIN')) || (this.canEdit === true) ) ) {
 
             if (this.currentRequestApproval.stage !== '1') {
                 this.stageLoaderItemList = [
@@ -255,8 +241,7 @@ export class RequestStageComponent implements OnInit {
             if (stage === '1') {
                 return 2;
             }
-            if ( (this.currentRequestApproval[stageField]) &&
-                 (this.currentRequestApproval[stageField].date)) {
+            if ( (this.currentRequestApproval[stageField]) && (this.currentRequestApproval[stageField].date)) {
 
                 if (!this.isSimpleUser || (stage === '2') ) {
 

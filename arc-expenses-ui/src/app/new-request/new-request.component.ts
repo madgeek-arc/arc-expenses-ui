@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Request, Project, User, Vocabulary } from '../domain/operation';
+import { Project, User, Vocabulary } from '../domain/operation';
 import { ManageRequestsService } from '../services/manage-requests.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthenticationService } from '../services/authentication.service';
@@ -44,7 +44,7 @@ export class NewRequestComponent implements OnInit {
     reqPositions = requesterPositions;
 
     programSelected = false;
-    isRequestOnBehalfOfOther = false;
+    isRequestOnBehalfOfOther;
 
     title = 'Δημιουργία νέου αιτήματος';
 
@@ -131,20 +131,26 @@ export class NewRequestComponent implements OnInit {
 
         if (this.requestType === 'TRIP') {
             this.newRequestForm.get('trip_firstname').setValidators([Validators.required]);
+            this.newRequestForm.get('trip_firstname').updateValueAndValidity();
             this.newRequestForm.get('trip_lastname').setValidators([Validators.required]);
-            this.newRequestForm.get('trip_email').setValidators([Validators.required]);
+            this.newRequestForm.get('trip_lastname').updateValueAndValidity();
+            this.newRequestForm.get('trip_email').setValidators([Validators.required, Validators.email]);
+            this.newRequestForm.get('trip_email').updateValueAndValidity();
             this.newRequestForm.get('trip_destination').setValidators([Validators.required]);
-            this.newRequestForm.updateValueAndValidity();
+            this.newRequestForm.get('trip_destination').updateValueAndValidity();
         }
     }
 
     submitRequest() {
         this.errorMessage = '';
-        if ((this.requestType === 'TRIP') && !this.isRequestOnBehalfOfOther) {
+        if (!this.isRequestOnBehalfOfOther) {
+            console.log('clearing validators');
             this.newRequestForm.get('trip_firstname').clearValidators();
+            this.newRequestForm.get('trip_firstname').updateValueAndValidity();
             this.newRequestForm.get('trip_lastname').clearValidators();
+            this.newRequestForm.get('trip_lastname').updateValueAndValidity();
             this.newRequestForm.get('trip_email').clearValidators();
-            this.newRequestForm.updateValueAndValidity();
+            this.newRequestForm.get('trip_email').updateValueAndValidity();
         }
 
         if (this.newRequestForm.valid ) {
@@ -154,19 +160,19 @@ export class NewRequestComponent implements OnInit {
 
                 this.errorMessage = 'Για αιτήματα άνω των 2.500 € η επιλογή προμηθευτή γίνεται μέσω διαγωνισμού ή έρευνας αγοράς.';
 
-            } else if ( ( +this.newRequestForm.get('amount').value > this.amountLimit) && this.checkIfTrip() &&
+            } else if ( ( +this.newRequestForm.get('amount').value > this.amountLimit) && this.isRegularOrServicesContract() &&
                         ( this.newRequestForm.get('supplierSelectionMethod').value !== 'AWARD_PROCEDURE' ) ) {
 
                 this.errorMessage = 'Για ποσά άνω των 20.000 € οι αναθέσεις πρέπει να γίνονται μέσω διαγωνισμού.';
 
-            } else if ( this.checkIfTrip() &&
+            } else if ( this.isRegularOrServicesContract() &&
                         ( (this.newRequestForm.get('supplierSelectionMethod').value !== 'AWARD_PROCEDURE') &&
                           !this.newRequestForm.get('supplier').value )) {
 
                 this.errorMessage = 'Τα πεδία που σημειώνονται με (*) είναι υποχρεωτικά.';
 
             } else if ( (( this.newRequestForm.get('supplierSelectionMethod').value !== 'DIRECT' ) &&
-                           this.checkIfTrip() ) && (!this.uploadedFiles) ) {
+                           this.isRegularOrServicesContract() ) && (!this.uploadedFiles) ) {
 
                 this.errorMessage = 'Για αναθέσεις μέσω διαγωνισμού ή έρευνας αγοράς η επισύναψη εγγράφων είναι υποχρεωτική.';
 
@@ -182,7 +188,7 @@ export class NewRequestComponent implements OnInit {
                 newRequest.append('projectId', this.chosenProgramID);
                 newRequest.append('requester_position', this.newRequestForm.get('position').value);
                 newRequest.append('subject', this.newRequestForm.get('requestText').value);
-                if ( this.checkIfTrip() ) {
+                if ( this.isRegularOrServicesContract() ) {
                     newRequest.append('supplier', this.newRequestForm.get('supplier').value);
                     newRequest.append('supplier_selection_method', this.newRequestForm.get('supplierSelectionMethod').value);
                 }
@@ -236,7 +242,6 @@ export class NewRequestComponent implements OnInit {
         if (this.newRequestForm.get('program').value) {
             this.showSpinner = true;
 
-            this.newRequestForm.get('institute').setValue('');
             this.newRequestForm.get('sciCoord').setValue('');
 
             this.projectService.getProjectById(this.chosenProgramID).subscribe(
@@ -254,9 +259,6 @@ export class NewRequestComponent implements OnInit {
                     this.errorMessage = '';
                     if ( this.chosenProject ) {
                         this.programSelected = true;
-                        if (this.chosenProject.institute && this.chosenProject.institute.name) {
-                            this.newRequestForm.get('institute').setValue(this.chosenProject.institute.name);
-                        }
                         if (this.chosenProject && this.chosenProject.scientificCoordinator) {
                             this.newRequestForm.get('sciCoord').setValue(
                                 this.chosenProject.scientificCoordinator.firstname + ' ' +
@@ -289,15 +291,10 @@ export class NewRequestComponent implements OnInit {
     updateProgramInput(project: Vocabulary) {
         /*console.log(this.projects);*/
         this.newRequestForm.get('program').setValue(project.projectAcronym);
+        this.newRequestForm.get('institute').setValue(`${project.instituteName} (${project.instituteId})`);
         this.chosenProgramID = project.projectID;
         console.log(this.newRequestForm.get('program').value);
         this.getProject();
-    }
-
-    show (event: any) {
-        if (this.newRequestForm.get('program').value && !this.chosenProject) {
-            this.getProject();
-        }
     }
 
     getUploadedFiles(files: File[]) {
@@ -324,9 +321,8 @@ export class NewRequestComponent implements OnInit {
                              (this.requestType === 'REGULAR') );
     }
 
-    checkIfTrip() {
-        return ((this.requestType !== 'TRIP') &&
-                (this.requestType !== 'CONTRACT'));
+    isRegularOrServicesContract() {
+        return ((this.requestType !== 'TRIP') && (this.requestType !== 'CONTRACT'));
     }
 
     checkIfSupplierIsRequired() {
@@ -341,6 +337,7 @@ export class NewRequestComponent implements OnInit {
 
     toggleOnBehalf(event: any) {
         this.isRequestOnBehalfOfOther = event.target.checked;
+        console.log(this.isRequestOnBehalfOfOther);
     }
 
 }

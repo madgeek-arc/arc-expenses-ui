@@ -28,20 +28,18 @@
               <div *ngIf="successMessage" class="uk-alert uk-alert-success">{{ successMessage }}</div>
               <div *ngIf="notFoundMessage" class="uk-alert">{{ notFoundMessage }}</div>
 
-              <div *ngIf="!showSpinner &&
-                          (currentRequestApproval != null) &&
-                          (currentRequest != null) &&
-                          (currentRequest.stage1 != null) &&
-                          (canEdit != null)">
+              <div *ngIf="!showSpinner && currentRequestInfo">
 
                 <!--1st stage-->
                 <div *ngIf="willShowStage('1') === 2" class="submittedRequest">
                   <div class="uk-margin-bottom uk-width-1-1 uk-grid">
                     <div class="uk-width-1-2@l">
                       <span class="uk-text-bold uk-margin-small-right">Πρόγραμμα: </span>
-                      <span *ngIf="currentRequest.project">
-                        {{ currentRequest.project.acronym }} ({{currentRequest.project.institute.name}})
-                      </span>
+                      <!-- TODO: DISPLAY ACRONYM AND INSTITUTE NAME INSTEAD WHEN THEY BECOME AVAILABLE -->
+                      <span>{{ currentRequest.projectId }}</span>
+                      <!--<span *ngIf="currentRequest.project">-->
+                        <!--{{ currentRequest.project.acronym }} ({{currentRequest.project.institute.name}})-->
+                      <!--</span>-->
                     </div>
                     <div class="uk-width-1-2@l">
                       <span class="uk-text-bold uk-margin-small-right">Ημερομηνία υποβολής: </span>
@@ -107,8 +105,6 @@
                 </div>
 
                 <div class="uk-text-right uk-margin-small-top no-print" data-html2canvas-ignore>
-                  <!--<button class="uk-button uk-button-default" (click)="printRequest()"
-                          title="Προτείνεται η χρήση<br>Google Chrome" uk-tooltip>Εκτύπωση Αιτήματος-->
                   <button class="uk-button uk-button-default" (click)="printRequest()"
                           title="Πατήστε για λήψη του<br>αιτήματος σε μορφή pdf" uk-tooltip>
                     Λήψη ως PDF</button>
@@ -117,9 +113,7 @@
                 <!-- Submitted stages display -->
                   <hr>
 
-                  <div *ngIf="!isSimpleUser &&
-                              ( (currentRequestApproval.stage2 && currentRequestApproval.stage2.date) ||
-                              ( (currentRequestApproval.stage === '2') && ((canEdit === true) || userIsAdmin())) )">
+                  <div class="uk-margin-top" *ngIf="currentRequestInfo['2'].showStage >= 1">
                       <h4>Ανάληψη υποχρέωσης δαπάνης</h4>
                   </div>
 

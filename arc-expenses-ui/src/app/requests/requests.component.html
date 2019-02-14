@@ -258,8 +258,9 @@
                                                 title="Μετάβαση στην σελίδα του αιτήματος" [style.backgroundColor]="listOfRowColors[i]">
                                                 <td>{{ req.baseInfo.id.includes('a') ? 'Α': 'Π' }}</td>
                                                 <td>{{ req.request.id }}<br>{{ reqTypes[req.request.type] }}</td>
-                                                <td>{{ req.request.project.acronym }}</td>
-                                                <td>{{ req.request.project.institute.name }}</td>
+                                                <!-- TODO: DISPLAY ACRONYM AND INSTITUTE NAME INSTEAD WHEN THEY BECOME AVAILABLE -->
+                                                <td>{{ req.request.projectId }}</td>
+                                                <td>{{ req.request.projectId }}</td>
                                                 <td>{{ req.request.user.firstname }} {{ req.request.user.lastname }}</td>
                                                 <td>{{ req.baseInfo.creationDate | date : 'dd-MM-yyyy' }}</td>
                                                 <td *ngIf="!isSimpleUser">{{ stagesMap[req.baseInfo.stage]}}</td>
