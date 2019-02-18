@@ -99,12 +99,14 @@ export class RequestStagePaymentComponent implements OnInit {
                                                               this.currentRequest.id,
                                                               this.currentRequest.user,
                                                               this.currentRequest.project,
+                                                              this.currentRequest.scientificCoordinatorAsDiataktis,
                                                               this.currentRequest.trip.email);
                 } else {
                     this.currentRequestInfo = new RequestInfo(this.currentRequestPayment.id,
                                                               this.currentRequest.id,
                                                               this.currentRequest.user,
-                                                              this.currentRequest.project);
+                                                              this.currentRequest.project,
+                                                              this.currentRequest.scientificCoordinatorAsDiataktis);
                 }
                 // console.log('diataktis is', this.currentRequestInfo['5a'].stagePOIs);
                 this.checkIfStageIs7();
