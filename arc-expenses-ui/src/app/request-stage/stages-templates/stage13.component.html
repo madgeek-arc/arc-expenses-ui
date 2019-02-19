@@ -15,10 +15,13 @@
             <span> {{ currentStage['comment'] }} </span>
         </div>
 
-        <!-- display link to attachment -->
-        <div *ngIf="currentStage['attachment']">
-            <a class="uk-link uk-width-1-1@l uk-margin-small-top" (click)="linkToFile()">
-                Πατήστε εδώ για να κατεβάσετε τα σχετικά αρχεία
+        <!-- display links to attachments -->
+        <div *ngIf="currentStage['attachments']" class="uk-margin-small-top no-print" data-html2canvas-ignore>
+            Πατήστε τους συνδέσμους για να κατεβάσετε τα σχετικά αρχεία
+            <a *ngFor="let f of currentStage['attachments']; let i = index"
+               class="uk-link uk-width-1-1@l"
+               (click)="linkToFile(i)">
+                {{ f.filename }}
             </a>
         </div>
     </div>

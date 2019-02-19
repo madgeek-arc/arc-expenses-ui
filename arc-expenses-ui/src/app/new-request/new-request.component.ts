@@ -172,13 +172,13 @@ export class NewRequestComponent implements OnInit {
                 this.errorMessage = 'Τα πεδία που σημειώνονται με (*) είναι υποχρεωτικά.';
 
             } else if ( (( this.newRequestForm.get('supplierSelectionMethod').value !== 'DIRECT' ) &&
-                           this.isRegularOrServicesContract() ) && (!this.uploadedFiles) ) {
+                           this.isRegularOrServicesContract() ) && ((this.uploadedFiles == null) || (this.uploadedFiles.length === 0)) ) {
 
                 this.errorMessage = 'Για αναθέσεις μέσω διαγωνισμού ή έρευνας αγοράς η επισύναψη εγγράφων είναι υποχρεωτική.';
 
             } else if ( (this.requestType !== 'SERVICES_CONTRACT') &&
                         (+this.newRequestForm.get('amount').value > this.lowAmountLimit) &&
-                        (this.uploadedFiles == null) ) {
+                        ((this.uploadedFiles == null) || (this.uploadedFiles.length === 0)) ) {
 
                 this.errorMessage = 'Για αιτήματα άνω των 2.500 € η επισύναψη εγγράφων είναι υποχρεωτική.';
 

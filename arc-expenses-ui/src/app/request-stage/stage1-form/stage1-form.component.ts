@@ -58,8 +58,8 @@ export class Stage1FormComponent implements OnInit {
         }
 
         if (this.currentRequest.stage1.attachments) {
-            for (const at of this.currentRequest.stage1.attachments) {
-                this.stage1AttachmentNames.push(at.filename);
+            for (const f of this.currentRequest.stage1.attachments) {
+                this.stage1AttachmentNames.push(f.filename);
             }
         }
         this.isSupplierRequired = (this.currentRequest.type !== 'TRIP');

@@ -189,11 +189,11 @@ export class ManageRequestsService {
                               stage: string[], from: string, quantity: string,
                               order: string, orderField: string, email: string): Observable<Paging<RequestSummary>> {
         let statusList = '';
-        status.forEach( x => statusList = statusList + '&status=' + x );
+        status.forEach( x => statusList = statusList + '&status=' + x.toUpperCase() );
         let typesList = '';
-        type.forEach( x => typesList = typesList + '&type=' + x );
+        type.forEach( x => typesList = typesList + '&type=' + x.toUpperCase() );
         let stagesList = '';
-        stage.forEach( x => stagesList = stagesList + '&stage=' + x );
+        stage.forEach( x => stagesList = stagesList + '&stage=' + x.toUpperCase() );
         let url = `${this.apiUrl}getAll?from=${from}&quantity=${quantity}${statusList}${typesList}${stagesList}`;
         url = url + `&order=${order}&orderField=${orderField}&email=${encodeURIComponent(email)}&searchField=${searchField}`;
 

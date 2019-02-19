@@ -270,14 +270,14 @@ export class RequestsComponent implements OnInit {
         const currentOffset = this.currentPage * this.itemsPerPage;
 
         this.requestService.searchAllRequestSummaries(this.searchTerm,
-            this.statusesChoice,
-            this.typesChoice,
-            this.stagesChoice,
-            currentOffset.toString(),
-            this.itemsPerPage.toString(),
-            this.order,
-            this.orderField,
-            this.authService.getUserProp('email')).subscribe(
+                                                      this.statusesChoice,
+                                                      this.typesChoice,
+                                                      this.stagesChoice,
+                                                      currentOffset.toString(),
+                                                      this.itemsPerPage.toString(),
+                                                      this.order,
+                                                      this.orderField,
+                                                      this.authService.getUserProp('email')).subscribe(
             res => {
                 if (res) {
                     this.searchResults = res;
@@ -653,18 +653,8 @@ export class RequestsComponent implements OnInit {
         }
     }
 
-    getTrStyle(req: RequestSummary) {
-        let travellerEmail = '';
-        if ( req.request.trip ) {
-            travellerEmail = req.request.trip.email;
-        }
-        /*if (this.getIfUserCanEdit(req.baseInfo.id, req.request.id,
-                                  req.request.user, req.request.project,
-                                  req.baseInfo.stage, travellerEmail)) {*/
-            return '#f7f7f7';
-        /*} else {
-            return '';
-        }*/
+    getTrStyle() {
+        return '#f7f7f7';
     }
 
     createSearchUrl() {
