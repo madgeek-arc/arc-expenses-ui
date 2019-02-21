@@ -87,7 +87,10 @@ export class RequestStagePaymentComponent implements OnInit {
                 this.stages = paymentStages;
                 this.currentRequestInfo = new RequestInfo(this.currentRequestPayment.id, this.currentRequest.id);
                 this.checkIfStageIs7();
-                this.getIfUserCanEditRequest();
+                this.showSpinner = false;
+                // TODO:: REMOVE THE LINE BELOW WHEN THE BACK SENDS THIS INFO
+                this.canEdit = true;
+                this.updateShowStageFields();
             }
         );
     }
@@ -101,35 +104,6 @@ export class RequestStagePaymentComponent implements OnInit {
                 this.currentRequestInfo.finalAmount = (this.currentRequest.stage1.finalAmount).toString();
             }
         }
-    }
-
-    getIfUserCanEditRequest() {
-        this.errorMessage = '';
-        this.canEdit = null;
-        const newBasicInfo = new BaseInfo();
-        newBasicInfo.creationDate = this.currentRequestPayment.creationDate;
-        newBasicInfo.requestId = this.currentRequestPayment.requestId;
-        newBasicInfo.id = this.currentRequestPayment.id;
-        newBasicInfo.stage = this.currentRequestPayment.stage;
-        newBasicInfo.status = this.currentRequestPayment.status;
-        const newSummary = new RequestSummary();
-        newSummary.request = this.currentRequest;
-        newSummary.baseInfo = newBasicInfo;
-        this.requestService.isEditable(newSummary, this.authService.getUserProp('email')).subscribe(
-            res => this.canEdit = res,
-            error => {
-                console.log(error);
-                this.canEdit = false;
-                this.showSpinner = false;
-                this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την ανάκτηση του αιτήματος.';
-            },
-            () => {
-                this.showSpinner = false;
-                console.log('this.canEdit is ', this.canEdit);
-                this.successMessage = '';
-                this.updateShowStageFields();
-            }
-        );
     }
 
     getSubmittedStage(submittedData: any[]) {

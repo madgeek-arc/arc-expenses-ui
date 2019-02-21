@@ -93,7 +93,6 @@ export class RequestStageComponent implements OnInit {
                 this.checkIfStageIs5b();
                 // TODO:: REMOVE THE LINE BELOW WHEN THE BACK SENDS THIS INFO
                 this.canEdit = true;
-                // this.getIfUserCanEditRequest();
                 if ((this.currentRequest.type !== 'CONTRACT') &&
                     (this.currentRequestApproval.status === 'ACCEPTED')) {
                     this.getRequestPayments();
@@ -286,10 +285,10 @@ export class RequestStageComponent implements OnInit {
             },
             () => {
                 this.successMessage = 'Οι αλλαγές αποθηκεύτηκαν.';
+                this.showSpinner = false;
                 // TODO:: REMOVE THE LINE BELOW WHEN THE BACK SENDS THIS INFO
                 this.canEdit = true;
                 this.updateShowStageFields();
-                // this.getIfUserCanEditRequest();
             }
         );
     }
