@@ -72,7 +72,7 @@
                       <a *ngFor="let f of currentRequest.stage1.attachments; let i = index"
                          class="uk-link uk-width-1-1@l"
                          (click)="linkToFile(i)">
-                        {{ f.filename }}
+                        {{ f.filename }} |
                       </a>
                     </div>
                     <div *ngIf="(currentRequest.type === 'TRIP') && (currentRequest.trip != null)"

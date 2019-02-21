@@ -87,10 +87,13 @@ export class RequestStageComponent implements OnInit {
                 }
             },
             () => {
+                this.showSpinner = false;
                 this.stages = approvalStages;
                 this.currentRequestInfo = new RequestInfo(this.currentRequestApproval.id, this.currentRequest.id);
                 this.checkIfStageIs5b();
-                this.getIfUserCanEditRequest();
+                // TODO:: REMOVE THE LINE BELOW WHEN THE BACK SENDS THIS INFO
+                this.canEdit = true;
+                // this.getIfUserCanEditRequest();
                 if ((this.currentRequest.type !== 'CONTRACT') &&
                     (this.currentRequestApproval.status === 'ACCEPTED')) {
                     this.getRequestPayments();
@@ -115,35 +118,6 @@ export class RequestStageComponent implements OnInit {
         }
     }
 
-    getIfUserCanEditRequest() {
-        this.errorMessage = '';
-        this.canEdit = null;
-        const newBasicInfo = new BaseInfo();
-        newBasicInfo.creationDate = this.currentRequestApproval.creationDate;
-        newBasicInfo.requestId = this.currentRequestApproval.requestId;
-        newBasicInfo.id = this.currentRequestApproval.id;
-        newBasicInfo.stage = this.currentRequestApproval.stage;
-        newBasicInfo.status = this.currentRequestApproval.status;
-        const newSummary = new RequestSummary();
-        newSummary.request = this.currentRequest;
-        newSummary.baseInfo = newBasicInfo;
-        this.requestService.isEditable(newSummary, this.authService.getUserProp('email')).subscribe(
-            res => this.canEdit = res,
-            error => {
-                console.log(error);
-                this.canEdit = false;
-                this.showSpinner = false;
-                this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την ανάκτηση του αιτήματος.';
-            },
-            () => {
-                this.showSpinner = false;
-                console.log('this.canEdit is ', this.canEdit);
-                this.successMessage = '';
-                this.updateShowStageFields();
-            }
-        );
-    }
-
     getRequestPayments() {
         this.errorMessage = '';
         this.requestService.getPaymentsOfRequest(this.currentRequest.id).subscribe(
@@ -163,11 +137,6 @@ export class RequestStageComponent implements OnInit {
     }
 
     getUpdatedRequest(updatedRequest: FormData) {
-        /* TODO: REMIND GIANNIS ABOUT THE CASE BELOW */
-        /*if ( (this.currentRequest.stage1.amountInEuros > this.amountLimit) &&
-             (!this.currentRequestApproval.stage5b) ) {
-            this.currentRequestApproval.stage5b = new Stage5b();
-        }*/
         this.updateRequest('approve', updatedRequest);
     }
 
@@ -317,7 +286,10 @@ export class RequestStageComponent implements OnInit {
             },
             () => {
                 this.successMessage = 'Οι αλλαγές αποθηκεύτηκαν.';
-                this.getIfUserCanEditRequest();
+                // TODO:: REMOVE THE LINE BELOW WHEN THE BACK SENDS THIS INFO
+                this.canEdit = true;
+                this.updateShowStageFields();
+                // this.getIfUserCanEditRequest();
             }
         );
     }

@@ -5,7 +5,7 @@ import { AuthenticationService } from '../services/authentication.service';
 import { Paging } from '../domain/extraClasses';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
-import { approvalStages, paymentStages, requestTypes, stageTitles } from '../domain/stageDescriptions';
+import { approvalStages, paymentStages, requestTypes, stageIds, stageTitles, statesList } from '../domain/stageDescriptions';
 import { ManageResourcesService } from '../services/manage-resources.service';
 import { ManageProjectService } from '../services/manage-project.service';
 
@@ -29,7 +29,7 @@ export class RequestsComponent implements OnInit {
     stages: string[] = [];
     stagesMap = stageTitles;
     reqTypes = requestTypes;
-    requestTypeIds = ['REGULAR', 'CONTRACT', 'SERVICES_CONTRACT', 'TRIP'];
+    requestTypeIds = ['regular', 'contract', 'services_contract', 'trip'];
     institutes: Map<string, string> = new Map<string, string>();
     instituteIds: string[] = [];
     projects: Vocabulary[] = [];
@@ -83,7 +83,7 @@ export class RequestsComponent implements OnInit {
 
     initializeParams() {
         this.statusesChoice = ['pending', 'under_review'];
-        this.stagesChoice = ['all'];
+        this.stagesChoice = stageIds;
         this.typesChoice = ['all'];
         this.institutesChoice = ['all'];
 
@@ -96,7 +96,7 @@ export class RequestsComponent implements OnInit {
         this.currentPage = 0;
         this.itemsPerPage = 10;
 
-        this.order = 'DESC';
+        this.order = 'DSC';
         this.orderField = 'creation_date';
         this.totalPages = 0;
 
@@ -104,7 +104,7 @@ export class RequestsComponent implements OnInit {
     }
 
     readParams() {
-        this.statusesChoice = ['all'];
+        this.statusesChoice = ['pending', 'under_review'];
         this.stagesChoice = ['all'];
         this.typesChoice = ['all'];
         this.institutesChoice = ['all'];
@@ -118,7 +118,7 @@ export class RequestsComponent implements OnInit {
         this.currentPage = 0;
         this.itemsPerPage = 10;
 
-        this.order = 'DESC';
+        this.order = 'DSC';
         this.orderField = 'creation_date';
         this.totalPages = 0;
 
@@ -269,10 +269,24 @@ export class RequestsComponent implements OnInit {
         this.showSpinner = true;
         const currentOffset = this.currentPage * this.itemsPerPage;
 
+        let finalStatuses = this.statusesChoice;
+        if ((finalStatuses.length === 1) && (finalStatuses[0] === 'all')) {
+            finalStatuses = statesList;
+        }
+        let finalTypes = this.typesChoice;
+        if ((finalTypes.length === 1) && (finalTypes[0] === 'all')) {
+            finalTypes = this.requestTypeIds;
+        }
+        let finalStages = this.stagesChoice;
+        if ((finalStages.length === 1) && (finalStages[0] === 'all')) {
+            finalStages = this.stages;
+        }
+
+
         this.requestService.searchAllRequestSummaries(this.searchTerm,
-                                                      this.statusesChoice,
-                                                      this.typesChoice,
-                                                      this.stagesChoice,
+                                                      finalStatuses,
+                                                      finalTypes,
+                                                      finalStages,
                                                       currentOffset.toString(),
                                                       this.itemsPerPage.toString(),
                                                       this.order,
@@ -327,7 +341,7 @@ export class RequestsComponent implements OnInit {
 
     toggleOrder() {
         if (this.order === 'ASC') {
-            this.order = 'DESC';
+            this.order = 'DSC';
         } else {
             this.order = 'ASC';
         }

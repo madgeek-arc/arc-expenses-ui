@@ -6,7 +6,7 @@ export const requesterPositions = {RESEARCHER: 'Ερευνητής-ΕΛΕ',
                                    COLLABORATIVE_RESEARCHER: 'Συνεργαζόμενος Ερευνητής',
                                    ADMINISTRATIVE: 'Διοικητικό-Τεχνικό-Βοηθητικό Προσωπικό'};
 
-export const statesList = ['all', 'accepted', 'pending', 'under_review', 'rejected', 'cancelled'];
+export const statesList = ['accepted', 'pending', 'under_review', 'rejected', 'cancelled'];
 
 export const supplierSelectionMethods = ['Απ\' ευθείας ανάθεση', 'Έρευνα αγοράς', 'Διαγωνισμός'];
 export const supplierSelectionMethodsMap = {

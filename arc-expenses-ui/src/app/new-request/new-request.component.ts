@@ -226,7 +226,15 @@ export class NewRequestComponent implements OnInit {
                     () => {
                         this.errorMessage = '';
                         this.showSpinner = false;
-                        this.router.navigate(['/requests']);
+                        this.router.navigate(['/requests'], { queryParams: {status: ['pending', 'under_review'],
+                                                                                            stage: ['all'],
+                                                                                            phase: 0,
+                                                                                            type: ['all'],
+                                                                                            page: 0,
+                                                                                            itemsPerPage: 10,
+                                                                                            orderField: 'creation_date',
+                                                                                            order: 'DSC',
+                                                                                            searchTerm: '' } });
                     }
                 );
             }

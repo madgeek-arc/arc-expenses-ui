@@ -6,9 +6,15 @@ export class Executive {
     email: string;
 }
 
+
 export class RequestSummary {
     baseInfo: BaseInfo;
-    request: Request;
+    requestId: string;
+    requestType: string;
+    projectAcronym: string;
+    instituteName: string;
+    requestFullName: string;
+    canEdit: boolean;
 }
 
 export class Vocabulary {
@@ -89,7 +95,7 @@ export class Project {
     operator: PersonOfInterest[];
     startDate: string;
     endDate: string;
-    totalCost: string;
+    totalCost: number;
     scientificCoordinatorAsDiataktis: boolean;
 }
 
@@ -101,9 +107,11 @@ export class Request {
     archiveId: string;
     projectId: string;
     user: User;
+    onBehalfOf: string;
+    diataktis: PersonOfInterest;
     requesterPosition: RequesterPosition;
     requestStatus: RequestStatus;
-    scientificCoordinatorAsDiataktis: boolean;
+    pois: string[];
     trip: Trip;
 }
 
@@ -229,7 +237,7 @@ export type OrderByType = 'ASC' | 'DSC';
 
 export type StageEvents = 'APPROVE' | 'REJECT' | 'DOWNGRADE' | 'CANCEL';
 
-export type Stages = 'CANCELLED' | 'REJECTED' | 'Stage1' | 'Stage2' | 'Stage3' | 'Stage4' | 'Stage5a' | 'Stage5b' | 'Stage6' | 'Stage7' | 'Stage8' | 'Stage9' | 'Stage10' | 'Stage11' | 'Stage12' | 'Stage13';
+export type Stages = 'CANCELLED' | 'REJECTED' | 'Stage1' | 'Stage2' | 'Stage3' | 'Stage4' | 'Stage5' | 'Stage5a' | 'Stage5b' | 'Stage6' | 'Stage7' | 'Stage8' | 'Stage9' | 'Stage10' | 'Stage11' | 'Stage12' | 'Stage13';
 
 export type Type = 'REGULAR' | 'CONTRACT' | 'SERVICES_CONTRACT' | 'TRIP';
 

@@ -193,9 +193,9 @@ export class ManageRequestsService {
         let typesList = '';
         type.forEach( x => typesList = typesList + '&type=' + x.toUpperCase() );
         let stagesList = '';
-        stage.forEach( x => stagesList = stagesList + '&stage=' + x.toUpperCase() );
+        stage.forEach( x => stagesList = stagesList + '&stage=' + x );
         let url = `${this.apiUrl}getAll?from=${from}&quantity=${quantity}${statusList}${typesList}${stagesList}`;
-        url = url + `&order=${order}&orderField=${orderField}&email=${encodeURIComponent(email)}&searchField=${searchField}`;
+        url = url + `&order=${order}&orderField=${orderField.toUpperCase()}&email=${encodeURIComponent(email)}&searchField=${searchField}`;
 
         console.log(`calling ${url}`);
         return this.http.get<Paging<RequestSummary>>(url, headerOptions).pipe(
