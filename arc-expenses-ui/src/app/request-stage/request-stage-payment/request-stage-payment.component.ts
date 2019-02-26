@@ -251,8 +251,13 @@ export class RequestStagePaymentComponent implements OnInit {
         this.successMessage = '';
 
         if ( this.uploadedFiles ) {
-            for (let i = 0; i < this.uploadedFilesURLs.length; i ++) {
-                this.currentRequestPayment[ this.currentStageName ][ 'attachments' ][i][ 'url' ] = this.uploadedFilesURLs[i];
+            const z = this.currentRequestPayment[this.currentStageName].attachments.findIndex(x => x.url === '');
+            console.log(`z is ${z}`);
+            console.log(`attachments are ${this.currentRequestPayment[this.currentStageName].attachments}`);
+            if (z > -1) {
+                for (let i = 0; i < this.uploadedFilesURLs.length; i++) {
+                    this.currentRequestPayment[ this.currentStageName ][ 'attachments' ][ i + z ][ 'url' ] = this.uploadedFilesURLs[ i ];
+                }
             }
             this.uploadedFilesURLs = [];
             this.uploadedFiles = [];
@@ -313,8 +318,13 @@ export class RequestStagePaymentComponent implements OnInit {
 
     submitRequestAndPayment() {
         if ( this.uploadedFiles ) {
-            for (let i = 0; i < this.uploadedFilesURLs.length; i ++) {
-                this.currentRequestPayment[ this.currentStageName ][ 'attachments' ][i][ 'url' ] = this.uploadedFilesURLs[i];
+            const z = this.currentRequestPayment[this.currentStageName].attachments.findIndex(x => x.url === '');
+            console.log(`z is ${z}`);
+            console.log(`attachments are ${this.currentRequestPayment[this.currentStageName].attachments}`);
+            if (z > -1) {
+                for (let i = 0; i < this.uploadedFilesURLs.length; i++) {
+                    this.currentRequestPayment[ this.currentStageName ][ 'attachments' ][ i + z ][ 'url' ] = this.uploadedFilesURLs[ i ];
+                }
             }
             this.uploadedFilesURLs = [];
             this.uploadedFiles = [];
