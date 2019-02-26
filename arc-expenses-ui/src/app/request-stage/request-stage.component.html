@@ -71,10 +71,15 @@
                       <span>{{ currentRequest.stage1.subject }}</span>
                     </div>
 
-                    <div *ngIf="currentRequest.stage1.attachment" class="no-print" data-html2canvas-ignore>
-                      <a class="uk-link uk-width-1-1@l uk-margin-small-top" (click)="linkToFile()">
-                        Πατήστε εδώ για να κατεβάσετε τα σχετικά αρχεία
-                      </a>
+                    <div *ngIf="currentRequest.stage1.attachments && (currentRequest.stage1.attachments.length > 0)"
+                         class="uk-margin-small-top no-print" data-html2canvas-ignore>
+                        Για λήψη του αρχείου που επιθυμείτε, πατήστε στον αντίστοιχο σύνδεσμο:
+                        <span *ngFor="let f of currentRequest.stage1.attachments; let i = index">
+                        <a class="uk-link uk-width-1-1@l" (click)="linkToFile(i)">
+                          {{ f.filename }}
+                        </a>
+                        <span *ngIf="currentRequest.stage1.attachments.length > i + 1"> |</span>
+                      </span>
                     </div>
                     <div *ngIf="(currentRequest.type === 'trip') && (currentRequest.trip != null)"
                          class="uk-width-1-1@l uk-grid uk-margin-auto-vertical">
@@ -93,7 +98,7 @@
                 <!-- stage 1 form -->
                 <div *ngIf="willShowStage('1') === 1" data-html2canvas-ignore>
                   <stage1-form [currentRequest]="currentRequest"
-                               (emitFile)="getUploadedFile($event)"
+                               (emitFiles)="getUploadedFiles($event)"
                                (emitRequest)="getUpdatedRequest($event)"></stage1-form>
                 </div>
 
@@ -173,7 +178,7 @@
                       <app-stage-loader [stages]="stageLoaderItemList"
                                         (emitGoBack)="getRequestToGoBack($event)"
                                         (emitStage)="getSubmittedStage($event)"
-                                        (emitFile)="getUploadedFile($event)"
+                                        (emitFiles)="getUploadedFiles($event)"
                                         (newValues)="getNewSupplierAndAmount($event)"></app-stage-loader>
 
                   </div>

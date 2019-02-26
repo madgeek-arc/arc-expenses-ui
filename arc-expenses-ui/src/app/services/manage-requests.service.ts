@@ -135,21 +135,22 @@ export class ManageRequestsService {
     }
 
     uploadAttachments<T>(archiveid: string, stage: string, files: File[], mode: string): Observable<HttpEvent<T>> {
-        const url = `${this.apiUrl}store/uploadFile?archiveID=${archiveid}&stage=${stage}&mode=${mode}`;
+        const url = `${this.apiUrl}store/uploadFile`;
         console.log(`calling ${url}`);
 
         const formBody: FormData = new FormData();
+        formBody.append('archiveID', archiveid);
+        formBody.append('stage', stage);
+        formBody.append('mode', mode);
         for (const f of files) {
-            formBody.append('file', f, f.name);
+            formBody.append('files', f, f.name);
         }
 
         const req = new HttpRequest('POST', url, formBody, {
             reportProgress: true,
-            responseType: 'text',
             withCredentials: true
         });
-        return this.http.request(req).pipe(catchError(this.handleError));
-        /*return this.http.request<HttpEvent<T>>('POST', url, {body: formBody, headers: headerOptions.headers, withCredentials: true});*/
+        return this.http.request<HttpEvent<T>>(req).pipe(catchError(this.handleError));
     }
 
     getAttachment (requestId: string, stage: string): Observable<any> {
