@@ -70,6 +70,20 @@ export class Stage1FormComponent implements OnInit {
         this.uploadedFiles = files;
     }
 
+    removeUploadedFile(filename: string) {
+        if (this.uploadedFiles && this.uploadedFiles.some(x => x.name === filename)) {
+            const i = this.uploadedFiles.findIndex(x => x.name === filename);
+            this.uploadedFiles.splice(i, 1);
+        }
+        if (this.currentRequest.stage1.attachments &&
+            this.currentRequest.stage1.attachments.some(x => x.filename === filename)) {
+
+            const i = this.currentRequest.stage1.attachments.findIndex(x => x.filename === filename);
+            this.currentRequest.stage1.attachments.splice(i, 1);
+            this.stage1AttachmentNames.splice(i, 1);
+        }
+    }
+
     updateStage1() {
         console.log(this.updateStage1Form);
         this.errorMessage = '';

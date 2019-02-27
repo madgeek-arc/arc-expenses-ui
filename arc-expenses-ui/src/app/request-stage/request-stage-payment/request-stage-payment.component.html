@@ -72,7 +72,7 @@
                                         </div>
 
                                         <div *ngIf="currentRequest.stage1.attachments" class="uk-margin-small-top no-print" data-html2canvas-ignore>
-                                            Πατήστε τους συνδέσμους για να κατεβάσετε τα σχετικά αρχεία
+                                            Για λήψη του αρχείου που επιθυμείτε, πατήστε στον αντίστοιχο σύνδεσμο:
                                             <a *ngFor="let f of currentRequest.stage1.attachments; let i = index"
                                                class="uk-link uk-width-1-1@l"
                                                (click)="linkToFile(i)">

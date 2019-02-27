@@ -110,8 +110,7 @@ export class StageComponent implements OnInit {
             url = `${url}${this.currentRequestInfo.phaseId}&stage=${this.stageId}&mode=${mode}`;
             console.log(url);
             /* link to download method */
-            window.open(url,
-                      '_blank', 'enabledstatus=0,toolbar=0,menubar=0,location=0');
+            window.open(this.currentStage.attachments[i].url, '_blank', 'enabledstatus=0,toolbar=0,menubar=0,location=0');
         }
     }
 
@@ -119,6 +118,20 @@ export class StageComponent implements OnInit {
         this.stageFormError = '';
         this.uploadedFiles = newFiles;
         console.log(`${this.uploadedFiles.length} files were chosen`);
+    }
+
+    removeUploadedFile(filename: string) {
+        if (this.uploadedFiles && this.uploadedFiles.some(x => x.name === filename)) {
+            const i = this.uploadedFiles.findIndex(x => x.name === filename);
+            this.uploadedFiles.splice(i, 1);
+        }
+        if (this.currentStage.attachments &&
+            this.currentStage.attachments.some(x => x.filename === filename)) {
+
+            const i = this.currentStage.attachments.findIndex(x => x.filename === filename);
+            this.currentStage.attachments.splice(i, 1);
+            this.uploadedFilenames.splice(i, 1);
+        }
     }
 
     approveRequest( approved: boolean ) {

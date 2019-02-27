@@ -38,7 +38,7 @@
 
         <!-- display links to attachments -->
         <div *ngIf="currentStage['attachments']" class="uk-margin-small-top no-print" data-html2canvas-ignore>
-            Πατήστε τους συνδέσμους για να κατεβάσετε τα σχετικά αρχεία
+            Για λήψη του αρχείου που επιθυμείτε, πατήστε στον αντίστοιχο σύνδεσμο:
             <a *ngFor="let f of currentStage['attachments']; let i = index"
                class="uk-link uk-width-1-1@l"
                (click)="linkToFile(i)">
@@ -80,7 +80,8 @@
 
         <!--ATTACHMENT FIELDS-->
         <app-form-upload-files [uploadedFilenames]="uploadedFilenames"
-                                    (emitFiles)="getAttachmentsInput($event)"></app-form-upload-files>
+                               (emitFiles)="getAttachmentsInput($event)"
+                               (emitDelete)="removeUploadedFile($event)"></app-form-upload-files>
 
         <!--BUTTONS-->
         <div *ngIf="stageId !== '6' && stageId !== '11'">

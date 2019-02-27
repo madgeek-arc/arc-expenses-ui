@@ -89,24 +89,28 @@ export class FormUploadFileComponent implements OnInit {
 @Component({
     selector: 'app-form-upload-files',
     template: `
-<div data-tooltip title="Επιλέξτε αρχεία" (drop)="getDroppedFile($event)" (dragover)="allowDrop($event)">
-    <div class="uk-link uk-placeholder uk-text-center uk-margin-top uk-width-1-1" uk-form-custom>
-        <i class="uk-icon-cloud-upload uk-icon-medium uk-text-muted uk-margin-small-right"></i>
-        <input type="file" name="selectedFile" multiple (change)="getInput($event)">
-        <span class="uk-link">Επισυνάψτε τα αρχεία σας ρίχνοντάς τα εδώ ή πατώντας εδώ</span>
-        <div *ngIf="uploadedFilenames.length === 0">επιλέξτε αρχείο</div>
-        <div *ngFor="let f of uploadedFilenames; let i = index"
-             class="uk-text-bold uk-flex-center">
-            <div class="uk-grid uk-child-width-1-4@l uk-child-width-1-2@s">
-                <div>{{ f }}</div>
-                <div>
-                    <a class="uk-link uk-margin-small-left" uk-icon="icon: close" (click)="deleteItem(i)"></a>
-                </div>
+<div class="uk-margin-small-bottom uk-margin-small-top">
+    <div class="uk-placeholder">
+        <div data-tooltip title="Επιλέξτε αρχεία" (drop)="getDroppedFile($event)" (dragover)="allowDrop($event)">
+            <div class="uk-link uk-text-center uk-margin-top uk-width-1-1" uk-form-custom>
+                <i class="uk-icon-cloud-upload uk-icon-medium uk-text-muted uk-margin-small-right"></i>
+                <input type="file" name="selectedFile" multiple (change)="getInput($event)">
+                <span class="uk-link">Επισυνάψτε τα αρχεία σας ρίχνοντάς τα εδώ ή πατώντας εδώ</span>
+                <div *ngIf="uploadedFilenames.length === 0">επιλέξτε αρχείο</div>
+            </div>
+        </div>
+        <div class="uk-flex-center">
+            <div *ngFor="let f of uploadedFilenames; let i = index"
+                 class="uk-text-bold uk-padding-small uk-display-inline-block uk-margin-small-right">
+                <span class="uk-margin-small-right">{{ f }}</span>
+                <span>
+            <a class="uk-link uk-position-z-index" uk-icon="icon: close" (click)="deleteItem(i)"></a>
+        </span>
             </div>
         </div>
     </div>
+    <button class="uk-button uk-button-link" (click)="clearList()">Απόρριψη όλων των αρχείων</button>
 </div>
-<button class="uk-button uk-button-link" (click)="clearList()">Απόρριψη όλων των αρχείων</button>
 `
 })
 export class FormUploadFilesComponent implements OnInit {
@@ -118,6 +122,7 @@ export class FormUploadFilesComponent implements OnInit {
     @Input() uploadedFilenames: string[] = [];
 
     @Output() emitFiles: EventEmitter<File[]> = new EventEmitter<File[]>();
+    @Output() emitDelete: EventEmitter<string> = new EventEmitter<string>();
 
     constructor() {}
 
@@ -151,10 +156,14 @@ export class FormUploadFilesComponent implements OnInit {
 
 
     deleteItem(i: number) {
-        this.uploadedFilenames.splice(i, 1);
-        this.uploadedFiles.splice(i, 1);
-        console.log(this.uploadedFiles);
-        this.emitFiles.emit(this.uploadedFiles);
+        console.log(`deleting ${this.uploadedFilenames[i]}`);
+        if (this.uploadedFiles && this.uploadedFiles.some(x => x.name === this.uploadedFilenames[i])) {
+            const z = this.uploadedFiles.findIndex(x => x.name === this.uploadedFilenames[i]);
+            this.uploadedFiles.splice(z, 1);
+            console.log(`number of uploaded files is ${this.uploadedFiles.length}`);
+            this.emitFiles.emit(this.uploadedFiles);
+        }
+        this.emitDelete.emit(this.uploadedFilenames[i]);
     }
 
     clearList() {

@@ -143,7 +143,7 @@ export class Stage {
 }
 
 export class Stage1 extends Stage {
-    requestDate: string;
+    requestDate: number;
     subject: string;
     supplier: string;
     supplierSelectionMethod: SupplierSelectionMethod;
