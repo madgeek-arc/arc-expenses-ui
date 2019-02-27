@@ -292,7 +292,7 @@ export class NewRequestComponent implements OnInit {
 
     uploadFiles() {
         this.errorMessage = '';
-        this.requestService.uploadAttachments<string[]>(this.request.archiveId, '1', this.uploadedFiles, 'request')
+        this.requestService.uploadAttachments<string[]>(this.request.archiveId, this.request.id, '1', this.uploadedFiles, 'request')
             .subscribe(
                 event => {
                     if (event.type === HttpEventType.UploadProgress) {

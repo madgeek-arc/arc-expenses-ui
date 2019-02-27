@@ -284,6 +284,7 @@ export class RequestStagePaymentComponent implements OnInit {
         this.errorMessage = '';
         const submittedStageNumber = this.currentStageName.split('stage')[1];
         this.requestService.uploadAttachments<string[]>(this.currentRequest.archiveId,
+                                                        this.currentRequestPayment.id,
                                                         submittedStageNumber,
                                                         this.uploadedFiles,
                                                         'payment')
@@ -291,7 +292,7 @@ export class RequestStagePaymentComponent implements OnInit {
                 event => {
                     // console.log('uploadAttachment responded: ', JSON.stringify(event));
                     if (event.type === HttpEventType.UploadProgress) {
-                        console.log('uploadAttachment responded: ', event);
+                        console.log('uploadAttachments responded: ', event);
                     } else if ( event instanceof HttpResponse) {
                         console.log('final event:', event.body);
                         this.uploadedFilesURLs = event.body;

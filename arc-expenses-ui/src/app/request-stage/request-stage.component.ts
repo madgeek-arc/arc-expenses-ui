@@ -390,11 +390,12 @@ export class RequestStageComponent implements OnInit {
     }
 
     uploadFiles() {
-        console.log('uploading file');
+        console.log('uploading files');
         this.showSpinner = true;
         this.errorMessage = '';
         const submittedStageNumber = this.currentStageName.split('stage')[1];
         this.requestService.uploadAttachments<string[]>(this.currentRequest.archiveId,
+                                                     this.currentRequestApproval.id,
                                                      submittedStageNumber,
                                                      this.uploadedFiles,
                                                      this.uploadMode)

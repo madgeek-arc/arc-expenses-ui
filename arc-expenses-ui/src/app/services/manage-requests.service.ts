@@ -134,12 +134,13 @@ export class ManageRequestsService {
         /*return this.http.request<HttpEvent<T>>('POST', url, {body: formBody, headers: headerOptions.headers, withCredentials: true});*/
     }
 
-    uploadAttachments<T>(archiveid: string, stage: string, files: File[], mode: string): Observable<HttpEvent<T>> {
+    uploadAttachments<T>(archiveid: string, id: string, stage: string, files: File[], mode: string): Observable<HttpEvent<T>> {
         const url = `${this.apiUrl}store/uploadFile`;
         console.log(`calling ${url}`);
 
         const formBody: FormData = new FormData();
         formBody.append('archiveID', archiveid);
+        formBody.append('id', id);
         formBody.append('stage', stage);
         formBody.append('mode', mode);
         for (const f of files) {
