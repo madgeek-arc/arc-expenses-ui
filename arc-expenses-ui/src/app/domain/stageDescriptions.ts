@@ -80,7 +80,7 @@ export const checkFeasibilityDesc = {
 
 export  const loanDesc = {
     id: 'loan',
-    label: 'Έγινε ταμειακή διευκόλυνση',
+    label: 'Ταμειακή διευκόλυνση',
     type: 'checkbox',
     description: '',
     required: true

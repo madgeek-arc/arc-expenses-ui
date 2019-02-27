@@ -135,7 +135,7 @@ export class StageComponent implements OnInit {
         if (this.currentStage['attachments'] && this.currentStage['attachments'][i]) {
             /* direct link to the storeService */
             const mode: string = (this.currentRequestInfo.phaseId.includes('a') ? 'approval' : 'payment');
-            let url = `${window.location.origin}/arc-expenses-service/request/store/download?requestId=`;
+            let url = `${window.location.origin}/arc-expenses-service/request/store/download?id=`;
             url = `${url}${this.currentRequestInfo.phaseId}&stage=${this.stageId}&mode=${mode}`;
             url = `${url}&filename=${this.currentStage['attachments'][i]['filename']}`;
             console.log(url);

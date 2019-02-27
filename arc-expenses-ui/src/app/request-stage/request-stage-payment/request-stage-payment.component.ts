@@ -429,7 +429,7 @@ export class RequestStagePaymentComponent implements OnInit {
             this.currentRequest.stage1.attachments[i].url) {
             /*window.open(this.currentRequest.stage1.attachment.url , '_blank', 'enabledstatus=0,toolbar=0,menubar=0,location=0');*/
             let url = `${window.location.origin}/arc-expenses-service/request/store/download?`;
-            url = `${url}requestId=${this.currentRequest.id}&stage=1&mode=request`;
+            url = `${url}id=${this.currentRequest.id}&stage=1&mode=request`;
             url = `${url}&filename=${this.currentRequest.stage1.attachments[i].filename}`;
             console.log(url);
             window.open(url, '_blank', 'enabledstatus=0,toolbar=0,menubar=0,location=0');
