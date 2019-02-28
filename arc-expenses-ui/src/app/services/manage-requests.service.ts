@@ -3,7 +3,7 @@
 * */
 
 import { Injectable } from '@angular/core';
-import { Request, RequestApproval, RequestPayment, RequestSummary } from '../domain/operation';
+import { Request, RequestApproval, RequestPayment, RequestResponse, RequestSummary } from '../domain/operation';
 import { Observable } from 'rxjs/Observable';
 import { HttpClient, HttpErrorResponse, HttpEvent, HttpHeaders, HttpRequest } from '@angular/common/http';
 import { catchError } from 'rxjs/operators';
@@ -38,9 +38,9 @@ export class ManageRequestsService {
         return this.http.request(req).pipe(catchError(this.handleError));
     }
 
-    submitUpdate<T>(mode: string, requestId: string, submittedStage?: FormData): Observable<HttpEvent<T>> {
+    submitUpdate<T>(phase: string, mode: string, requestId: string, submittedStage?: FormData): Observable<HttpEvent<T>> {
         /* AVAILABLE MODES: approve, reject, downgrade, cancel */
-        const url = `${this.apiUrl}${mode}/${requestId}`;
+        const url = `${environment.API_ENDPOINT}/${phase}/${mode}/${requestId}`;
         console.log(`calling ${url}`);
 
         const formData = submittedStage ? submittedStage : new FormData();
@@ -75,12 +75,12 @@ export class ManageRequestsService {
             );
     }
 
-    addRequestPayment(newRequestPayment: RequestPayment): Observable<RequestPayment> {
-        const url = `${this.apiUrl}addRequestPayment`;
+    addRequestPayment(requestId: string): Observable<RequestPayment> {
+        const url = `${this.apiUrl}addPayment/${requestId}`;
         console.log(`calling ${url}`);
-        console.log(`sending ${JSON.stringify(newRequestPayment)}`);
+        console.log(`sending ${JSON.stringify(requestId)}`);
 
-        return this.http.post<RequestPayment>(url, JSON.stringify(newRequestPayment), headerOptions)
+        return this.http.post<RequestPayment>(url, {}, headerOptions)
             .pipe(
                 catchError(this.handleError)
             );
@@ -92,10 +92,10 @@ export class ManageRequestsService {
         return this.http.get<Request>(url, headerOptions);
     }
 
-    getRequestApprovalById(requestApproval: string): Observable<RequestApproval> {
+    getRequestApprovalById(requestApproval: string): Observable<RequestResponse> {
         const url = `${this.apiUrl}approval/getById/${requestApproval}`;
         console.log(`calling ${url}`);
-        return this.http.get<RequestApproval>(url, headerOptions);
+        return this.http.get<RequestResponse>(url, headerOptions);
     }
 
     getRequestPaymentById(requestPaymentId: string): Observable<RequestPayment> {
@@ -187,7 +187,7 @@ export class ManageRequestsService {
 
     searchAllRequestSummaries(searchField: string, status: string[], type: string[],
                               stage: string[], from: string, quantity: string,
-                              order: string, orderField: string, email: string): Observable<Paging<RequestSummary>> {
+                              order: string, orderField: string, editable: string): Observable<Paging<RequestSummary>> {
         let statusList = '';
         status.forEach( x => statusList = statusList + '&status=' + x.toUpperCase() );
         let typesList = '';
@@ -195,7 +195,8 @@ export class ManageRequestsService {
         let stagesList = '';
         stage.forEach( x => stagesList = stagesList + '&stage=' + x );
         let url = `${this.apiUrl}getAll?from=${from}&quantity=${quantity}${statusList}${typesList}${stagesList}`;
-        url = url + `&order=${order}&orderField=${orderField.toUpperCase()}&email=${encodeURIComponent(email)}&searchField=${searchField}`;
+        url = url + `&order=${order}&orderField=${orderField.toUpperCase()}`;
+        url = url + `&editable=${editable}&searchField=${searchField}`;
 
         console.log(`calling ${url}`);
         return this.http.get<Paging<RequestSummary>>(url, headerOptions).pipe(

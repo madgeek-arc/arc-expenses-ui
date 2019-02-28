@@ -1,6 +1,6 @@
 /* shared constants */
 
-export const requestTypes = {REGULAR: 'Προμήθεια', TRIP: 'Ταξίδι', CONTRACT: 'Σύμβαση Έργου', SERVICES_CONTRACT: 'Σύμβαση Υπηρεσίας'};
+export const requestTypes = {REGULAR: 'Προμήθεια', TRIP: 'Ταξίδι', CONTRACT: 'Σύμβαση έργου', SERVICES_CONTRACT: 'Σύμβαση υπηρεσίας'};
 
 export const requesterPositions = {RESEARCHER: 'Ερευνητής-ΕΛΕ',
                                    COLLABORATIVE_RESEARCHER: 'Συνεργαζόμενος Ερευνητής',
@@ -79,7 +79,7 @@ export const checkFeasibilityDesc = {
 
 export  const loanDesc = {
     id: 'loan',
-    label: 'Έγινε ταμειακή διευκόλυνση',
+    label: 'Ταμειακή διευκόλυνση',
     type: 'checkbox',
     description: '',
     required: true

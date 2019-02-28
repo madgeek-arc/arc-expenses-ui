@@ -125,7 +125,7 @@ export class RequestStagePaymentComponent implements OnInit {
         if (this.currentRequestPayment.stage === '7') {
             submitted.append('finalAmount', this.currentRequest.stage1.finalAmount.toString());
         }
-        this.requestService.submitUpdate<any>(mode, this.currentRequest.id, submitted).subscribe(
+        this.requestService.submitUpdate<any>('payment', mode, this.currentRequest.id, submitted).subscribe(
             event => {
                 if (event.type === HttpEventType.UploadProgress) {
                     console.log('uploadAttachment responded: ', event.loaded);

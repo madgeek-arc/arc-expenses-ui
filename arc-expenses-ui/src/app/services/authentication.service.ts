@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { deleteCookie, getCookie } from '../domain/cookieUtils';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { Attachment } from '../domain/operation';
 import { catchError, tap } from 'rxjs/operators';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { environment } from '../../environments/environment';
@@ -31,8 +30,7 @@ export class AuthenticationService {
     isLoggedIn = false;
 
     public loginWithState() {
-        if ( (sessionStorage.getItem('state.location') === undefined) ||
-             (sessionStorage.getItem('state.location') === null) ) {
+        if ( (sessionStorage.getItem('state.location') == null) ) {
             console.log(`logging in with state. Current url is: ${this.router.url}`);
             sessionStorage.setItem('state.location', this.router.url );
         }

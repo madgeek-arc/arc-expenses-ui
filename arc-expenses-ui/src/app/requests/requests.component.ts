@@ -36,6 +36,7 @@ export class RequestsComponent implements OnInit {
 
     /* flags */
     isSimpleUser: boolean;
+    editableSelected: boolean;
     allStatusSelected: boolean;
     allStagesSelected: boolean;
     allPhasesSelected: boolean;
@@ -157,6 +158,7 @@ export class RequestsComponent implements OnInit {
                 }
                 if ( params.has('orderField') ) { this.orderField = params.get('orderField'); }
                 if ( params.has('order') ) { this.order = params.get('order'); }
+                if ( params.has('editable') ) { this.editableSelected = (params.get('editable') === 'true'); }
             }
         );
 
@@ -281,7 +283,7 @@ export class RequestsComponent implements OnInit {
         if ((finalStages.length === 1) && (finalStages[0] === 'all')) {
             finalStages = this.stages;
         }
-
+        const editable = this.editableSelected ? 'true' : 'false';
 
         this.requestService.searchAllRequestSummaries(this.searchTerm,
                                                       finalStatuses,
@@ -291,7 +293,7 @@ export class RequestsComponent implements OnInit {
                                                       this.itemsPerPage.toString(),
                                                       this.order,
                                                       this.orderField,
-                                                      this.authService.getUserProp('email')).subscribe(
+                                                      editable).subscribe(
             res => {
                 if (res) {
                     this.searchResults = res;
@@ -446,6 +448,14 @@ export class RequestsComponent implements OnInit {
         console.log('this.searchTerm is', this.searchTerm);
         this.currentPage = 0;
         // this.getListOfRequests();
+        this.createSearchUrl();
+    }
+
+    toggleEditable(event: any) {
+        this.editableSelected = event.target.checked;
+        if (this.editableSelected) {
+            this.statusesChoice = ['pending', 'under_review'];
+        }
         this.createSearchUrl();
     }
 
@@ -667,10 +677,6 @@ export class RequestsComponent implements OnInit {
         }
     }
 
-    getTrStyle() {
-        return '#f7f7f7';
-    }
-
     createSearchUrl() {
         const url = new URLSearchParams();
 
@@ -685,6 +691,9 @@ export class RequestsComponent implements OnInit {
         url.set('itemsPerPage', this.itemsPerPage.toString());
         url.set('orderField', this.orderField);
         url.set('order', this.order);
+        if (this.editableSelected) {
+            url.set('editable', 'true');
+        }
 
         this.router.navigateByUrl(`/requests?${url.toString()}`)
             .then(() => this.readParams() );

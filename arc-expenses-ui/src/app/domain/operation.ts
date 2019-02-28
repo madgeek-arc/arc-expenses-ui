@@ -1,4 +1,4 @@
-// Generated using typescript-generator version 2.1.406 on 2019-02-14 12:09:11.
+// Generated using typescript-generator version 2.1.406 on 2019-02-27 14:27:04.
 
 export class Executive {
     firstname: string;
@@ -6,10 +6,22 @@ export class Executive {
     email: string;
 }
 
+export class RequestResponse {
+    baseInfo: BaseInfo;
+    requesterPosition: RequesterPosition;
+    type: Type;
+    requestStatus: RequestStatus;
+    stages: { [index: string]: Stage };
+    projectAcronym: string;
+    instituteName: string;
+    requesterFullName: string;
+    onBehalfFullName: string;
+    tripDestination: string;
+    canEdit: boolean;
+}
 
 export class RequestSummary {
     baseInfo: BaseInfo;
-    requestId: string;
     requestType: string;
     projectAcronym: string;
     instituteName: string;
@@ -31,10 +43,11 @@ export class Attachment {
     url: string;
 }
 
+
 export class BaseInfo {
     id: string;
     requestId: string;
-    creationDate: string;
+    creationDate: number;
     stage: string;
     status: Status;
 }
@@ -137,13 +150,13 @@ export class RequestPayment extends BaseInfo {
 export class Stage {
     type: string;
     user: User;
-    date: string;
+    date: number;
     comment: string;
     attachments: Attachment[];
 }
 
 export class Stage1 extends Stage {
-    requestDate: number;
+    requestDate: string;
     subject: string;
     supplier: string;
     supplierSelectionMethod: SupplierSelectionMethod;
@@ -241,10 +254,10 @@ export type Stages = 'CANCELLED' | 'REJECTED' | 'Stage1' | 'Stage2' | 'Stage3' |
 
 export type Type = 'REGULAR' | 'CONTRACT' | 'SERVICES_CONTRACT' | 'TRIP';
 
-export type Status = 'CANCELLED' | 'PENDING' | 'ACCEPTED' | 'UNDER_REVIEW' | 'REJECTED';
-
 export type RequesterPosition = 'RESEARCHER' | 'COLLABORATIVE_RESEARCHER' | 'ADMINISTRATIVE';
 
 export type RequestStatus = 'CANCELLED' | 'PENDING' | 'ACCEPTED' | 'REJECTED';
+
+export type Status = 'CANCELLED' | 'PENDING' | 'ACCEPTED' | 'UNDER_REVIEW' | 'REJECTED';
 
 export type SupplierSelectionMethod = 'DIRECT' | 'MARKET_RESEARCH' | 'AWARD_PROCEDURE';

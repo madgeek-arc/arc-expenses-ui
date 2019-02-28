@@ -234,6 +234,7 @@ export class NewRequestComponent implements OnInit {
                                                                                             itemsPerPage: 10,
                                                                                             orderField: 'creation_date',
                                                                                             order: 'DSC',
+                                                                                            editable: 'true',
                                                                                             searchTerm: '' } });
                     }
                 );

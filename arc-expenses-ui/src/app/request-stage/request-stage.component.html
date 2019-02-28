@@ -6,8 +6,10 @@
       <div class="uk-width-1-1@m uk-first-column">
 
         <h1 id="requestTitle" class="uk-h3 uk-heading-bullet uk-padding-small">
-          Αίτημα {{currentRequest ? currentRequest.id : ''}}
-          <span *ngIf="currentRequest" class="uk-text-small">[{{ reqTypes[currentRequest.type] }}]</span></h1>
+          Αίτημα {{currentRequestApproval ? currentRequestApproval.baseInfo.requestId : ''}}
+          <span *ngIf="currentRequestApproval" class="uk-text-small">
+            [{{ reqTypes[currentRequestApproval.type] }}]</span>
+        </h1>
 
         <!-- TOP HELP CONTENT -->
         <help-content #topHelperContent [position]="'top'"
@@ -36,54 +38,52 @@
                     <div class="uk-width-1-2@l">
                       <span class="uk-text-bold uk-margin-small-right">Πρόγραμμα: </span>
                       <!-- TODO: DISPLAY ACRONYM AND INSTITUTE NAME INSTEAD WHEN THEY BECOME AVAILABLE -->
-                      <span>{{ currentRequest.projectId }}</span>
-                      <!--<span *ngIf="currentRequest.project">-->
-                        <!--{{ currentRequest.project.acronym }} ({{currentRequest.project.institute.name}})-->
-                      <!--</span>-->
+                      <span *ngIf="currentRequestApproval.projectAcronym">
+                        {{ currentRequestApproval.projectAcronym }} ({{currentRequestApproval.instituteName}})
+                      </span>
                     </div>
                     <div class="uk-width-1-2@l">
                       <span class="uk-text-bold uk-margin-small-right">Ημερομηνία υποβολής: </span>
-                      <span>{{ currentRequest.stage1.requestDate | date : 'dd-MM-yyyy' }}</span>
+                      <span>{{ currentRequestApproval.stages['1']['requestDate'] | date : 'dd-MM-yyyy' }}</span>
                     </div>
                     <div class="uk-width-1-1@l">
                       <span class="uk-text-bold uk-margin-small-right">Από: </span>
-                      <span *ngIf="currentRequest.user">
-                      {{ currentRequest.user.firstname }} {{ currentRequest.user.lastname }} ({{ reqPositions[currentRequest.requesterPosition] }})
+                      <span *ngIf="currentRequestApproval.requesterFullName">
+                      {{ currentRequestApproval.requesterFullName }} ({{ reqPositions[currentRequestApproval.requesterPosition] }})
                       </span>
                     </div>
 
-                    <div *ngIf="(currentRequest.type !== 'TRIP') && (currentRequest.type !== 'CONTRACT')" class="uk-width-1-2@l">
+                    <div *ngIf="(currentRequestApproval.type !== 'TRIP') && (currentRequestApproval.type !== 'CONTRACT')" class="uk-width-1-2@l">
                       <span class="uk-text-bold uk-margin-small-right">Προμηθευτής: </span>
-                      <span>{{ currentRequest.stage1.supplier }} ({{ selMethods[currentRequest.stage1.supplierSelectionMethod] }})</span>
+                      <span>{{ currentRequestApproval.stages['1']['supplier'] }} ({{ selMethods[currentRequestApproval.stages['1']['supplierSelectionMethod']] }})</span>
                     </div>
                     <div class="uk-width-1-2@l">
                       <span class="uk-text-bold uk-margin-small-right">
-                        {{ (currentRequest.stage1.amountInEuros !== currentRequest.stage1.finalAmount) ? 'Τελικό π': 'Π' }}οσό: </span>
-                      <span>{{ currentRequest.stage1.finalAmount | currency: 'EUR': 'symbol-narrow' }}</span>
+                        {{ (currentRequestApproval.stages['1']['amountInEuros'] !== currentRequestApproval.stages['1']['finalAmount']) ? 'Τελικό π': 'Π' }}οσό: </span>
+                      <span>{{ currentRequestApproval.stages['1']['finalAmount'] | currency: 'EUR': 'symbol-narrow' }}</span>
                     </div>
 
                     <div class="uk-width-1-1@l">
                       <span class="uk-text-bold uk-margin-small-right">Θέμα:</span>
-                      <span>{{ currentRequest.stage1.subject }}</span>
+                      <span>{{ currentRequestApproval.stages['1']['subject'] }}</span>
                     </div>
 
-                    <div *ngIf="currentRequest.stage1.attachments" class="uk-margin-small-top no-print" data-html2canvas-ignore>
+                    <div *ngIf="currentRequestApproval.stages['1'].attachments" class="uk-margin-small-top no-print" data-html2canvas-ignore>
                       Για λήψη του αρχείου που επιθυμείτε, πατήστε στον αντίστοιχο σύνδεσμο:
-                      <span *ngFor="let f of currentRequest.stage1.attachments; let i = index">
+                      <span *ngFor="let f of currentRequestApproval.stages['1'].attachments; let i = index">
                         <a class="uk-link uk-width-1-1@l" (click)="linkToFile(i)">
                           {{ f.filename }}
                         </a> |
                       </span>
                     </div>
-                    <div *ngIf="(currentRequest.type === 'TRIP') && (currentRequest.trip != null)"
+                    <div *ngIf="(currentRequestApproval.type === 'TRIP') && (currentRequestApproval.onBehalfFullName != null)"
                          class="uk-width-1-1@l uk-grid uk-margin-auto-vertical">
                       <div class="uk-text-bold uk-inline">Λεπτομέρειες ταξιδίου:</div>
                       <div class="uk-inline">
-                        <span *ngIf="currentRequest.trip.email !== currentRequest.user.email"
-                              class="uk-display-block">
-                          <u>Ονοματεπώνυμο:</u> {{ currentRequest.trip.firstname }} {{ currentRequest.trip.lastname }}
+                        <span class="uk-display-block">
+                          <u>Ονοματεπώνυμο:</u> {{ currentRequestApproval.onBehalfFullName }}
                         </span>
-                        <span><u>Προορισμός:</u> {{ currentRequest.trip.destination }}</span>
+                        <span><u>Προορισμός:</u> {{ currentRequestApproval.tripDestination }}</span>
                       </div>
                     </div>
                   </div>
@@ -91,7 +91,7 @@
 
                 <!-- stage 1 form -->
                 <div *ngIf="willShowStage('1') === 1" data-html2canvas-ignore>
-                  <stage1-form [currentRequest]="currentRequest"
+                  <stage1-form [currentRequest]="currentRequestApproval"
                                (emitRequest)="getUpdatedRequest($event)"></stage1-form>
                 </div>
 
@@ -111,58 +111,54 @@
                 </div>
 
                 <!-- Submitted stages display -->
-                  <hr>
+                <hr>
 
-                  <div class="uk-margin-top" *ngIf="currentRequestInfo['2'].showStage >= 1">
-                      <h4>Ανάληψη υποχρέωσης δαπάνης</h4>
-                  </div>
+                <div class="uk-margin-top" *ngIf="currentRequestInfo['2'].showStage >= 1">
+                    <h4>Ανάληψη υποχρέωσης δαπάνης</h4>
+                </div>
 
                 <!-- PHASE 1  -->
                 <div class="uk-child-width-expand uk-grid" uk-grid
-                     *ngIf="((currentRequestInfo['2'].showStage > 1) ||
-                             (currentRequestInfo['3'].showStage > 1) ||
-                             (currentRequestInfo['4'].showStage > 1) )">
+                     *ngIf="currentRequestInfo['2'].showStage > 1">
 
                   <stage2-component class="uk-card uk-card-body uk-card-basic-info uk-margin-left"
                                     *ngIf="currentRequestInfo['2'].showStage > 1"
-                                    [data]="{currentStage: currentRequestApproval.stage2, currentRequestInfo: currentRequestInfo}"></stage2-component>
+                                    [data]="{currentStage: currentRequestApproval.stages['2'], currentRequestInfo: currentRequestInfo}"></stage2-component>
 
                   <stage3-component class="uk-card uk-card-body uk-card-basic-info uk-margin-left"
                                     *ngIf="currentRequestInfo['3'].showStage > 1"
-                                    [data]="{currentStage: currentRequestApproval.stage3, currentRequestInfo: currentRequestInfo}"></stage3-component>
+                                    [data]="{currentStage: currentRequestApproval.stages['3'], currentRequestInfo: currentRequestInfo}"></stage3-component>
 
                   <stage4-component class="uk-card uk-card-body uk-card-basic-info uk-margin-left"
                                     *ngIf="currentRequestInfo['4'].showStage > 1"
-                                    [data]="{currentStage: currentRequestApproval.stage4, currentRequestInfo: currentRequestInfo}"></stage4-component>
+                                    [data]="{currentStage: currentRequestApproval.stages['4'], currentRequestInfo: currentRequestInfo}"></stage4-component>
 
                 </div>
 
 
 
                 <div class="uk-child-width-expand uk-grid" uk-grid
-                     *ngIf="((currentRequestInfo['5a'].showStage > 1) ||
-                             (currentRequestInfo['5b'].showStage > 1) ||
-                             (currentRequestInfo['6'].showStage > 1) )">
+                     *ngIf="currentRequestInfo['5a'].showStage > 1">
 
                   <stage5a-component class="uk-card uk-card-body uk-card-basic-info uk-margin-left"
                                      *ngIf="currentRequestInfo['5a'].showStage > 1"
-                                     [data]="{currentStage: currentRequestApproval.stage5a, currentRequestInfo: currentRequestInfo}"></stage5a-component>
+                                     [data]="{currentStage: currentRequestApproval.stages['5a'], currentRequestInfo: currentRequestInfo}"></stage5a-component>
 
                   <stage5b-component class="uk-card uk-card-body uk-card-basic-info uk-margin-left"
                                      *ngIf="currentRequestInfo['5b'].showStage > 1"
-                                     [data]="{currentStage: currentRequestApproval.stage5b, currentRequestInfo: currentRequestInfo}"></stage5b-component>
+                                     [data]="{currentStage: currentRequestApproval.stages['5b'], currentRequestInfo: currentRequestInfo}"></stage5b-component>
 
                   <stage6-component class="uk-card uk-card-body uk-card-basic-info uk-margin-left"
                                     *ngIf="currentRequestInfo['6'].showStage > 1"
-                                    [data]="{currentStage: currentRequestApproval.stage6, currentRequestInfo: currentRequestInfo}"></stage6-component>
+                                    [data]="{currentStage: currentRequestApproval.stages['6'], currentRequestInfo: currentRequestInfo}"></stage6-component>
 
                 </div>
 
 
                   <!-- Create/Edit pending stage -->
                   <div class="uk-margin-medium-top no-print" data-html2canvas-ignore
-                       *ngIf="(currentRequestApproval.stage !== '1') && (currentRequestInfo[currentRequestApproval.stage].showStage === 1)">
-                      <!--<hr>-->
+                       *ngIf="(currentRequestApproval.baseInfo.stage !== '1') &&
+                              (currentRequestInfo[currentRequestApproval.baseInfo.stage].showStage === 1)">
 
                       <app-stage-loader [stages]="stageLoaderItemList"
                                         (emitStage)="getSubmittedStage($event)"
@@ -171,22 +167,22 @@
                   </div>
 
                 <!-- Message to a simpleUser when the request is pending -->
-                <div *ngIf="isSimpleUser && (currentRequestApproval.stage !== '1')"
+                <div *ngIf="isSimpleUser && (currentRequestApproval.baseInfo.stage !== '1')"
                      class="uk-alert uk-alert-primary uk-text-center uk-margin-top">
-                  Το αίτημά σας {{ stateNames[currentRequest.requestStatus] }}.
+                  Το αίτημά σας {{ stateNames[currentRequestApproval.requestStatus] }}.
                     <!-- TODO: add message about payments?? -->
                 </div>
 
                 <!-- Message to user -->
-                <div *ngIf=" (currentRequest.requestStatus === 'ACCEPTED') ||
-                             (currentRequest.requestStatus === 'REJECTED') ||
-                             (currentRequest.requestStatus === 'CANCELLED')"
+                <div *ngIf=" (currentRequestApproval.requestStatus === 'ACCEPTED') ||
+                             (currentRequestApproval.requestStatus === 'REJECTED') ||
+                             (currentRequestApproval.requestStatus === 'CANCELLED')"
                      class="uk-alert uk-alert-primary uk-text-center uk-margin-top">
-                  Το αίτημα {{ stateNames[currentRequest.requestStatus] }}.
+                  Το αίτημα {{ stateNames[currentRequestApproval.requestStatus] }}.
                 </div>
 
-                <div *ngIf="(currentRequestApproval.status === 'ACCEPTED') &&
-                            (currentRequest.type !== 'CONTRACT')" class="uk-margin-top" data-html2canvas-ignore>
+                <div *ngIf="(currentRequestApproval.baseInfo.status === 'ACCEPTED') &&
+                            (currentRequestApproval.type !== 'CONTRACT')" class="uk-margin-top" data-html2canvas-ignore>
                   <hr>
 
                     <!-- Create Payment button JUST FOR ADMINS -->
@@ -201,12 +197,12 @@
                     <div *ngIf="(currentRequestPayments && (currentRequestPayments.length > 0))">
 
                       <!-- Link to Payment -->
-                      <div *ngIf="(currentRequest.type !== 'SERVICES_CONTRACT')" class="no-print" data-html2canvas-ignore>
+                      <div *ngIf="(currentRequestApproval.type !== 'SERVICES_CONTRACT')" class="no-print" data-html2canvas-ignore>
                           <a [routerLink]="['/requests/request-stage-payment', currentRequestPayments[0].id]">Προβολή Περαίωσης</a>
                       </div>
 
                       <!-- Payments list -->
-                      <div *ngIf="(currentRequest.type === 'SERVICES_CONTRACT')" class="no-print" data-html2canvas-ignore>
+                      <div *ngIf="(currentRequestApproval.type === 'SERVICES_CONTRACT')" class="no-print" data-html2canvas-ignore>
 
                         <div>
                           <h4>Περαιώσεις του αιτήματος</h4>
@@ -232,7 +228,7 @@
                           </div>
                         </div>
 
-                        <div *ngIf="( (canEdit === true) || userIsAdmin() )">
+                        <div *ngIf="( (currentRequestApproval.canEdit === true) || userIsAdmin() )">
                           <button class="uk-button uk-button-primary"
                                   (click)="createRequestPayment()">Προσθήκη Νέας Περαίωσης</button>
                         </div>
@@ -266,11 +262,11 @@
   </div>
 </div>
 
-<div *ngIf="currentRequest" id="cancellationModal" uk-modal>
+<div *ngIf="currentRequestApproval" id="cancellationModal" uk-modal>
   <div class="uk-modal-dialog uk-modal-body">
     <h4 class="uk-modal-title uk-h4">Επιβεβαίωση ακύρωσης</h4>
     <div class="uk-modal-body">
-      Είστε βέβαιοι ότι επιθυμείτε να ακυρώσετε το αίτημα με αρ.Πρ.{{ currentRequest.id }}
+      Είστε βέβαιοι ότι επιθυμείτε να ακυρώσετε το αίτημα με αρ.Πρ.{{ currentRequestApproval.baseInfo.requestId }}
     </div>
     <button class="uk-button uk-button-primary uk-margin-small-right" (click)="confirmedCancel()">Ακύρωση αιτήματος</button>
     <button class="uk-button uk-button-primary uk-modal-close">Επιστροφή στην σελίδα</button>
