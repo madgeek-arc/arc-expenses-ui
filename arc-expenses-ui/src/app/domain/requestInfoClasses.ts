@@ -4,6 +4,7 @@ import { Type } from '@angular/core';
 import { Stage10Component, Stage11Component, Stage12Component, Stage13Component, Stage2Component,
          Stage3Component, Stage4Component, Stage5aComponent, Stage5bComponent, Stage6Component,
          Stage7Component, Stage8Component, Stage9Component } from '../request-stage/stages-components';
+import { Stage10, Stage11, Stage12, Stage13, Stage2, Stage3, Stage4, Stage5a, Stage5b, Stage6, Stage7, Stage8, Stage9 } from './operation';
 
 
 /* Map of the displayed messages according to the stage's outcome (if submitted) */
@@ -62,7 +63,6 @@ export class RequestInfo {
     '2': StageInfo;
     '3': StageInfo;
     '4': StageInfo;
-    '5': StageInfo;
     '5a': StageInfo;
     '5b': StageInfo;
     '6': StageInfo;
@@ -254,6 +254,40 @@ export class RequestInfo {
             )
         );
 
+
+    }
+
+    createNewStageObject(stageid: string) {
+        switch (stageid) {
+            case '2':
+                return new Stage2();
+            case '3':
+                return new Stage3();
+            case '4':
+                return new Stage4();
+            case '5a':
+                return new Stage5a();
+            case '5b':
+                return new Stage5b();
+            case '6':
+                return new Stage6();
+            case '7':
+                return new Stage7();
+            case '8':
+                return new Stage8();
+            case '9':
+                return new Stage9();
+            case '10':
+                return new Stage10();
+            case '11':
+                return new Stage11();
+            case '12':
+                return new Stage12();
+            case '13':
+                return new Stage13();
+            default:
+                return null;
+        }
 
     }
 

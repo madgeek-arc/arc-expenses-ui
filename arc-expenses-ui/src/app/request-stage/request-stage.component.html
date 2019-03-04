@@ -58,9 +58,12 @@
                       <span>{{ currentRequestApproval.stages['1']['supplier'] }} ({{ selMethods[currentRequestApproval.stages['1']['supplierSelectionMethod']] }})</span>
                     </div>
                     <div class="uk-width-1-2@l">
-                      <span class="uk-text-bold uk-margin-small-right">
-                        {{ (currentRequestApproval.stages['1']['amountInEuros'] !== currentRequestApproval.stages['1']['finalAmount']) ? 'Τελικό π': 'Π' }}οσό: </span>
-                      <span>{{ currentRequestApproval.stages['1']['finalAmount'] | currency: 'EUR': 'symbol-narrow' }}</span>
+                      <span class="uk-text-bold uk-margin-small-right">Ποσό: </span>
+                      <span>{{ currentRequestApproval.stages['1']['amountInEuros'] | currency: 'EUR': 'symbol-narrow' }}</span>
+                      <!--TODO: RESTORE CODE BELOW WHEN FINALAMOUNT IS BEING SENT IN STAGE1-->
+                      <!--<span class="uk-text-bold uk-margin-small-right">-->
+                        <!--{{ (currentRequestApproval.stages['1']['amountInEuros'] !== currentRequestApproval.stages['1']['finalAmount']) ? 'Τελικό π': 'Π' }}οσό: </span>-->
+                      <!--<span>{{ currentRequestApproval.stages['1']['finalAmount'] | currency: 'EUR': 'symbol-narrow' }}</span>-->
                     </div>
 
                     <div class="uk-width-1-1@l">
@@ -68,7 +71,8 @@
                       <span>{{ currentRequestApproval.stages['1']['subject'] }}</span>
                     </div>
 
-                    <div *ngIf="currentRequestApproval.stages['1'].attachments" class="uk-margin-small-top no-print" data-html2canvas-ignore>
+                    <div *ngIf="currentRequestApproval.stages['1'].attachments && (currentRequestApproval.stages['1'].attachments.length > 0)"
+                         class="uk-margin-small-top no-print" data-html2canvas-ignore>
                       Για λήψη του αρχείου που επιθυμείτε, πατήστε στον αντίστοιχο σύνδεσμο:
                       <span *ngFor="let f of currentRequestApproval.stages['1'].attachments; let i = index">
                         <a class="uk-link uk-width-1-1@l" (click)="linkToFile(i)">

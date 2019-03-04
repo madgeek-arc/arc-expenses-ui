@@ -189,6 +189,9 @@ export class RequestStageComponent implements OnInit {
               (this.currentRequestApproval.canEdit === true) ) ) {
 
             if (this.currentRequestApproval.baseInfo.stage !== '1') {
+                if (this.currentRequestApproval.stages[stage] == null) {
+                    this.currentRequestApproval.stages[stage] = this.currentRequestInfo.createNewStageObject(stage);
+                }
                 this.stageLoaderItemList = [
                     new AnchorItem(
                         this.currentRequestInfo[stage]['stageComponent'],
@@ -292,7 +295,8 @@ export class RequestStageComponent implements OnInit {
     }
 
     userIsRequester() {
-        return (this.authService.getUserProp('email') === this.currentRequestApproval.stages['1'].user.email);
+        return ((this.authService.getUserProp('firstname') + ' ' + this.authService.getUserProp('lastname')) ===
+                this.currentRequestApproval.requesterFullName);
     }
 
     confirmedCancel() {
