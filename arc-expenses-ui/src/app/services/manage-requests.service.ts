@@ -48,6 +48,7 @@ export class ManageRequestsService {
         const req = new HttpRequest('POST', url, formData, {
             reportProgress: true,
             responseType: 'text',
+            headers : new HttpHeaders().set('Content-Type', 'multipart/form-data'),
             withCredentials: true
         });
         return this.http.request(req).pipe(catchError(this.handleError));

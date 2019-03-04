@@ -180,7 +180,6 @@ export class RequestStageComponent implements OnInit {
     }
 
     willShowStage(stage: string) {
-        const stageField = 'stage' + stage;
         if ((stage === this.currentRequestApproval.baseInfo.stage) &&
             (this.currentRequestApproval.baseInfo.status !== 'REJECTED') &&
             (this.currentRequestApproval.baseInfo.status !== 'ACCEPTED') &&

@@ -127,7 +127,7 @@ export class Stage1FormComponent implements OnInit {
                 }
                 if ( this.uploadedFiles ) {
                     for (const file of this.uploadedFiles) {
-                        updatedRequest.append('files', file, file.name);
+                        updatedRequest.append('attachments', file, file.name);
                     }
                 }
 

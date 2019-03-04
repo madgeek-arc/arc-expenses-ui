@@ -204,7 +204,7 @@ export class NewRequestComponent implements OnInit {
                 }
                 if (this.uploadedFiles) {
                     for (const file of this.uploadedFiles) {
-                        newRequest.append('files', file, file.name);
+                        newRequest.append('attachments', file, file.name);
                     }
                 }
                 this.showSpinner = true;

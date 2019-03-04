@@ -186,7 +186,7 @@ export class StageComponent implements OnInit {
 
                 if (this.uploadedFiles) {
                     for (const f of this.uploadedFiles) {
-                        stageToSubmit.append('file', f, f.name);
+                        stageToSubmit.append('attachments', f, f.name);
                     }
                 }
                 this.emitStage.emit([this.updateMode, this.currentStage]);
