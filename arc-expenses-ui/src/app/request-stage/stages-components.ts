@@ -140,8 +140,7 @@ export class StageComponent implements OnInit {
             url = `${url}&filename=${this.currentStage['attachments'][i]['filename']}`;
             console.log(url);
             /* link to download method */
-            window.open(url,
-                      '_blank', 'enabledstatus=0,toolbar=0,menubar=0,location=0');
+            window.open(url, '_blank', 'enabledstatus=0,toolbar=0,menubar=0,location=0');
         }
     }
 
@@ -152,6 +151,8 @@ export class StageComponent implements OnInit {
 
 
     removeUploadedFile(filename: string) {
+        const z = this.uploadedFilenames.indexOf(filename);
+        this.uploadedFilenames.splice(z, 1);
         if (this.uploadedFiles && this.uploadedFiles.some(x => x.name === filename)) {
             const i = this.uploadedFiles.findIndex(x => x.name === filename);
             this.uploadedFiles.splice(i, 1);
@@ -162,7 +163,6 @@ export class StageComponent implements OnInit {
 
             const i = this.currentStage.attachments.findIndex(x => x.filename === filename);
             this.currentStage.attachments.splice(i, 1);
-            this.uploadedFilenames.splice(i, 1);
         }
     }
 

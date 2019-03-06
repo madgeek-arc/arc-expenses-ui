@@ -134,12 +134,6 @@
                                                     [data]="{currentStage: currentRequestPayment.stage9, currentRequestInfo: currentRequestInfo}"></stage9-component>
                                 </div>
 
-                                <!-- Message to a simpleUser -->
-                                <div *ngIf="isSimpleUser && (currentRequestPayment.stage !== '7')"
-                                     class="uk-alert uk-alert-primary uk-text-center uk-margin-top">
-                                    Το αίτημά σας {{ stateNames[currentRequest.requestStatus] }}.
-                                </div>
-
                                 <div class="uk-child-width-expand uk-grid" uk-grid
                                      *ngIf="((currentRequestInfo['10'].showStage > 1) ||
                                              (currentRequestInfo['11'].showStage > 1) )">
@@ -178,6 +172,21 @@
                                                       (emitFiles)="getUploadedFiles($event)"
                                                       (newValues)="getFinalAmount($event)"></app-stage-loader>
 
+                                </div>
+
+
+                                <!-- Message to a simpleUser -->
+                                <div *ngIf="isSimpleUser && (currentRequestPayment.stage !== '7')"
+                                     class="uk-alert uk-alert-primary uk-text-center uk-margin-top">
+                                    Το αίτημά σας {{ stateNames[currentRequest.requestStatus] }}.
+                                </div>
+
+                                <!-- Message to user -->
+                                <div *ngIf=" (currentRequest.requestStatus === 'accepted') ||
+                                             (currentRequest.requestStatus === 'rejected') ||
+                                             (currentRequest.requestStatus === 'cancelled')"
+                                     class="uk-alert uk-alert-primary uk-text-center uk-margin-top">
+                                    Το αίτημα {{ stateNames[currentRequest.requestStatus] }}.
                                 </div>
 
 

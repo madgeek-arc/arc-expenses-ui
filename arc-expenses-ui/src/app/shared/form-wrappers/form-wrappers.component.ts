@@ -89,7 +89,7 @@ export class FormUploadFileComponent implements OnInit {
 @Component({
     selector: 'app-form-upload-files',
     template: `
-<div class="uk-margin-small-bottom uk-margin-small-top">
+<div class="uk-margin-bottom uk-margin-small-top">
     <div class="uk-placeholder">
         <div data-tooltip title="Επιλέξτε αρχεία" (drop)="getDroppedFile($event)" (dragover)="allowDrop($event)">
             <div class="uk-link uk-text-center uk-margin-top uk-width-1-1" uk-form-custom>
@@ -109,7 +109,9 @@ export class FormUploadFileComponent implements OnInit {
             </div>
         </div>
     </div>
-    <button class="uk-button uk-button-link" (click)="clearList()">Απόρριψη όλων των αρχείων</button>
+    <button *ngIf="uploadedFilenames.length > 0"
+            class="uk-button uk-button-link"
+            (click)="clearList()">Απόρριψη όλων των αρχείων</button>
 </div>
 `
 })
@@ -164,6 +166,7 @@ export class FormUploadFilesComponent implements OnInit {
             this.emitFiles.emit(this.uploadedFiles);
         }
         this.emitDelete.emit(this.uploadedFilenames[i]);
+        console.log(`uploaded filenames are ${this.uploadedFilenames}`);
     }
 
     clearList() {

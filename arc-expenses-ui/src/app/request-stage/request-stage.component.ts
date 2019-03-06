@@ -253,7 +253,7 @@ export class RequestStageComponent implements OnInit {
         console.log('submitted status:', this.currentRequestApproval.status);
         console.log('next stage:', this.currentRequestApproval.stage);
 
-        if ( this.uploadedFiles ) {
+        if ( this.uploadedFiles && (this.uploadedFiles.length > 0) ) {
             this.uploadMode = 'approval';
             this.uploadFiles();
         } else {
@@ -276,7 +276,7 @@ export class RequestStageComponent implements OnInit {
              (!this.currentRequestApproval.stage5b) ) {
             this.currentRequestApproval.stage5b = new Stage5b();
         }
-        if ( this.uploadedFiles ) {
+        if ( this.uploadedFiles && (this.uploadedFiles.length > 0) ) {
             this.uploadMode = 'request';
             this.uploadFiles();
         } else {
@@ -290,7 +290,7 @@ export class RequestStageComponent implements OnInit {
         this.errorMessage = '';
         this.successMessage = '';
 
-        if ( this.uploadedFiles ) {
+        if ( this.uploadedFiles && (this.uploadedFiles.length > 0) ) {
             const z = this.currentRequest.stage1.attachments.findIndex(x => x.url === '');
             console.log(`z is ${z}`);
             console.log(`attachments are ${this.currentRequest.stage1.attachments}`);
@@ -313,7 +313,7 @@ export class RequestStageComponent implements OnInit {
         this.errorMessage = '';
         this.successMessage = '';
 
-        if ( this.uploadedFiles ) {
+        if ( this.uploadedFiles && (this.uploadedFiles.length > 0) ) {
             const z = this.currentRequestApproval[this.currentStageName].attachments.findIndex(x => x.url === '');
             console.log(`z is ${z}`);
             console.log(`attachments are ${this.currentRequestApproval[this.currentStageName].attachments}`);
@@ -334,7 +334,8 @@ export class RequestStageComponent implements OnInit {
                 console.log(error);
                 this.showSpinner = false;
                 this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
-                this.getCurrentRequest();
+                // this.getCurrentRequest();
+                window.scroll(1, 1);
             },
             () => {
                 if ((this.currentRequestApproval.status === 'accepted') && (this.currentRequest.type !== 'contract')) {
@@ -343,6 +344,7 @@ export class RequestStageComponent implements OnInit {
                     this.successMessage = 'Οι αλλαγές αποθηκεύτηκαν.';
                     // this.showSpinner = false;
                     this.getIfUserCanEditRequest();
+                    window.scroll(1, 1);
                 }
             }
         );
@@ -375,7 +377,8 @@ export class RequestStageComponent implements OnInit {
                 console.log(error);
                 this.showSpinner = false;
                 this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
-                this.getCurrentRequest();
+                // this.getCurrentRequest();
+                window.scroll(1, 1);
             },
             () => {
                 if ((this.currentRequestApproval.status === 'accepted') && (this.currentRequest.type !== 'contract')) {
@@ -551,7 +554,8 @@ export class RequestStageComponent implements OnInit {
                 console.log(error);
                 this.showSpinner = false;
                 this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
-                this.getCurrentRequest();
+                // this.getCurrentRequest();
+                window.scroll(1, 1);
             },
             () => {
                 this.successMessage = 'Οι αλλαγές αποθηκεύτηκαν.';
@@ -598,7 +602,7 @@ export class RequestStageComponent implements OnInit {
                         console.log(error);
                         this.showSpinner = false;
                         this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
-                        this.getCurrentRequest();
+                        // this.getCurrentRequest();
                         UIkit.modal('#cancellationModal').hide();
                     },
             () => {

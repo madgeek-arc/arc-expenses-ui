@@ -127,7 +127,7 @@ export class Stage1FormComponent implements OnInit {
                 this.currentRequest.stage1.supplierSelectionMethod = this.updateStage1Form.get('supplierSelectionMethod').value;
                 this.currentRequest.stage1.amountInEuros = +this.updateStage1Form.get('amount').value;
                 this.currentRequest.stage1.finalAmount = +this.updateStage1Form.get('amount').value;
-                if ( this.uploadedFiles ) {
+                if ( this.uploadedFiles && (this.uploadedFiles.length > 0) ) {
                     if ((this.currentRequest.stage1.attachments == null) || (this.currentRequest.stage1.attachments.length === 0)) {
                         this.currentRequest.stage1.attachments = [];
                     }

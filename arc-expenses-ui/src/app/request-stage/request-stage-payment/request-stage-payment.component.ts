@@ -250,7 +250,7 @@ export class RequestStagePaymentComponent implements OnInit {
         this.errorMessage = '';
         this.successMessage = '';
 
-        if ( this.uploadedFiles ) {
+        if ( this.uploadedFiles && (this.uploadedFiles.length > 0) ) {
             const z = this.currentRequestPayment[this.currentStageName].attachments.findIndex(x => x.url === '');
             console.log(`z is ${z}`);
             console.log(`attachments are ${this.currentRequestPayment[this.currentStageName].attachments}`);
@@ -270,6 +270,7 @@ export class RequestStagePaymentComponent implements OnInit {
                 console.log(error);
                 this.showSpinner = false;
                 this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
+                window.scroll(1, 1);
             },
             () => {
                 this.successMessage = 'Οι αλλαγές αποθηκεύτηκαν.';
@@ -318,7 +319,7 @@ export class RequestStagePaymentComponent implements OnInit {
     }
 
     submitRequestAndPayment() {
-        if ( this.uploadedFiles ) {
+        if ( this.uploadedFiles && (this.uploadedFiles.length > 0) ) {
             const z = this.currentRequestPayment[this.currentStageName].attachments.findIndex(x => x.url === '');
             console.log(`z is ${z}`);
             console.log(`attachments are ${this.currentRequestPayment[this.currentStageName].attachments}`);
@@ -345,6 +346,7 @@ export class RequestStagePaymentComponent implements OnInit {
                 console.log(error);
                 this.showSpinner = false;
                 this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
+                window.scroll(1, 1);
             },
             () => {
                 this.successMessage = 'Οι αλλαγές αποθηκεύτηκαν.';
