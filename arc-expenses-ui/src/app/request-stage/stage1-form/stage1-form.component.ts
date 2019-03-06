@@ -71,6 +71,8 @@ export class Stage1FormComponent implements OnInit {
     }
 
     removeUploadedFile(filename: string) {
+        const z = this.stage1AttachmentNames.indexOf(filename);
+        this.stage1AttachmentNames.splice(z, 1);
         if (this.uploadedFiles && this.uploadedFiles.some(x => x.name === filename)) {
             const i = this.uploadedFiles.findIndex(x => x.name === filename);
             this.uploadedFiles.splice(i, 1);
@@ -80,7 +82,6 @@ export class Stage1FormComponent implements OnInit {
 
             const i = this.currentRequest.stage1.attachments.findIndex(x => x.filename === filename);
             this.currentRequest.stage1.attachments.splice(i, 1);
-            this.stage1AttachmentNames.splice(i, 1);
         }
     }
 

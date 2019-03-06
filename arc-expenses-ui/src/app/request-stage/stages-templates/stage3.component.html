@@ -64,11 +64,12 @@
         <!-- display links to attachments -->
         <div *ngIf="currentStage['attachments']" class="uk-margin-small-top no-print" data-html2canvas-ignore>
             Για λήψη του αρχείου που επιθυμείτε, πατήστε στον αντίστοιχο σύνδεσμο:
-            <a *ngFor="let f of currentStage['attachments']; let i = index"
-               class="uk-link uk-width-1-1@l"
-               (click)="linkToFile(i)">
+            <span *ngFor="let f of currentStage.attachments; let i = index">
+              <a class="uk-link uk-width-1-1@l" (click)="linkToFile(i)">
                 {{ f.filename }}
-            </a>
+              </a>
+              <span *ngIf="currentStage.attachments.length > i + 1"> |</span>
+            </span>
         </div>
     </div>
     <!-- END OF STAGE RESULT DISPLAY -->

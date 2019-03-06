@@ -46,16 +46,25 @@
                       <span class="uk-text-bold uk-margin-small-right">Ημερομηνία υποβολής: </span>
                       <span>{{ currentRequestApproval.stages['1']['requestDate'] | date : 'dd-MM-yyyy' }}</span>
                     </div>
-                    <div class="uk-width-1-1@l">
-                      <span class="uk-text-bold uk-margin-small-right">Από: </span>
-                      <span *ngIf="currentRequestApproval.requesterFullName">
-                      {{ currentRequestApproval.requesterFullName }} ({{ reqPositions[currentRequestApproval.requesterPosition] }})
-                      </span>
+                    <div class="uk-width-1-1@l uk-grid">
+                      <div class="uk-width-1-2@l">
+                        <span class="uk-text-bold uk-margin-small-right">Από: </span>
+                        <span *ngIf="currentRequestApproval.requesterFullName">
+                        {{ currentRequestApproval.requesterFullName }} ({{ reqPositions[currentRequestApproval.requesterPosition] }})
+                        </span>
+                      </div>
+                      <div *ngIf="currentRequestApproval.onBehalfFullName" class="uk-width-1-2@l">
+                        <span class="uk-text-bold uk-margin-small-right">Εκ μέρους του/της: </span>
+                        <span>{{ currentRequestApproval.onBehalfFullName }}</span>
+                      </div>
                     </div>
-
                     <div *ngIf="(currentRequestApproval.type !== 'TRIP') && (currentRequestApproval.type !== 'CONTRACT')" class="uk-width-1-2@l">
                       <span class="uk-text-bold uk-margin-small-right">Προμηθευτής: </span>
                       <span>{{ currentRequestApproval.stages['1']['supplier'] }} ({{ selMethods[currentRequestApproval.stages['1']['supplierSelectionMethod']] }})</span>
+                    </div>
+                    <div *ngIf="currentRequestApproval.type === 'TRIP'" class="uk-width-1-2@l">
+                      <span class="uk-text-bold uk-margin-small-right">Προορισμός: </span>
+                      <span>{{ currentRequestApproval.tripDestination }}</span>
                     </div>
                     <div class="uk-width-1-2@l">
                       <span class="uk-text-bold uk-margin-small-right">Ποσό: </span>
@@ -77,18 +86,9 @@
                       <span *ngFor="let f of currentRequestApproval.stages['1'].attachments; let i = index">
                         <a class="uk-link uk-width-1-1@l" (click)="linkToFile(i)">
                           {{ f.filename }}
-                        </a> |
+                        </a>
+                        <span *ngIf="currentRequestApproval.stages['1'].attachments.length > i + 1"> |</span>
                       </span>
-                    </div>
-                    <div *ngIf="(currentRequestApproval.type === 'TRIP') && (currentRequestApproval.onBehalfFullName != null)"
-                         class="uk-width-1-1@l uk-grid uk-margin-auto-vertical">
-                      <div class="uk-text-bold uk-inline">Λεπτομέρειες ταξιδίου:</div>
-                      <div class="uk-inline">
-                        <span class="uk-display-block">
-                          <u>Ονοματεπώνυμο:</u> {{ currentRequestApproval.onBehalfFullName }}
-                        </span>
-                        <span><u>Προορισμός:</u> {{ currentRequestApproval.tripDestination }}</span>
-                      </div>
                     </div>
                   </div>
                 </div>
@@ -232,10 +232,14 @@
                           </div>
                         </div>
 
-                        <div *ngIf="( (currentRequestApproval.canEdit === true) || userIsAdmin() )">
+                      <div *ngIf="( userIsRequester() || userIsAdmin() )">
                           <button class="uk-button uk-button-primary"
                                   (click)="createRequestPayment()">Προσθήκη Νέας Περαίωσης</button>
-                        </div>
+                      </div>
+                      <div *ngIf="( userIsRequester() || userIsAdmin() )">
+                          <button class="uk-button uk-button-primary" type="button" uk-toggle="target: #finalizingModal">
+                              Ολοκλήρωση Αιτήματος</button>
+                      </div>
                       </div>
                     </div>
 
@@ -270,9 +274,22 @@
   <div class="uk-modal-dialog uk-modal-body">
     <h4 class="uk-modal-title uk-h4">Επιβεβαίωση ακύρωσης</h4>
     <div class="uk-modal-body">
-      Είστε βέβαιοι ότι επιθυμείτε να ακυρώσετε το αίτημα με αρ.Πρ.{{ currentRequestApproval.baseInfo.requestId }}
+      Είστε βέβαιοι ότι επιθυμείτε να ακυρώσετε το αίτημα με αρ.Πρ.{{ currentRequestApproval.baseInfo.requestId }};
     </div>
     <button class="uk-button uk-button-primary uk-margin-small-right" (click)="confirmedCancel()">Ακύρωση αιτήματος</button>
+    <button class="uk-button uk-button-primary uk-modal-close">Επιστροφή στην σελίδα</button>
+  </div>
+</div>
+
+<div *ngIf="currentRequestApproval" id="finalizingModal" uk-modal>
+  <div class="uk-modal-dialog uk-modal-body">
+    <h4 class="uk-modal-title uk-h4">Επιβεβαίωση ολοκλήρωσης</h4>
+    <div class="uk-modal-body">
+        Είστε βέβαιοι ότι επιθυμείτε να ολοκληρώσετε το αίτημα με αρ.Πρ.{{ currentRequestApproval.baseInfo.requestId }};
+        <br>
+        Μετά από αυτή την ενέργεια δεν θα είναι δυνατή η προσθήκη νέων περαιώσεων.
+    </div>
+    <button class="uk-button uk-button-primary uk-margin-small-right" (click)="confirmedFinalize()">Ολοκλήρωση αιτήματος</button>
     <button class="uk-button uk-button-primary uk-modal-close">Επιστροφή στην σελίδα</button>
   </div>
 </div>

@@ -117,11 +117,11 @@ export class NewRequestComponent implements OnInit {
             institute: [''],
             position: ['', Validators.required],
             requestText: ['', Validators.required],
-            supplier: [''],
-            supplierSelectionMethod: [''],
-            trip_firstname: [''],
-            trip_lastname: [''],
-            trip_email: [''],
+            supplier: ['', Validators.required],
+            supplierSelectionMethod: ['', Validators.required],
+            onBehalf_firstname: [''],
+            onBehalf_lastname: [''],
+            onBehalf_email: [''],
             trip_destination: [''],
             amount: ['', [Validators.required, Validators.min(0), Validators.pattern('^\\d+(\\.\\d{1,2})?$')] ],
             sciCoord: ['']
@@ -130,29 +130,20 @@ export class NewRequestComponent implements OnInit {
         this.newRequestForm.get('name').disable();
 
         if (this.requestType === 'TRIP') {
-            this.newRequestForm.get('trip_firstname').setValidators([Validators.required]);
-            this.newRequestForm.get('trip_firstname').updateValueAndValidity();
-            this.newRequestForm.get('trip_lastname').setValidators([Validators.required]);
-            this.newRequestForm.get('trip_lastname').updateValueAndValidity();
-            this.newRequestForm.get('trip_email').setValidators([Validators.required, Validators.email]);
-            this.newRequestForm.get('trip_email').updateValueAndValidity();
             this.newRequestForm.get('trip_destination').setValidators([Validators.required]);
             this.newRequestForm.get('trip_destination').updateValueAndValidity();
+        }
+        if ((this.requestType === 'TRIP') || (this.requestType === 'CONTRACT')) {
+            this.newRequestForm.get('supplierSelectionMethod').clearValidators();
+            this.newRequestForm.get('supplier').clearValidators();
+        }
+        if ((this.requestType === 'REGULAR') || (this.requestType === 'SERVICES_CONTRACT')) {
+            this.isSupplierRequired = '(*)';
         }
     }
 
     submitRequest() {
         this.errorMessage = '';
-        if (!this.isRequestOnBehalfOfOther) {
-            console.log('clearing validators');
-            this.newRequestForm.get('trip_firstname').clearValidators();
-            this.newRequestForm.get('trip_firstname').updateValueAndValidity();
-            this.newRequestForm.get('trip_lastname').clearValidators();
-            this.newRequestForm.get('trip_lastname').updateValueAndValidity();
-            this.newRequestForm.get('trip_email').clearValidators();
-            this.newRequestForm.get('trip_email').updateValueAndValidity();
-        }
-
         if (this.newRequestForm.valid ) {
             if ( (+this.newRequestForm.get('amount').value > this.lowAmountLimit) &&
                  (+this.newRequestForm.get('amount').value <= this.amountLimit) &&
@@ -196,11 +187,11 @@ export class NewRequestComponent implements OnInit {
 
                 if (this.requestType === 'TRIP') {
                     newRequest.append('destination', this.newRequestForm.get('trip_destination').value);
-                    if (this.isRequestOnBehalfOfOther) {
-                        newRequest.append('firstName', this.newRequestForm.get('trip_firstname').value);
-                        newRequest.append('lastName', this.newRequestForm.get('trip_lastname').value);
-                        newRequest.append('email', this.newRequestForm.get('trip_email').value);
-                    }
+                }
+                if (this.isRequestOnBehalfOfOther) {
+                    newRequest.append('firstName', this.newRequestForm.get('onBehalf_firstname').value);
+                    newRequest.append('lastName', this.newRequestForm.get('onBehalf_lastname').value);
+                    newRequest.append('email', this.newRequestForm.get('onBehalf_email').value);
                 }
                 if (this.uploadedFiles) {
                     for (const file of this.uploadedFiles) {
@@ -242,6 +233,9 @@ export class NewRequestComponent implements OnInit {
 
         } else {
             this.errorMessage = 'Τα πεδία που σημειώνονται με (*) είναι υποχρεωτικά.';
+            for (const c of Object.keys(this.newRequestForm.getRawValue())) {
+                this.newRequestForm.get(c).markAsTouched();
+            }
         }
         window.scroll(1, 1);
     }
@@ -339,14 +333,30 @@ export class NewRequestComponent implements OnInit {
             (this.newRequestForm.get('supplierSelectionMethod').value === 'AWARD_PROCEDURE')) ) {
 
                 this.isSupplierRequired = '';
+            this.newRequestForm.get('supplier').clearValidators();
         } else {
             this.isSupplierRequired = '(*)';
+            this.newRequestForm.get('supplier').setValidators([Validators.required]);
         }
+        this.newRequestForm.get('supplier').updateValueAndValidity();
     }
 
     toggleOnBehalf(event: any) {
         this.isRequestOnBehalfOfOther = event.target.checked;
         console.log(this.isRequestOnBehalfOfOther);
+        if (this.isRequestOnBehalfOfOther) {
+            this.newRequestForm.get('onBehalf_firstname').setValidators([Validators.required]);
+            this.newRequestForm.get('onBehalf_lastname').setValidators([Validators.required]);
+            this.newRequestForm.get('onBehalf_email').setValidators([Validators.required, Validators.email]);
+        } else {
+            this.newRequestForm.get('onBehalf_firstname').clearValidators();
+            this.newRequestForm.get('onBehalf_lastname').clearValidators();
+            this.newRequestForm.get('onBehalf_email').clearValidators();
+        }
+        this.newRequestForm.get('onBehalf_firstname').updateValueAndValidity();
+        this.newRequestForm.get('onBehalf_lastname').updateValueAndValidity();
+        this.newRequestForm.get('onBehalf_email').updateValueAndValidity();
+
     }
 
 }

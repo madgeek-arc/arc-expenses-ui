@@ -246,11 +246,14 @@ export class RequestStageComponent implements OnInit {
 
     linkToFile(fileIndex: number) {
         if (this.currentRequestApproval.stages['1'].attachments && this.currentRequestApproval.stages['1'].attachments[fileIndex].url) {
-            let url = `${window.location.origin}/arc-expenses-service/request/store/download?`;
-            url = `${url}requestId=${this.currentRequestApproval.baseInfo.id}&stage=1&mode=request`;
-            console.log(url);
-            window.open(this.currentRequestApproval.stages['1'].attachments[fileIndex].url,
-                  '_blank', 'enabledstatus=0,toolbar=0,menubar=0,location=0');
+            // let url = `${window.location.origin}/arc-expenses-service/request/store/download?`;
+            // url = `${url}requestId=${this.currentRequestApproval.baseInfo.requestId}&stage=1&mode=request`;
+            // url = `${url}&filename=${this.currentRequestApproval.stages['1'].attachments[fileIndex].filename}`;
+            let url = `${window.location.origin}/arc-expenses-service/request/store/`;
+            url = `${url}${this.currentRequestApproval.stages['1'].attachments[fileIndex].url}`;
+            // url = `${url}${this.currentRequestApproval.stages['1'].attachments[fileIndex].filename}`;
+            console.log('calling', url);
+            window.open(url, '_blank', 'enabledstatus=0,toolbar=0,menubar=0,location=0');
         }
     }
 
@@ -321,6 +324,10 @@ export class RequestStageComponent implements OnInit {
                 UIkit.modal('#cancellationModal').hide();
             }
         );
+    }
+
+    confirmedFinalize() {
+        UIkit.modal('#finalizingModal').hide();
     }
 
 }

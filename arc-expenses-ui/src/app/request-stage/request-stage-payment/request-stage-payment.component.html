@@ -73,11 +73,12 @@
 
                                         <div *ngIf="currentRequest.stage1.attachments" class="uk-margin-small-top no-print" data-html2canvas-ignore>
                                             Για λήψη του αρχείου που επιθυμείτε, πατήστε στον αντίστοιχο σύνδεσμο:
-                                            <a *ngFor="let f of currentRequest.stage1.attachments; let i = index"
-                                               class="uk-link uk-width-1-1@l"
-                                               (click)="linkToFile(i)">
+                                            <span *ngFor="let f of currentRequest.stage1.attachments; let i = index">
+                                              <a class="uk-link uk-width-1-1@l" (click)="linkToFile(i)">
                                                 {{ f.filename }}
-                                            </a>
+                                              </a>
+                                              <span *ngIf="currentRequest.stage1.attachments.length > i + 1"> |</span>
+                                            </span>
                                         </div>
                                         <div *ngIf="(currentRequest.type === 'TRIP') && (currentRequest.trip != null)"
                                              class="uk-width-1-1@l uk-grid uk-margin-auto-vertical">

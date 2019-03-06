@@ -109,7 +109,8 @@ export class FormUploadFileComponent implements OnInit {
             </div>
         </div>
     </div>
-    <button class="uk-button uk-button-link" (click)="clearList()">Απόρριψη όλων των αρχείων</button>
+    <button *ngIf="uploadedFilenames.length > 0" class="uk-button uk-button-link"
+            (click)="clearList()">Απόρριψη όλων των αρχείων</button>
 </div>
 `
 })
