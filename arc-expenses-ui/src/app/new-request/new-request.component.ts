@@ -33,6 +33,7 @@ export class NewRequestComponent implements OnInit {
     newRequestForm: FormGroup;
 
     uploadedFiles: File[];
+    uploadedFilenames: string[] = [];
 
     requestedAmount: string;
     showWarning: boolean;
@@ -401,6 +402,15 @@ export class NewRequestComponent implements OnInit {
 
     getUploadedFiles(files: File[]) {
         this.uploadedFiles = files;
+    }
+
+    removeUploadedFile(filename: string) {
+        const z = this.uploadedFilenames.indexOf(filename);
+        this.uploadedFilenames.splice(z, 1);
+        if (this.uploadedFiles && this.uploadedFiles.some(x => x.name === filename)) {
+            const i = this.uploadedFiles.findIndex(x => x.name === filename);
+            this.uploadedFiles.splice(i, 1);
+        }
     }
 
     showAmount() {

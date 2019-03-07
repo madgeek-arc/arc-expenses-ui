@@ -96,7 +96,8 @@ export class FormUploadFileComponent implements OnInit {
                 <i class="uk-icon-cloud-upload uk-icon-medium uk-text-muted uk-margin-small-right"></i>
                 <input type="file" name="selectedFile" multiple (change)="getInput($event)">
                 <span class="uk-link">Επισυνάψτε τα αρχεία σας ρίχνοντάς τα εδώ ή πατώντας εδώ</span>
-                <div *ngIf="uploadedFilenames.length === 0">επιλέξτε αρχείο</div>
+                <div *ngIf="uploadedFilenames.length === 0" class="uk-text-bold">Επιλέξτε αρχεία</div>
+                <div *ngIf="uploadedFilenames.length > 0" class="uk-text-bold">Επιλεγμένα αρχεία:</div>
             </div>
         </div>
         <div class="uk-flex-center">
