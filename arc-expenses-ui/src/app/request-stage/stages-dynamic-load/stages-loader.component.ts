@@ -13,7 +13,7 @@ export class StagesLoaderComponent implements OnInit {
     @ViewChild(AnchorDirective) stageHost: AnchorDirective;
 
     @Output() emitStage: EventEmitter<any> = new EventEmitter<any>();
-    @Output() emitFile: EventEmitter<File> = new EventEmitter<File>();
+    @Output() emitFiles: EventEmitter<File[]> = new EventEmitter<File[]>();
     @Output() emitGoBack: EventEmitter<any> = new EventEmitter<any>();
     @Output() newValues: EventEmitter<string[]> = new EventEmitter<string[]>();
 
@@ -36,7 +36,7 @@ export class StagesLoaderComponent implements OnInit {
 
         const componentRef = viewContainerRef.createComponent(componentFactory);
         componentRef.instance['emitStage'].subscribe(emitted => this.emitStage.emit(emitted));
-        componentRef.instance['emitFile'].subscribe(emitted => this.emitFile.emit(emitted));
+        componentRef.instance['emitFiles'].subscribe(emitted => this.emitFiles.emit(emitted));
         componentRef.instance['emitGoBack'].subscribe(emitted => this.emitGoBack.emit(emitted));
         componentRef.instance['newValues'].subscribe(emitted => this.newValues.emit(emitted));
 

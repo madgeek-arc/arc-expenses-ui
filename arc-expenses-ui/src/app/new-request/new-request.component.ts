@@ -32,7 +32,8 @@ export class NewRequestComponent implements OnInit {
 
     newRequestForm: FormGroup;
 
-    uploadedFile: File;
+    uploadedFiles: File[];
+    uploadedFilenames: string[] = [];
 
     requestedAmount: string;
     showWarning: boolean;
@@ -171,22 +172,19 @@ export class NewRequestComponent implements OnInit {
                         ( (this.newRequestForm.get('supplierSelectionMethod').value !== 'competition') &&
                           !this.newRequestForm.get('supplier').value )) {
 
-                // UIkit.modal.alert('Τα πεδία που σημειώνονται με (*) είναι υποχρεωτικά.');
                 this.errorMessage = 'Τα πεδία που σημειώνονται με (*) είναι υποχρεωτικά.';
                 window.scroll(1, 1);
 
             } else if ( (( this.newRequestForm.get('supplierSelectionMethod').value !== 'direct' ) &&
-                           this.checkIfTrip() ) && (!this.uploadedFile) ) {
+                           this.checkIfTrip() ) && ((this.uploadedFiles == null) || (this.uploadedFiles.length === 0)) ) {
 
-                // UIkit.modal.alert('Για αναθέσεις μέσω διαγωνισμού ή έρευνας αγοράς η επισύναψη εγγράφων είναι υποχρεωτική.');
                 this.errorMessage = 'Για αναθέσεις μέσω διαγωνισμού ή έρευνας αγοράς η επισύναψη εγγράφων είναι υποχρεωτική.';
                 window.scroll(1, 1);
 
             } else if ( (this.requestType !== 'services_contract') &&
                         (+this.newRequestForm.get('amount').value > this.lowAmountLimit) &&
-                        (this.uploadedFile === undefined) ) {
+                        ((this.uploadedFiles == null) || (this.uploadedFiles.length === 0)) ) {
 
-                // UIkit.modal.alert('Για αιτήματα άνω των 2.500 € η επισύναψη εγγράφων είναι υποχρεωτική.');
                 this.errorMessage = 'Για αιτήματα άνω των 2.500 € η επισύναψη εγγράφων είναι υποχρεωτική.';
                 window.scroll(1, 1);
 
@@ -206,9 +204,11 @@ export class NewRequestComponent implements OnInit {
                 }
                 this.request.stage1.amountInEuros = +this.newRequestForm.get('amount').value;
                 this.request.stage1.finalAmount = +this.newRequestForm.get('amount').value;
-                if (this.uploadedFile) {
-                    this.request.stage1.attachment = new Attachment(this.uploadedFile.name, this.uploadedFile.type,
-                                                                    this.uploadedFile.size, '');
+                if (this.uploadedFiles) {
+                    this.request.stage1.attachments = [];
+                    for (const file of this.uploadedFiles) {
+                        this.request.stage1.attachments.push(new Attachment(file.name, file.type, file.size, ''));
+                    }
                 }
 
                 if (this.requestType === 'trip') {
@@ -230,12 +230,6 @@ export class NewRequestComponent implements OnInit {
                 this.requestApproval.stage2 = new Stage2();
                 this.requestApproval.stage3 = new Stage3();
                 this.requestApproval.stage4 = new Stage4();
-
-                /*TODO: Uncomment this and remove the line below when we clarify
-                        the case when the scientific coordinator becomes diataktis*/
-                /* if (this.request.stage1.amountInEuros <= this.lowAmount) {
-                    this.requestApproval.stage5a = new Stage5a();
-                } */
                 this.requestApproval.stage5a = new Stage5a();
 
                 if ( (this.requestType === 'contract') || (this.requestType === 'services_contract') ||
@@ -246,8 +240,7 @@ export class NewRequestComponent implements OnInit {
                 this.requestApproval.stage6 = new Stage6();
 
                 window.scrollTo(0, 0);
-                // console.log(JSON.stringify(this.request, null, 2));
-                // console.log(JSON.stringify(this.requestApproval, null, 2));
+
                 this.showSpinner = true;
                 this.errorMessage = '';
                 this.requestService.addRequest(this.request).subscribe (
@@ -264,8 +257,8 @@ export class NewRequestComponent implements OnInit {
                         window.scroll(1, 1);
                     },
                     () => {
-                        if (this.uploadedFile) {
-                            this.uploadFile();
+                        if (this.uploadedFiles && (this.uploadedFiles.length > 0)) {
+                            this.uploadFiles();
                         } else {
                             this.submitRequestApproval();
                         }
@@ -287,7 +280,6 @@ export class NewRequestComponent implements OnInit {
             error => {
                 console.log(error);
                 this.showSpinner = false;
-                // UIkit.modal.alert('Παρουσιάστηκε πρόβλημα με την υποβολή της φόρμας.');
                 this.errorMessage = 'Παρουσιάστηκε πρόβλημα με την υποβολή της φόρμας.';
                 window.scroll(1, 1);
             },
@@ -299,24 +291,23 @@ export class NewRequestComponent implements OnInit {
         );
     }
 
-    uploadFile() {
-        // this.showSpinner = true;
+    uploadFiles() {
         this.errorMessage = '';
-        this.requestService.uploadAttachment<string>(this.request.archiveId, 'stage1', this.uploadedFile, 'request')
+        this.requestService.uploadAttachments<string[]>(this.request.archiveId, this.request.id, '1', this.uploadedFiles, 'request')
             .subscribe(
                 event => {
-                    // console.log('uploadAttachment responded: ', JSON.stringify(event));
                     if (event.type === HttpEventType.UploadProgress) {
-                        console.log('uploadAttachment responded: ', event);
+                        console.log('uploadAttachments responded: ', event);
                     } else if ( event instanceof HttpResponse) {
                         console.log('final event:', event.body);
-                        this.request.stage1.attachment.url = event.body;
+                        for (let i = 0; i < event.body.length; i++) {
+                            this.request.stage1.attachments[i].url = event.body[i];
+                        }
                     }
                 },
                 error => {
                     console.log(error);
                     this.showSpinner = false;
-                    // UIkit.modal.alert('Παρουσιάστηκε πρόβλημα με την επισύναψη του αρχείου.');
                     this.errorMessage = 'Παρουσιάστηκε πρόβλημα με την επισύναψη του αρχείου.';
                     window.scroll(1, 1);
                 },
@@ -328,15 +319,12 @@ export class NewRequestComponent implements OnInit {
                         error => {
                             console.log('from update new request', error);
                             this.showSpinner = false;
-                            // UIkit.modal.alert('Παρουσιάστηκε πρόβλημα με την επισύναψη του αρχείου.');
-                            this.errorMessage = 'Παρουσιάστηκε πρόβλημα με την επισύναψη του αρχείου.';
+                            this.errorMessage = 'Παρουσιάστηκε πρόβλημα με την επισύναψη των αρχείων.';
                             window.scroll(1, 1);
                         },
                         () => {
                             this.errorMessage = '';
                             this.submitRequestApproval();
-                            /*this.showSpinner = false;
-                            this.router.navigate(['/requests']);*/
                         }
                     );
                 }
@@ -400,7 +388,6 @@ export class NewRequestComponent implements OnInit {
     }
 
     updateProgramInput(project: Vocabulary) {
-        /*console.log(this.projects);*/
         this.newRequestForm.get('program').setValue(project.projectAcronym);
         this.chosenProgramID = project.projectID;
         console.log(this.newRequestForm.get('program').value);
@@ -413,9 +400,17 @@ export class NewRequestComponent implements OnInit {
         }
     }
 
-    getUploadedFile(file: File) {
-        // this.uploadedFile = file;
-        this.uploadedFile = file;
+    getUploadedFiles(files: File[]) {
+        this.uploadedFiles = files;
+    }
+
+    removeUploadedFile(filename: string) {
+        const z = this.uploadedFilenames.indexOf(filename);
+        this.uploadedFilenames.splice(z, 1);
+        if (this.uploadedFiles && this.uploadedFiles.some(x => x.name === filename)) {
+            const i = this.uploadedFiles.findIndex(x => x.name === filename);
+            this.uploadedFiles.splice(i, 1);
+        }
     }
 
     showAmount() {

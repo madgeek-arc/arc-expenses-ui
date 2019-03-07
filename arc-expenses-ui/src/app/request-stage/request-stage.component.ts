@@ -28,8 +28,9 @@ export class RequestStageComponent implements OnInit {
     readonly amountLimit = 20000;
     readonly lowAmountLimit = 2500;
 
-    uploadedFile: File;
-    uploadedFileURL: string;
+    uploadedFiles: File[] = [];
+    uploadedFilesURLs: string[] = [];
+
     uploadMode: string;
 
     isSimpleUser: boolean;
@@ -102,12 +103,14 @@ export class RequestStageComponent implements OnInit {
                                                               this.currentRequest.id,
                                                               this.currentRequest.user,
                                                               this.currentRequest.project,
+                                                              this.currentRequest.scientificCoordinatorAsDiataktis,
                                                               this.currentRequest.trip.email);
                 } else {
                     this.currentRequestInfo = new RequestInfo(this.currentRequestApproval.id,
                                                               this.currentRequest.id,
                                                               this.currentRequest.user,
-                                                              this.currentRequest.project);
+                                                              this.currentRequest.project,
+                                                              this.currentRequest.scientificCoordinatorAsDiataktis);
                 }
                 // console.log('diataktis is', this.currentRequestInfo['5a'].stagePOIs);
                 this.checkIfStageIs5b();
@@ -250,9 +253,9 @@ export class RequestStageComponent implements OnInit {
         console.log('submitted status:', this.currentRequestApproval.status);
         console.log('next stage:', this.currentRequestApproval.stage);
 
-        if ( this.uploadedFile ) {
+        if ( this.uploadedFiles && (this.uploadedFiles.length > 0) ) {
             this.uploadMode = 'approval';
-            this.uploadFile();
+            this.uploadFiles();
         } else {
             if (this.requestNeedsUpdate) {
                 this.requestNeedsUpdate = false;
@@ -273,9 +276,9 @@ export class RequestStageComponent implements OnInit {
              (!this.currentRequestApproval.stage5b) ) {
             this.currentRequestApproval.stage5b = new Stage5b();
         }
-        if ( this.uploadedFile ) {
+        if ( this.uploadedFiles && (this.uploadedFiles.length > 0) ) {
             this.uploadMode = 'request';
-            this.uploadFile();
+            this.uploadFiles();
         } else {
             this.submitRequest();
         }
@@ -287,11 +290,17 @@ export class RequestStageComponent implements OnInit {
         this.errorMessage = '';
         this.successMessage = '';
 
-        if ( this.uploadedFile ) {
-
-            this.currentRequest.stage1.attachment.url = this.uploadedFileURL;
-            this.uploadedFileURL = '';
-            this.uploadedFile = null;
+        if ( this.uploadedFiles && (this.uploadedFiles.length > 0) ) {
+            const z = this.currentRequest.stage1.attachments.findIndex(x => x.url === '');
+            console.log(`z is ${z}`);
+            console.log(`attachments are ${this.currentRequest.stage1.attachments}`);
+            if (z > -1) {
+                for (let i = 0; i < this.uploadedFilesURLs.length; i ++) {
+                    this.currentRequest.stage1.attachments[i + z].url = this.uploadedFilesURLs[i];
+                }
+            }
+            this.uploadedFilesURLs = [];
+            this.uploadedFiles = [];
         }
         console.log(`sending ${JSON.stringify(this.currentRequest.stage1, null, 1)} to updateRequest`);
         this.updateRequestAndApproval();
@@ -304,22 +313,29 @@ export class RequestStageComponent implements OnInit {
         this.errorMessage = '';
         this.successMessage = '';
 
-        if ( this.uploadedFile ) {
-
-            this.currentRequestApproval[this.currentStageName]['attachment']['url'] = this.uploadedFileURL;
-            this.uploadedFileURL = '';
-            this.uploadedFile = null;
+        if ( this.uploadedFiles && (this.uploadedFiles.length > 0) ) {
+            const z = this.currentRequestApproval[this.currentStageName].attachments.findIndex(x => x.url === '');
+            console.log(`z is ${z}`);
+            console.log(`attachments are ${this.currentRequestApproval[this.currentStageName].attachments}`);
+            if (z > -1) {
+                for (let i = 0; i < this.uploadedFilesURLs.length; i ++) {
+                    this.currentRequestApproval[ this.currentStageName ][ 'attachments' ][i + z][ 'url' ] = this.uploadedFilesURLs[i];
+                }
+            }
+            this.uploadedFilesURLs = [];
+            this.uploadedFiles = [];
         }
         console.log(`sending ${JSON.stringify(this.currentRequestApproval[this.currentStageName], null, 1)} to updateRequestApproval`);
 
         /*update this.currentRequestApproval*/
-        this.requestService.updateRequestApproval(this.currentRequestApproval).subscribe (
+        this.requestService.updateRequestApproval(this.currentRequestApproval).subscribe(
             res => console.log(`update RequestApproval responded: ${res.id}, status=${res.status}, stage=${res.stage}`),
             error => {
                 console.log(error);
                 this.showSpinner = false;
                 this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
-                this.getCurrentRequest();
+                // this.getCurrentRequest();
+                window.scroll(1, 1);
             },
             () => {
                 if ((this.currentRequestApproval.status === 'accepted') && (this.currentRequest.type !== 'contract')) {
@@ -328,6 +344,7 @@ export class RequestStageComponent implements OnInit {
                     this.successMessage = 'Οι αλλαγές αποθηκεύτηκαν.';
                     // this.showSpinner = false;
                     this.getIfUserCanEditRequest();
+                    window.scroll(1, 1);
                 }
             }
         );
@@ -335,11 +352,17 @@ export class RequestStageComponent implements OnInit {
 
     updateRequestAndApproval() {
         console.log('updating request and approval');
-        if ( (this.uploadedFile) && (this.currentStageName !== 'stage1') ) {
-
-            this.currentRequestApproval[this.currentStageName]['attachment']['url'] = this.uploadedFileURL;
-            this.uploadedFileURL = '';
-            this.uploadedFile = null;
+        if ( (this.uploadedFiles) && (this.currentStageName !== 'stage1') ) {
+            const z = this.currentRequestApproval[this.currentStageName].attachments.findIndex(x => x.url === '');
+            console.log(`z is ${z}`);
+            console.log(`attachments are ${this.currentRequestApproval[this.currentStageName].attachments}`);
+            if (z > -1) {
+                for (let i = 0; i < this.uploadedFilesURLs.length; i ++) {
+                    this.currentRequestApproval[ this.currentStageName ][ 'attachments' ][i + z][ 'url' ] = this.uploadedFilesURLs[i];
+                }
+            }
+            this.uploadedFilesURLs = [];
+            this.uploadedFiles = [];
         }
 
         this.requestService.updateRequest(this.currentRequest, this.authService.getUserProp('email')).pipe(
@@ -354,7 +377,8 @@ export class RequestStageComponent implements OnInit {
                 console.log(error);
                 this.showSpinner = false;
                 this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
-                this.getCurrentRequest();
+                // this.getCurrentRequest();
+                window.scroll(1, 1);
             },
             () => {
                 if ((this.currentRequestApproval.status === 'accepted') && (this.currentRequest.type !== 'contract')) {
@@ -368,27 +392,30 @@ export class RequestStageComponent implements OnInit {
         );
     }
 
-    uploadFile() {
-        console.log('uploading file');
+    uploadFiles() {
+        console.log('uploading files');
         this.showSpinner = true;
         this.errorMessage = '';
-        this.requestService.uploadAttachment<string>(this.currentRequest.archiveId,
-                                                     this.currentStageName,
-                                                     this.uploadedFile,
+        const submittedStageNumber = this.currentStageName.split('stage')[1];
+        this.requestService.uploadAttachments<string[]>(this.currentRequest.archiveId,
+                                                     this.currentRequestApproval.id,
+                                                     submittedStageNumber,
+                                                     this.uploadedFiles,
                                                      this.uploadMode)
             .subscribe(
                 event => {
                     // console.log('uploadAttachment responded: ', JSON.stringify(event));
                     if (event.type === HttpEventType.UploadProgress) {
-                        console.log('uploadAttachment responded: ', event);
+                        console.log('uploadAttachments responded: ', event);
                     } else if ( event instanceof HttpResponse) {
                         console.log('final event:', event.body);
-                        this.uploadedFileURL = event.body;
+                        this.uploadedFilesURLs = event.body;
                     }
                 },
                 error => {
                     console.log(error);
-                    this.uploadedFile = null;
+                    this.uploadedFiles = [];
+                    this.uploadedFilesURLs = [];
                     this.uploadMode = null;
                     this.showSpinner = false;
                     this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
@@ -475,11 +502,11 @@ export class RequestStageComponent implements OnInit {
         }
     }
 
-    linkToFile() {
-        if (this.currentRequest.stage1.attachment && this.currentRequest.stage1.attachment.url) {
-            /*window.open(this.currentRequest.stage1.attachment.url , '_blank', 'enabledstatus=0,toolbar=0,menubar=0,location=0');*/
+    linkToFile(i: number) {
+        if (this.currentRequest.stage1.attachments && this.currentRequest.stage1.attachments[i]) {
             let url = `${window.location.origin}/arc-expenses-service/request/store/download?`;
-            url = `${url}requestId=${this.currentRequest.id}&stage=1&mode=request`;
+            url = `${url}id=${this.currentRequest.id}&stage=1&mode=request`;
+            url = `${url}&filename=${this.currentRequest.stage1.attachments[i].filename}`;
             console.log(url);
             window.open(url, '_blank', 'enabledstatus=0,toolbar=0,menubar=0,location=0');
         }
@@ -494,9 +521,9 @@ export class RequestStageComponent implements OnInit {
         }
     }
 
-    getUploadedFile(file: File) {
-        console.log('I got the file!');
-        this.uploadedFile = file;
+    getUploadedFiles(files: File[]) {
+        console.log('I got the files!');
+        this.uploadedFiles = files;
     }
 
     printRequest() {
@@ -527,7 +554,8 @@ export class RequestStageComponent implements OnInit {
                 console.log(error);
                 this.showSpinner = false;
                 this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
-                this.getCurrentRequest();
+                // this.getCurrentRequest();
+                window.scroll(1, 1);
             },
             () => {
                 this.successMessage = 'Οι αλλαγές αποθηκεύτηκαν.';
@@ -574,7 +602,7 @@ export class RequestStageComponent implements OnInit {
                         console.log(error);
                         this.showSpinner = false;
                         this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
-                        this.getCurrentRequest();
+                        // this.getCurrentRequest();
                         UIkit.modal('#cancellationModal').hide();
                     },
             () => {

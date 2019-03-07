@@ -43,11 +43,16 @@
             <span> {{ currentStage['comment'] }} </span>
         </div>
 
-        <!-- display link to attachment -->
-        <div *ngIf="currentStage['attachment']">
-            <a class="uk-link uk-width-1-1@l uk-margin-small-top" (click)="linkToFile()">
-                Πατήστε εδώ για να κατεβάσετε τα σχετικά αρχεία
-            </a>
+        <!-- display links to attachments -->
+        <div *ngIf="currentStage['attachments'] && (currentStage['attachments'].length > 0)"
+             class="uk-margin-small-top no-print" data-html2canvas-ignore>
+            Για λήψη του αρχείου που επιθυμείτε, πατήστε στον αντίστοιχο σύνδεσμο:
+            <span *ngFor="let f of currentStage['attachments']; let i = index">
+                <a class="uk-link uk-width-1-1@l" (click)="linkToFile(i)">
+                  {{ f.filename }}
+                </a>
+                <span *ngIf="currentStage['attachments'].length > i + 1"> |</span>
+            </span>
         </div>
     </div>
     <!-- END OF STAGE RESULT DISPLAY -->
@@ -81,9 +86,9 @@
             <textarea formControlName="comment" class="uk-form-controls uk-textarea" rows="2"></textarea>
         </app-form-field>
 
-        <!--ATTACHMENT FIELD-->
-        <app-form-upload-file [uploadedFilename]="uploadedFilename" (emitFile)="getAttachmentInput($event)">
-        </app-form-upload-file>
+        <!--ATTACHMENTS FIELDS-->
+        <app-form-upload-files [uploadedFilenames]="uploadedFilenames" (emitFiles)="getAttachmentsInput($event)" (emitDelete)="removeUploadedFile($event)">
+        </app-form-upload-files>
 
         <!--BUTTONS-->
         <button class="uk-button uk-button-primary" (click)="approveRequest(true)">Εγκρίνεται</button>

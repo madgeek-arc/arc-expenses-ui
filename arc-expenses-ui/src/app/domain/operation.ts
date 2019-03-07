@@ -1,27 +1,5 @@
 // Generated using typescript-generator version 2.1.406 on 2018-10-23 13:46:16.
 
-export class RequestFatClass {
-    request_id: string;
-    id: string;
-    user: User;
-    project: Project;
-    stage1: Stage1;
-    stage2: Stage2;
-    stage3: Stage3;
-    stage4: Stage4;
-    stage5: Stage5;
-    stage5a: Stage5a;
-    stage5b: Stage5b;
-    stage6: Stage6;
-    stage7: Stage7;
-    stage8: Stage8;
-    stage9: Stage9;
-    stage10: Stage10;
-    stage11: Stage11;
-    stage12: Stage12;
-    stage13: Stage13;
-}
-
 export class Vocabulary {
     projectID: string;
     projectAcronym: string;
@@ -155,7 +133,7 @@ export class Stage1 {
     supplierSelectionMethod: string;
     amountInEuros: number;
     finalAmount: number;
-    attachment: Attachment;
+    attachments: Attachment[];
 }
 
 export class Stage2 {
@@ -165,7 +143,7 @@ export class Stage2 {
     checkNecessity: boolean;
     approved: boolean;
     comment: string;
-    attachment: Attachment;
+    attachments: Attachment[];
 }
 
 export class Stage3 {
@@ -177,7 +155,7 @@ export class Stage3 {
     loanSource: string;
     approved: boolean;
     comment: string;
-    attachment: Attachment;
+    attachments: Attachment[];
 }
 
 export class Stage4 {
@@ -187,7 +165,7 @@ export class Stage4 {
     fundsAvailable: boolean;
     approved: boolean;
     comment: string;
-    attachment: Attachment;
+    attachments: Attachment[];
 }
 
 export class Stage5 {
@@ -195,7 +173,7 @@ export class Stage5 {
     date: string;
     approved: boolean;
     comment: string;
-    attachment: Attachment;
+    attachments: Attachment[];
 }
 
 export class Stage5a {
@@ -203,7 +181,7 @@ export class Stage5a {
     date: string;
     approved: boolean;
     comment: string;
-    attachment: Attachment;
+    attachments: Attachment[];
 }
 
 export class Stage5b {
@@ -211,14 +189,14 @@ export class Stage5b {
     date: string;
     approved: boolean;
     comment: string;
-    attachment: Attachment;
+    attachments: Attachment[];
 }
 
 export class Stage6 {
     user: User;
     date: string;
     comment: string;
-    attachment: Attachment;
+    attachments: Attachment[];
 }
 
 export class Stage7 {
@@ -226,7 +204,7 @@ export class Stage7 {
     date: string;
     approved: boolean;
     comment: string;
-    attachment: Attachment;
+    attachments: Attachment[];
 }
 
 export class Stage8 {
@@ -236,7 +214,7 @@ export class Stage8 {
     checkLegality: boolean;
     approved: boolean;
     comment: string;
-    attachment: Attachment;
+    attachments: Attachment[];
 }
 
 export class Stage9 {
@@ -246,7 +224,7 @@ export class Stage9 {
     checkLegality: boolean;
     approved: boolean;
     comment: string;
-    attachment: Attachment;
+    attachments: Attachment[];
 }
 
 export class Stage10 {
@@ -254,14 +232,14 @@ export class Stage10 {
     date: string;
     approved: boolean;
     comment: string;
-    attachment: Attachment;
+    attachments: Attachment[];
 }
 
 export class Stage11 {
     user: User;
     date: string;
     comment: string;
-    attachment: Attachment;
+    attachments: Attachment[];
 }
 
 export class Stage12 {
@@ -269,7 +247,7 @@ export class Stage12 {
     date: string;
     approved: boolean;
     comment: string;
-    attachment: Attachment;
+    attachments: Attachment[];
 }
 
 export class Stage13 {
@@ -277,7 +255,7 @@ export class Stage13 {
     date: string;
     approved: boolean;
     comment: string;
-    attachment: Attachment;
+    attachments: Attachment[];
 }
 
 export class Trip {

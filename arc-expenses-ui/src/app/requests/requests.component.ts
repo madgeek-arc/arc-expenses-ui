@@ -661,21 +661,22 @@ export class RequestsComponent implements OnInit {
         }
         if (this.getIfUserCanEdit(req.baseInfo.id, req.request.id,
                                   req.request.user, req.request.project,
-                                  req.baseInfo.stage, travellerEmail)) {
+                                  req.baseInfo.stage, req.request.scientificCoordinatorAsDiataktis, travellerEmail)) {
             return '#f7f7f7';
         } else {
             return '';
         }
     }
 
-    getIfUserCanEdit(id: string, requestId: string, requester: User, project: Project, stage: string, travellerEmail?: string) {
+    getIfUserCanEdit(id: string, requestId: string, requester: User, project: Project,
+                     stage: string, scientificCoordinatorAsDiataktis: boolean, travellerEmail?: string) {
         let newRequestInfo: RequestInfo;
         if (travellerEmail) {
-            newRequestInfo = new RequestInfo(id, requestId, requester, project, travellerEmail);
+            newRequestInfo = new RequestInfo(id, requestId, requester, project, scientificCoordinatorAsDiataktis, travellerEmail);
         } else {
-            newRequestInfo = new RequestInfo(id, requestId, requester, project);
+            newRequestInfo = new RequestInfo(id, requestId, requester, project, scientificCoordinatorAsDiataktis);
         }
-        // console.log('diataktis of', requestId, ' is', newRequestInfo['5a'].stagePOIs);
+
         return (( this.authService.getUserRole().some(x => x.authority === 'ROLE_ADMIN')) ||
                 ( ((stage === '1') || (stage === '7')) && (this.authService.getUserProp('email') === newRequestInfo.requester.email) ) ||
                 ((stage !== '1') &&

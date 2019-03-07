@@ -18,7 +18,7 @@ export class StageComponent implements OnInit {
     /* output variable that sends the new Stage back to the parent component
      * in order to call the api and update the request */
     @Output() emitStage: EventEmitter<any> = new EventEmitter<any>();
-    @Output() emitFile: EventEmitter<File> = new EventEmitter<File>();
+    @Output() emitFiles: EventEmitter<File[]> = new EventEmitter<File[]>();
 
     /* output variable that sends back to the parent an alert that the user
      * chose to go back to the previous stage */
@@ -47,8 +47,8 @@ export class StageComponent implements OnInit {
     stageId: string;
     stageFields: FieldDescription[];
 
-    uploadedFile: File;
-    uploadedFilename = ''; /*a filename to send to the attachment wrapper*/
+    uploadedFiles: File[];
+    uploadedFilenames: string[] = [];
 
     currentStage: any;
     currentRequestInfo: RequestInfo;
@@ -90,9 +90,11 @@ export class StageComponent implements OnInit {
     initializeView() {
         if (this.showStage === 1) {
 
-            /* set filename if exists */
-            if ( this.currentStage['attachment'] ) {
-                this.uploadedFilename = this.currentStage['attachment']['filename'];
+            /* get filenames if attachments exist */
+            if ( this.currentStage['attachments'] ) {
+                for (const f of this.currentStage['attachments']) {
+                    this.uploadedFilenames.push(f.filename);
+                }
             }
 
             /* create form */
@@ -128,25 +130,41 @@ export class StageComponent implements OnInit {
         // !!! if a poi is not found, currentPOI will remain undefined
     }
 
-    linkToFile() {
-        if (this.currentStage['attachment'] && this.currentStage['attachment']['url'].length > 0 ) {
-            /* direct link to the storeService */
-            /*window.open(this.currentStage['attachment']['url'], '_blank', 'enabledstatus=0,toolbar=0,menubar=0,location=0');*/
+    linkToFile(i: number) {
+        if (this.currentStage['attachments'] && this.currentStage['attachments'][i]) {
+
             const mode: string = (this.currentRequestInfo.phaseId.includes('a') ? 'approval' : 'payment');
-            let url = `${window.location.origin}/arc-expenses-service/request/store/download?requestId=`;
+            let url = `${window.location.origin}/arc-expenses-service/request/store/download?id=`;
             url = `${url}${this.currentRequestInfo.phaseId}&stage=${this.stageId}&mode=${mode}`;
-            console.log(url);
+            url = `${url}&filename=${this.currentStage['attachments'][i]['filename']}`;
+
             /* link to download method */
-            window.open(url,
-                      '_blank', 'enabledstatus=0,toolbar=0,menubar=0,location=0');
+            window.open(url, '_blank', 'enabledstatus=0,toolbar=0,menubar=0,location=0');
         }
     }
 
-    getAttachmentInput(newFile: File) {
+    getAttachmentsInput(files: File[]) {
         this.stageFormError = '';
-        this.uploadedFile = newFile;
-        console.log('this.uploadedFile is : ', this.uploadedFile);
+        this.uploadedFiles = files;
     }
+
+
+    removeUploadedFile(filename: string) {
+        const z = this.uploadedFilenames.indexOf(filename);
+        this.uploadedFilenames.splice(z, 1);
+        if (this.uploadedFiles && this.uploadedFiles.some(x => x.name === filename)) {
+            const i = this.uploadedFiles.findIndex(x => x.name === filename);
+            this.uploadedFiles.splice(i, 1);
+            this.emitFiles.emit(this.uploadedFiles);
+        }
+        if (this.currentStage.attachments &&
+            this.currentStage.attachments.some(x => x.filename === filename)) {
+
+            const i = this.currentStage.attachments.findIndex(x => x.filename === filename);
+            this.currentStage.attachments.splice(i, 1);
+        }
+    }
+
 
     approveRequest( approved: boolean ) {
         console.log('approved is:', approved);
@@ -179,8 +197,8 @@ export class StageComponent implements OnInit {
     submitForm() {
         this.stageFormError = '';
         if (this.stageForm && this.stageForm.valid ) {
-            if ( ( (this.uploadedFile === undefined) &&
-                   (this.currentStage['attachment'] === undefined) ) &&
+            if ( ( ((this.uploadedFiles == null) || (this.uploadedFiles.length === 0)) &&
+                   ((this.currentStage['attachments'] == null) || (this.currentStage['attachments'].length === 0)) ) &&
                  !this.choseToGoBack &&
                  ( (this.stageId === '6') || (this.stageId === '11') ||
                    ( (this.stageId === '7') && this.currentStage['approved']) ) ) {
@@ -196,10 +214,13 @@ export class StageComponent implements OnInit {
                     this.currentStage[key.toString()] = this.stageForm.get(key).value;
                 });
 
-                if (this.uploadedFile) {
-                    this.currentStage['attachment'] = this.createAttachment();
-                    this.emitFile.emit(this.uploadedFile);
-
+                if (this.uploadedFiles) {
+                    if ((this.currentStage.attachments == null) || (this.currentStage.attachments.length === 0)) {
+                        this.currentStage.attachments = [];
+                    }
+                    this.currentStage.attachments = this.currentStage.attachments.concat(this.createAttachments());
+                    console.log(`attachments are ${this.currentStage.attachments}`);
+                    this.emitFiles.emit(this.uploadedFiles);
                 }
                 this.emitStage.emit(this.currentStage);
 
@@ -286,19 +307,13 @@ export class StageComponent implements OnInit {
         }
     }
 
-    createAttachment(): Attachment {
-        const tempAttachment: Attachment = new Attachment(this.uploadedFile.name,
-                                                          this.uploadedFile.type,
-                                                          this.uploadedFile.size,
-                                                          '');
-        /*if (this.uploadedFile) {
-            tempAttachment.filename = this.uploadedFile.name;
-            tempAttachment.mimetype = this.uploadedFile.type;
-            tempAttachment.size = this.uploadedFile.size;
-            tempAttachment.url = '';
-        }*/
+    createAttachments(): Attachment[] {
+        const tempAttachments: Attachment[] = [];
 
-        return tempAttachment;
+        for (const f of this.uploadedFiles) {
+            tempAttachments.push( new Attachment(f.name, f.type, f.size, '') );
+        }
+        return tempAttachments;
     }
 
     getCurrentDateString() {

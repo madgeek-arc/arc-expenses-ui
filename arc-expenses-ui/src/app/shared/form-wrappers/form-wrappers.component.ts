@@ -89,32 +89,43 @@ export class FormUploadFileComponent implements OnInit {
 @Component({
     selector: 'app-form-upload-files',
     template: `
-<div data-tooltip title="Επιλέξτε αρχεία" (drop)="getDroppedFile($event)" (dragover)="allowDrop($event)">
-    <div class="uk-link uk-placeholder uk-text-center uk-margin-top uk-width-1-1" uk-form-custom>
-        <i class="uk-icon-cloud-upload uk-icon-medium uk-text-muted uk-margin-small-right"></i>
-        <input type="file" name="selectedFile" multiple (change)="getInput($event)">
-        <span class="uk-link">Επισυνάψτε τα αρχεία σας ρίχνοντάς τα εδώ ή πατώντας εδώ</span>
-        <div *ngIf="uploadedFilenames.length === 0">επιλέξτε αρχείο</div>
-        <div *ngFor="let f of uploadedFilenames; let i = index"
-             class="uk-text-bold uk-grid uk-child-width-1-4@l uk-child-width-1-2@s uk-flex-center">
-            <div>{{ f }}</div>
-            <div>
-                <a class="uk-link uk-margin-small-left" uk-icon="icon: close"
-                       (click)="deleteItem(i)"></a>
+<div class="uk-margin-bottom uk-margin-small-top">
+    <div class="uk-placeholder">
+        <div data-tooltip title="Επιλέξτε αρχεία" (drop)="getDroppedFile($event)" (dragover)="allowDrop($event)">
+            <div class="uk-link uk-text-center uk-margin-top uk-width-1-1" uk-form-custom>
+                <i class="uk-icon-cloud-upload uk-icon-medium uk-text-muted uk-margin-small-right"></i>
+                <input type="file" name="selectedFile" multiple (change)="getInput($event)">
+                <span class="uk-link">Επισυνάψτε τα αρχεία σας ρίχνοντάς τα εδώ ή πατώντας εδώ</span>
+                <div *ngIf="uploadedFilenames.length === 0" class="uk-text-bold">Επιλέξτε αρχεία</div>
+                <div *ngIf="uploadedFilenames.length > 0" class="uk-text-bold">Επιλεγμένα αρχεία:</div>
+            </div>
+        </div>
+        <div class="uk-flex-center">
+            <div *ngFor="let f of uploadedFilenames; let i = index"
+                 class="uk-text-bold uk-padding-small uk-display-inline-block uk-margin-small-right">
+                <span class="uk-margin-small-right">{{ f }}</span>
+                <span>
+                    <a class="uk-link uk-position-z-index" uk-icon="icon: close" (click)="deleteItem(i)"></a>
+                </span>
             </div>
         </div>
     </div>
+    <button *ngIf="uploadedFilenames.length > 0"
+            class="uk-button uk-button-link"
+            (click)="clearList()">Απόρριψη όλων των αρχείων</button>
 </div>
-<button class="uk-button uk-button-link" (click)="clearList()">Διαγραφή όλων των αρχείων</button>
 `
 })
 export class FormUploadFilesComponent implements OnInit {
 
+    /* the file list is updated and emitted to the parent component after every user action
+       (drop - open from explorer - delete one - delete all) */
     uploadedFiles: File[] = [];
 
     @Input() uploadedFilenames: string[] = [];
 
-    @Output() emitFile: EventEmitter<File[]> = new EventEmitter<File[]>();
+    @Output() emitFiles: EventEmitter<File[]> = new EventEmitter<File[]>();
+    @Output() emitDelete: EventEmitter<string> = new EventEmitter<string>();
 
     constructor() {}
 
@@ -129,17 +140,17 @@ export class FormUploadFilesComponent implements OnInit {
             this.uploadedFiles.push(files[i]);
         }
         console.log('droppedFiles are:', JSON.stringify(this.uploadedFilenames));
-        this.emitFile.emit(this.uploadedFiles);
+        this.emitFiles.emit(this.uploadedFiles);
     }
 
     getInput(event: any) {
         const files = event.target.files;
-        for (let i = 0; i < files; i++) {
+        for (let i = 0; i < files.length; i++) {
             this.uploadedFilenames.push(files[i].name);
             this.uploadedFiles.push(files[i]);
         }
         console.log('inputFiles are: ', JSON.stringify(this.uploadedFilenames));
-        this.emitFile.emit(this.uploadedFiles);
+        this.emitFiles.emit(this.uploadedFiles);
     }
 
     allowDrop(event: any) {
@@ -148,16 +159,21 @@ export class FormUploadFilesComponent implements OnInit {
 
 
     deleteItem(i: number) {
-        this.uploadedFilenames.splice(i, 1);
-        this.uploadedFiles.splice(i, 1);
-        console.log(this.uploadedFiles);
-        this.emitFile.emit(this.uploadedFiles);
+        console.log(`deleting ${this.uploadedFilenames[i]}`);
+        if (this.uploadedFiles && this.uploadedFiles.some(x => x.name === this.uploadedFilenames[i])) {
+            const z = this.uploadedFiles.findIndex(x => x.name === this.uploadedFilenames[i]);
+            this.uploadedFiles.splice(z, 1);
+            console.log(`number of uploaded files is ${this.uploadedFiles.length}`);
+            this.emitFiles.emit(this.uploadedFiles);
+        }
+        this.emitDelete.emit(this.uploadedFilenames[i]);
+        console.log(`uploaded filenames are ${this.uploadedFilenames}`);
     }
 
     clearList() {
         this.uploadedFiles = [];
         this.uploadedFilenames = [];
-        this.emitFile.emit(this.uploadedFiles);
+        this.emitFiles.emit(this.uploadedFiles);
     }
 
 

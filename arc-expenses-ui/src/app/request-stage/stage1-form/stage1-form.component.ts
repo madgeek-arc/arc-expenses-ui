@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { Attachment, Request, Stage5b } from '../../domain/operation';
+import { Attachment, Request } from '../../domain/operation';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { supplierSelectionMethodsMap } from '../../domain/stageDescriptions';
 
@@ -15,12 +15,12 @@ export class Stage1FormComponent implements OnInit {
     /* output variable that sends the new Stage back to the parent component
      * in order to call the api and update the request */
     @Output() emitRequest: EventEmitter<any> = new EventEmitter<any>();
-    @Output() emitFile: EventEmitter<File> = new EventEmitter<File>();
+    @Output() emitFiles: EventEmitter<File[]> = new EventEmitter<File[]>();
 
 
     updateStage1Form: FormGroup;
-    stage1AttachmentName = '';
-    uploadedFile: File;
+    stage1AttachmentNames: string[] = [];
+    uploadedFiles: File[] = [];
     requestedAmount: string;
     readonly amountLimit = 20000;
     readonly lowAmountLimit = 2500;
@@ -58,16 +58,34 @@ export class Stage1FormComponent implements OnInit {
             this.updateStage1Form.get('amount').markAsTouched();
         }
 
-        if (this.currentRequest.stage1.attachment) {
-            this.stage1AttachmentName = this.currentRequest.stage1.attachment.filename;
+        if (this.currentRequest.stage1.attachments) {
+            for (const f of this.currentRequest.stage1.attachments) {
+                this.stage1AttachmentNames.push(f.filename);
+            }
         }
         this.isSupplierRequired = (this.currentRequest.type !== 'trip');
     }
 
 
-    getUploadedFile(file: File) {
-        this.uploadedFile = file;
-        this.emitFile.emit(this.uploadedFile);
+    getUploadedFiles(files: File[]) {
+        this.uploadedFiles = files;
+        this.emitFiles.emit(this.uploadedFiles);
+    }
+
+    removeUploadedFile(filename: string) {
+        const z = this.stage1AttachmentNames.indexOf(filename);
+        this.stage1AttachmentNames.splice(z, 1);
+        if (this.uploadedFiles && this.uploadedFiles.some(x => x.name === filename)) {
+            const i = this.uploadedFiles.findIndex(x => x.name === filename);
+            this.uploadedFiles.splice(i, 1);
+            this.emitFiles.emit(this.uploadedFiles);
+        }
+        if (this.currentRequest.stage1.attachments &&
+            this.currentRequest.stage1.attachments.some(x => x.filename === filename)) {
+
+            const i = this.currentRequest.stage1.attachments.findIndex(x => x.filename === filename);
+            this.currentRequest.stage1.attachments.splice(i, 1);
+        }
     }
 
     updateStage1() {
@@ -92,15 +110,15 @@ export class Stage1FormComponent implements OnInit {
 
                 this.errorMessage = 'Είναι υποχρεωτικό να προσθέσετε πληροφορίες για τον προμηθευτή.';
             } else if ( (( this.updateStage1Form.get('supplierSelectionMethod').value !== this.selMethods['direct'] ) &&
-                         ((this.currentRequest.type !== 'trip') &&
-                          (this.currentRequest.type !== 'contract') )) &&
-                        ((!this.uploadedFile) && (!this.currentRequest.stage1.attachment) )) {
+                         ((this.currentRequest.type !== 'trip') && (this.currentRequest.type !== 'contract') )) &&
+                        (((this.uploadedFiles == null) || (this.uploadedFiles.length === 0)) &&
+                         ((this.currentRequest.stage1.attachments == null) || (this.currentRequest.stage1.attachments.length === 0)) )) {
 
                 this.errorMessage = 'Για αναθέσεις μέσω διαγωνισμού ή έρευνας αγοράς η επισύναψη εγγράφων είναι υποχρεωτική.';
             } else if ( (this.currentRequest.type !== 'services_contract') &&
                         (+this.updateStage1Form.get('amount').value > this.lowAmountLimit) &&
-                        (!this.currentRequest.stage1.attachment) &&
-                        !this.uploadedFile ) {
+                        (!this.currentRequest.stage1.attachments) &&
+                        ((this.uploadedFiles == null) || (this.uploadedFiles.length === 0)) ) {
 
                 this.errorMessage = 'Για αιτήματα άνω των 2.500 € η επισύναψη εγγράφων είναι υποχρεωτική.';
             } else {
@@ -110,9 +128,13 @@ export class Stage1FormComponent implements OnInit {
                 this.currentRequest.stage1.supplierSelectionMethod = this.updateStage1Form.get('supplierSelectionMethod').value;
                 this.currentRequest.stage1.amountInEuros = +this.updateStage1Form.get('amount').value;
                 this.currentRequest.stage1.finalAmount = +this.updateStage1Form.get('amount').value;
-                if ( this.uploadedFile ) {
-                    this.currentRequest.stage1.attachment = new Attachment(this.uploadedFile.name, this.uploadedFile.type,
-                                                                           this.uploadedFile.size, '');
+                if ( this.uploadedFiles && (this.uploadedFiles.length > 0) ) {
+                    if ((this.currentRequest.stage1.attachments == null) || (this.currentRequest.stage1.attachments.length === 0)) {
+                        this.currentRequest.stage1.attachments = [];
+                    }
+                    for (const f of this.uploadedFiles) {
+                        this.currentRequest.stage1.attachments.push(new Attachment(f.name, f.type, f.size, ''));
+                    }
                 }
 
                 this.emitRequest.emit(this.currentRequest);

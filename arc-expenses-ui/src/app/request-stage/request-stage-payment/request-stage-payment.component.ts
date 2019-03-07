@@ -23,8 +23,8 @@ export class RequestStagePaymentComponent implements OnInit {
     readonly amountLimit = 20000;
     readonly lowAmountLimit = 2500;
 
-    uploadedFile: File;
-    uploadedFileURL: string;
+    uploadedFiles: File[] = [];
+    uploadedFilesURLs: string[] = [];
 
     updatedFinalAmount: number;
 
@@ -99,12 +99,14 @@ export class RequestStagePaymentComponent implements OnInit {
                                                               this.currentRequest.id,
                                                               this.currentRequest.user,
                                                               this.currentRequest.project,
+                                                              this.currentRequest.scientificCoordinatorAsDiataktis,
                                                               this.currentRequest.trip.email);
                 } else {
                     this.currentRequestInfo = new RequestInfo(this.currentRequestPayment.id,
                                                               this.currentRequest.id,
                                                               this.currentRequest.user,
-                                                              this.currentRequest.project);
+                                                              this.currentRequest.project,
+                                                              this.currentRequest.scientificCoordinatorAsDiataktis);
                 }
                 // console.log('diataktis is', this.currentRequestInfo['5a'].stagePOIs);
                 this.checkIfStageIs7();
@@ -230,8 +232,8 @@ export class RequestStagePaymentComponent implements OnInit {
         this.wentBackOneStage = false;
         console.log('submitted status:', this.currentRequestPayment.status);
 
-        if ( (this.uploadedFile !== undefined) && (this.uploadedFile !== null) ) {
-            this.uploadFile();
+        if ( this.uploadedFiles && (this.uploadedFiles.length > 0) ) {
+            this.uploadFiles();
         } else {
             if (this.requestNeedsUpdate) {
                 this.requestNeedsUpdate = false;
@@ -248,10 +250,17 @@ export class RequestStagePaymentComponent implements OnInit {
         this.errorMessage = '';
         this.successMessage = '';
 
-        if ( this.uploadedFile ) {
-            this.currentRequestPayment[this.currentStageName]['attachment']['url'] = this.uploadedFileURL;
-            this.uploadedFileURL = '';
-            this.uploadedFile = null;
+        if ( this.uploadedFiles && (this.uploadedFiles.length > 0) ) {
+            const z = this.currentRequestPayment[this.currentStageName].attachments.findIndex(x => x.url === '');
+            console.log(`z is ${z}`);
+            console.log(`attachments are ${this.currentRequestPayment[this.currentStageName].attachments}`);
+            if (z > -1) {
+                for (let i = 0; i < this.uploadedFilesURLs.length; i++) {
+                    this.currentRequestPayment[ this.currentStageName ][ 'attachments' ][ i + z ][ 'url' ] = this.uploadedFilesURLs[ i ];
+                }
+            }
+            this.uploadedFilesURLs = [];
+            this.uploadedFiles = [];
         }
         console.log(`sending ${JSON.stringify(this.currentRequestPayment[this.currentStageName], null, 1)} to updateRequestPayment`);
         /*update this.currentRequest*/
@@ -261,6 +270,7 @@ export class RequestStagePaymentComponent implements OnInit {
                 console.log(error);
                 this.showSpinner = false;
                 this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
+                window.scroll(1, 1);
             },
             () => {
                 this.successMessage = 'Οι αλλαγές αποθηκεύτηκαν.';
@@ -270,26 +280,29 @@ export class RequestStagePaymentComponent implements OnInit {
         );
     }
 
-    uploadFile() {
+    uploadFiles() {
         this.showSpinner = true;
         this.errorMessage = '';
-        this.requestService.uploadAttachment<string>(this.currentRequest.archiveId,
-                                                     this.currentStageName,
-                                                     this.uploadedFile,
-                                                     'payment')
+        const submittedStageNumber = this.currentStageName.split('stage')[1];
+        this.requestService.uploadAttachments<string[]>(this.currentRequest.archiveId,
+                                                        this.currentRequestPayment.id,
+                                                        submittedStageNumber,
+                                                        this.uploadedFiles,
+                                                        'payment')
             .subscribe (
                 event => {
                     // console.log('uploadAttachment responded: ', JSON.stringify(event));
                     if (event.type === HttpEventType.UploadProgress) {
-                        console.log('uploadAttachment responded: ', event);
+                        console.log('uploadAttachments responded: ', event);
                     } else if ( event instanceof HttpResponse) {
                         console.log('final event:', event.body);
-                        this.uploadedFileURL = event.body;
+                        this.uploadedFilesURLs = event.body;
                     }
                 },
                 error => {
                     console.log(error);
-                    this.uploadedFile = null;
+                    this.uploadedFiles = [];
+                    this.uploadedFilesURLs = [];
                     this.showSpinner = false;
                     this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
                 },
@@ -306,10 +319,17 @@ export class RequestStagePaymentComponent implements OnInit {
     }
 
     submitRequestAndPayment() {
-        if ( (this.uploadedFile !== undefined) && (this.uploadedFile !== null) ) {
-            this.currentRequestPayment[this.currentStageName]['attachment']['url'] = this.uploadedFileURL;
-            this.uploadedFileURL = '';
-            this.uploadedFile = null;
+        if ( this.uploadedFiles && (this.uploadedFiles.length > 0) ) {
+            const z = this.currentRequestPayment[this.currentStageName].attachments.findIndex(x => x.url === '');
+            console.log(`z is ${z}`);
+            console.log(`attachments are ${this.currentRequestPayment[this.currentStageName].attachments}`);
+            if (z > -1) {
+                for (let i = 0; i < this.uploadedFilesURLs.length; i++) {
+                    this.currentRequestPayment[ this.currentStageName ][ 'attachments' ][ i + z ][ 'url' ] = this.uploadedFilesURLs[ i ];
+                }
+            }
+            this.uploadedFilesURLs = [];
+            this.uploadedFiles = [];
         }
 
         if ( (this.updatedFinalAmount !== undefined) && (this.updatedFinalAmount !== null) ) {
@@ -326,6 +346,7 @@ export class RequestStagePaymentComponent implements OnInit {
                 console.log(error);
                 this.showSpinner = false;
                 this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
+                window.scroll(1, 1);
             },
             () => {
                 this.successMessage = 'Οι αλλαγές αποθηκεύτηκαν.';
@@ -405,16 +426,20 @@ export class RequestStagePaymentComponent implements OnInit {
         }
     }
 
-    linkToFile() {
-        if (this.currentRequest.stage1.attachment && this.currentRequest.stage1.attachment.url) {
-            /*window.open(this.currentRequest.stage1.attachment.url , '_blank', 'enabledstatus=0,toolbar=0,menubar=0,location=0');*/
-            window.open(`${window.location.origin}/arc-expenses-service/request/store/download?requestId=${this.currentRequest.id}&stage=1&mode=request`,
-                '_blank', 'enabledstatus=0,toolbar=0,menubar=0,location=0');
+    linkToFile(i: number) {
+        if (this.currentRequest.stage1.attachments && this.currentRequest.stage1.attachments[i] &&
+            this.currentRequest.stage1.attachments[i].url) {
+
+            let url = `${window.location.origin}/arc-expenses-service/request/store/download?`;
+            url = `${url}id=${this.currentRequest.id}&stage=1&mode=request`;
+            url = `${url}&filename=${this.currentRequest.stage1.attachments[i].filename}`;
+
+            window.open(url, '_blank', 'enabledstatus=0,toolbar=0,menubar=0,location=0');
         }
     }
 
-    getUploadedFile(file: File) {
-        this.uploadedFile = file;
+    getUploadedFiles(files: File[]) {
+        this.uploadedFiles = files;
     }
 
     printRequest(): void {
