@@ -147,7 +147,7 @@ export class RequestInfo {
             this['10'].stagePOIs[0].delegates.splice(i, 1);
         }
 
-        /* TODO:: if a member of the InspectionTeam is requester -> some other member must forward stage 8 */
+        /* if a member of the InspectionTeam is requester -> some other member must forward stage 8 */
         if ( this['8'].stagePOIs.some(i => i.email === this.requester.email) ||
              ((this.travellerEmail != null) && this['8'].stagePOIs.some(i => i.email === this.travellerEmail)) ) {
 
