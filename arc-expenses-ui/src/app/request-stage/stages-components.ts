@@ -102,15 +102,17 @@ export class StageComponent implements OnInit {
     }
 
     linkToFile(i: number) {
-        if (this.currentStage.attachments && this.currentStage.attachments[i] ) {
-            /* direct link to the storeService */
-            /*window.open(this.currentStage['attachment']['url'], '_blank', 'enabledstatus=0,toolbar=0,menubar=0,location=0');*/
+        if (this.currentStage.attachments &&
+            this.currentStage.attachments[i] ) {
+
             const mode: string = (this.currentRequestInfo.phaseId.includes('a') ? 'approval' : 'payment');
-            let url = `${window.location.origin}/arc-expenses-service/request/store/download?requestId=`;
+
+            let url = `${window.location.origin}/arc-expenses-service/request/store/download?id=`;
             url = `${url}${this.currentRequestInfo.phaseId}&stage=${this.stageId}&mode=${mode}`;
-            console.log(url);
+            url = `${url}&filename=${this.currentStage.attachments[i].filename}`;
+
             /* link to download method */
-            window.open(this.currentStage.attachments[i].url, '_blank', 'enabledstatus=0,toolbar=0,menubar=0,location=0');
+            window.open(url, '_blank', 'enabledstatus=0,toolbar=0,menubar=0,location=0');
         }
     }
 

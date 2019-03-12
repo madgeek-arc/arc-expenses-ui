@@ -245,14 +245,13 @@ export class RequestStageComponent implements OnInit {
     }
 
     linkToFile(fileIndex: number) {
-        if (this.currentRequestApproval.stages['1'].attachments && this.currentRequestApproval.stages['1'].attachments[fileIndex].url) {
-            // let url = `${window.location.origin}/arc-expenses-service/request/store/download?`;
-            // url = `${url}requestId=${this.currentRequestApproval.baseInfo.requestId}&stage=1&mode=request`;
-            // url = `${url}&filename=${this.currentRequestApproval.stages['1'].attachments[fileIndex].filename}`;
-            let url = `${window.location.origin}/arc-expenses-service/request/store/`;
-            url = `${url}${this.currentRequestApproval.stages['1'].attachments[fileIndex].url}`;
-            // url = `${url}${this.currentRequestApproval.stages['1'].attachments[fileIndex].filename}`;
-            console.log('calling', url);
+        if (this.currentRequestApproval.stages['1'].attachments &&
+            this.currentRequestApproval.stages['1'].attachments[fileIndex]) {
+
+            let url = `${window.location.origin}/arc-expenses-service/request/store/download?`;
+            url = `${url}id=${this.currentRequestApproval.baseInfo.requestId}&stage=1&mode=request`;
+            url = `${url}&filename=${this.currentRequestApproval.stages['1'].attachments[fileIndex].filename}`;
+
             window.open(url, '_blank', 'enabledstatus=0,toolbar=0,menubar=0,location=0');
         }
     }

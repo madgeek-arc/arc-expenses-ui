@@ -213,11 +213,14 @@ export class RequestStagePaymentComponent implements OnInit {
     }
 
     linkToFile(fileIndex: number) {
-        if (this.currentRequest.stage1.attachments && this.currentRequest.stage1.attachments[fileIndex].url) {
+        if (this.currentRequest.stage1.attachments &&
+            this.currentRequest.stage1.attachments[fileIndex]) {
+
             let url = `${window.location.origin}/arc-expenses-service/request/store/download?`;
-            url = `${url}requestId=${this.currentRequest.id}&stage=1&mode=request`;
-            console.log(url);
-            window.open(this.currentRequest.stage1.attachments[fileIndex].url, '_blank', 'enabledstatus=0,toolbar=0,menubar=0,location=0');
+            url = `${url}id=${this.currentRequest.id}&stage=1&mode=request`;
+            url = `${url}&filename=${this.currentRequest.stage1.attachments[fileIndex].filename}`;
+
+            window.open(url, '_blank', 'enabledstatus=0,toolbar=0,menubar=0,location=0');
         }
     }
 

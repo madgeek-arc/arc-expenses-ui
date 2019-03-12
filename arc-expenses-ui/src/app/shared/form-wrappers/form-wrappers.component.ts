@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FieldDescription } from '../../domain/stageDescriptions';
+import * as uikit from 'uikit';
 
 @Component({
   selector: 'app-form-field',
@@ -89,14 +90,15 @@ export class FormUploadFileComponent implements OnInit {
 @Component({
     selector: 'app-form-upload-files',
     template: `
-<div class="uk-margin-small-bottom uk-margin-small-top">
+<div class="uk-margin-bottom uk-margin-small-top">
     <div class="uk-placeholder">
         <div data-tooltip title="Επιλέξτε αρχεία" (drop)="getDroppedFile($event)" (dragover)="allowDrop($event)">
             <div class="uk-link uk-text-center uk-margin-top uk-width-1-1" uk-form-custom>
                 <i class="uk-icon-cloud-upload uk-icon-medium uk-text-muted uk-margin-small-right"></i>
                 <input type="file" name="selectedFile" multiple (change)="getInput($event)">
                 <span class="uk-link">Επισυνάψτε τα αρχεία σας ρίχνοντάς τα εδώ ή πατώντας εδώ</span>
-                <div *ngIf="uploadedFilenames.length === 0">επιλέξτε αρχείο</div>
+                <div *ngIf="uploadedFilenames.length === 0" class="uk-text-bold">Επιλέξτε αρχεία</div>
+                <div *ngIf="uploadedFilenames.length > 0" class="uk-text-bold">Επιλεγμένα αρχεία:</div>
             </div>
         </div>
         <div class="uk-flex-center">
@@ -104,17 +106,20 @@ export class FormUploadFileComponent implements OnInit {
                  class="uk-text-bold uk-padding-small uk-display-inline-block uk-margin-small-right">
                 <span class="uk-margin-small-right">{{ f }}</span>
                 <span>
-            <a class="uk-link uk-position-z-index" uk-icon="icon: close" (click)="deleteItem(i)"></a>
-        </span>
+                    <a class="uk-link uk-position-z-index" uk-icon="icon: close" (click)="deleteItem(i)"></a>
+                </span>
             </div>
         </div>
     </div>
-    <button *ngIf="uploadedFilenames.length > 0" class="uk-button uk-button-link"
+    <button *ngIf="uploadedFilenames.length > 0"
+            class="uk-button uk-button-link"
             (click)="clearList()">Απόρριψη όλων των αρχείων</button>
 </div>
 `
 })
 export class FormUploadFilesComponent implements OnInit {
+
+    badFilename: string;
 
     /* the file list is updated and emitted to the parent component after every user action
        (drop - open from explorer - delete one - delete all) */
@@ -132,23 +137,39 @@ export class FormUploadFilesComponent implements OnInit {
     getDroppedFile(event: any) {
         event.preventDefault();
         const files = event.dataTransfer.files;
-
-        for (let i = 0; i < files.length; i++) {
-            this.uploadedFilenames.push(files[i].name);
-            this.uploadedFiles.push(files[i]);
-        }
+        this.loadFilesToUploadedList(files);
         console.log('droppedFiles are:', JSON.stringify(this.uploadedFilenames));
         this.emitFiles.emit(this.uploadedFiles);
     }
 
     getInput(event: any) {
         const files = event.target.files;
-        for (let i = 0; i < files.length; i++) {
-            this.uploadedFilenames.push(files[i].name);
-            this.uploadedFiles.push(files[i]);
-        }
+        this.loadFilesToUploadedList(files);
         console.log('inputFiles are: ', JSON.stringify(this.uploadedFilenames));
         this.emitFiles.emit(this.uploadedFiles);
+    }
+
+    loadFilesToUploadedList(files: File[]) {
+        for (const f of files) {
+            // check for illegal filename characters
+            if ( f.name.match(/[!@#$%^&*()=,?"':;{}|< >\[\]\(\)+`~\/\\]/g) ||
+                (f.name.indexOf('.') !== f.name.lastIndexOf('.'))) {
+                this.badFilename = f.name;
+                this.badFilename.replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+                uikit.modal.alert(`<h6 class="uk-modal-title">Μη αποδεκτό όνομα αρχείου<br>(${this.badFilename})</h6>
+                                   <div class="uk-modal-body">
+                                        <div>Τα ονόματα των αρχείων δεν πρέπει να περιέχουν σύμβολα ή κενά.</div>
+                                        <div>Αποδεκτά σύμβολα είναι μόνο τα: \'-\' και \'_\'.</div>
+                                   </div>`);
+            } else {
+                this.uploadedFilenames.push(f.name);
+                this.uploadedFiles.push(f);
+            }
+        }
     }
 
     allowDrop(event: any) {
