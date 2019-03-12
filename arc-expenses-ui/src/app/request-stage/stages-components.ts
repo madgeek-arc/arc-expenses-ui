@@ -214,7 +214,7 @@ export class StageComponent implements OnInit {
                     this.currentStage[key.toString()] = this.stageForm.get(key).value;
                 });
 
-                if (this.uploadedFiles) {
+                if (this.uploadedFiles && (this.uploadedFiles.length > 0)) {
                     if ((this.currentStage.attachments == null) || (this.currentStage.attachments.length === 0)) {
                         this.currentStage.attachments = [];
                     }
