@@ -204,7 +204,7 @@ export class NewRequestComponent implements OnInit {
                 }
                 this.request.stage1.amountInEuros = +this.newRequestForm.get('amount').value;
                 this.request.stage1.finalAmount = +this.newRequestForm.get('amount').value;
-                if (this.uploadedFiles) {
+                if (this.uploadedFiles && (this.uploadedFiles.length > 0)) {
                     this.request.stage1.attachments = [];
                     for (const file of this.uploadedFiles) {
                         this.request.stage1.attachments.push(new Attachment(file.name, file.type, file.size, ''));
