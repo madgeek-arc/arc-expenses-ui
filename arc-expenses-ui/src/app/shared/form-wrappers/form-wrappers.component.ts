@@ -151,7 +151,7 @@ export class FormUploadFilesComponent implements OnInit {
     loadFilesToUploadedList(files: File[]) {
         for (const f of files) {
             // check for illegal filename characters
-            if ( f.name.match(/[!@#$%^&*()=,?"':;{}|< >\[\]\(\)+`~\/\\]/g) ||
+            if ( f.name.match(/[!@#$%^&*()=,?"':;{}|<>\[\]\(\)+`~\/\\]/g) ||
                  (f.name.indexOf('.') !== f.name.lastIndexOf('.'))) {
                 this.badFilename = f.name;
                 this.badFilename.replace(/&/g, '&amp;')
