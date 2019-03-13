@@ -32,7 +32,6 @@ export class ManageRequestsService {
 
         const req = new HttpRequest('POST', url, newRequest, {
             reportProgress: true,
-            responseType: 'text',
             withCredentials: true
         });
         return this.http.request(req).pipe(catchError(this.handleError));
@@ -43,12 +42,11 @@ export class ManageRequestsService {
         const url = `${environment.API_ENDPOINT}/${phase}/${mode}/${requestId}`;
         console.log(`calling ${url}`);
 
-        const formData = submittedStage ? submittedStage : new FormData();
+        let formData = new FormData();
+        if (submittedStage) { formData = submittedStage; }
 
         const req = new HttpRequest('POST', url, formData, {
             reportProgress: true,
-            responseType: 'text',
-            headers : new HttpHeaders().set('Content-Type', 'multipart/form-data'),
             withCredentials: true
         });
         return this.http.request(req).pipe(catchError(this.handleError));

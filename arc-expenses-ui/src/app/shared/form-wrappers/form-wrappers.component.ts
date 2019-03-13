@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FieldDescription } from '../../domain/stageDescriptions';
-import * as uikit from 'uikit';
 
 @Component({
   selector: 'app-form-field',
@@ -119,8 +118,6 @@ export class FormUploadFileComponent implements OnInit {
 })
 export class FormUploadFilesComponent implements OnInit {
 
-    badFilename: string;
-
     /* the file list is updated and emitted to the parent component after every user action
        (drop - open from explorer - delete one - delete all) */
     uploadedFiles: File[] = [];
@@ -151,24 +148,8 @@ export class FormUploadFilesComponent implements OnInit {
 
     loadFilesToUploadedList(files: File[]) {
         for (const f of files) {
-            // check for illegal filename characters
-            if ( f.name.match(/[!@#$%^&*()=,?"':;{}|< >\[\]\(\)+`~\/\\]/g) ||
-                (f.name.indexOf('.') !== f.name.lastIndexOf('.'))) {
-                this.badFilename = f.name;
-                this.badFilename.replace(/&/g, '&amp;')
-                    .replace(/</g, '&lt;')
-                    .replace(/>/g, '&gt;')
-                    .replace(/"/g, '&quot;')
-                    .replace(/'/g, '&#039;');
-                uikit.modal.alert(`<h6 class="uk-modal-title">Μη αποδεκτό όνομα αρχείου<br>(${this.badFilename})</h6>
-                                   <div class="uk-modal-body">
-                                        <div>Τα ονόματα των αρχείων δεν πρέπει να περιέχουν σύμβολα ή κενά.</div>
-                                        <div>Αποδεκτά σύμβολα είναι μόνο τα: \'-\' και \'_\'.</div>
-                                   </div>`);
-            } else {
-                this.uploadedFilenames.push(f.name);
-                this.uploadedFiles.push(f);
-            }
+            this.uploadedFilenames.push(f.name);
+            this.uploadedFiles.push(f);
         }
     }
 
