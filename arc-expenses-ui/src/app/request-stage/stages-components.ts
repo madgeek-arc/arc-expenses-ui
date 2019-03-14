@@ -150,7 +150,7 @@ export class StageComponent implements OnInit {
         }
 
         if ((this.stageId !== '6') && (this.stageId !== '11')) {
-            this.currentStage['approved'] = approved;
+            this.currentStage['approvedjson'] = approved;
         }
 
         this.submitForm();
@@ -184,15 +184,15 @@ export class StageComponent implements OnInit {
             } else {
                 const stageToSubmit = new FormData();
                 Object.keys(this.stageForm.controls).forEach(key => {
-                    stageToSubmit.append(key, this.stageForm.get(key).value);
+                    stageToSubmit.append(key.toString(), this.stageForm.get(key).value);
                 });
 
-                if (this.uploadedFiles) {
+                if (this.uploadedFiles && (this.uploadedFiles.length > 0)) {
                     for (const f of this.uploadedFiles) {
                         stageToSubmit.append('attachments', f, f.name);
                     }
                 }
-                this.emitStage.emit([this.updateMode, this.currentStage]);
+                this.emitStage.emit([this.updateMode, stageToSubmit]);
 
             }
 

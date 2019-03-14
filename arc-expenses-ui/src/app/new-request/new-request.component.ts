@@ -194,7 +194,7 @@ export class NewRequestComponent implements OnInit {
                     newRequest.append('lastName', this.newRequestForm.get('onBehalf_lastname').value);
                     newRequest.append('email', this.newRequestForm.get('onBehalf_email').value);
                 }
-                if (this.uploadedFiles) {
+                if (this.uploadedFiles && (this.uploadedFiles.length > 0)) {
                     for (const file of this.uploadedFiles) {
                         newRequest.append('attachments', file, file.name);
                     }

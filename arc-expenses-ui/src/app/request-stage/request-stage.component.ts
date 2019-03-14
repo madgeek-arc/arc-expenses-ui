@@ -301,7 +301,8 @@ export class RequestStageComponent implements OnInit {
     }
 
     confirmedCancel() {
-        this.requestService.submitUpdate<any>('request', 'cancel', this.currentRequestApproval.baseInfo.requestId).subscribe(
+        this.requestService.submitUpdate<any>('request', 'cancel',
+                                               this.currentRequestApproval.baseInfo.requestId).subscribe(
             event => {
                 if (event.type === HttpEventType.UploadProgress) {
                     console.log('cancel request responded: ', event.loaded);

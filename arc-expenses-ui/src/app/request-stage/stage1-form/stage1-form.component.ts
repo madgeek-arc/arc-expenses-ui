@@ -126,7 +126,7 @@ export class Stage1FormComponent implements OnInit {
                     updatedRequest.append('supplier', this.updateStage1Form.get('supplier').value);
                     updatedRequest.append('supplier_selection_method', this.updateStage1Form.get('supplierSelectionMethod').value);
                 }
-                if ( this.uploadedFiles ) {
+                if ( this.uploadedFiles && (this.uploadedFiles.length > 0) ) {
                     for (const file of this.uploadedFiles) {
                         updatedRequest.append('attachments', file, file.name);
                     }
