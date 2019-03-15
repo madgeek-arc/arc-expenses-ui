@@ -125,6 +125,7 @@ export class NewRequestComponent implements OnInit {
             onBehalf_email: [''],
             trip_destination: [''],
             amount: ['', [Validators.required, Validators.min(0), Validators.pattern('^\\d+(\\.\\d{1,2})?$')] ],
+            no_of_payments: [1, Validators.min(1)],
             sciCoord: ['']
         });
         this.newRequestForm.get('name').setValue(`${this.currentUser.firstname} ${this.currentUser.lastname}`);
@@ -188,6 +189,9 @@ export class NewRequestComponent implements OnInit {
 
                 if (this.requestType === 'TRIP') {
                     newRequest.append('destination', this.newRequestForm.get('trip_destination').value);
+                }
+                if (this.requestType === 'SERVICES_CONTRACT') {
+                    newRequest.append('cycles', this.newRequestForm.get('no_of_payments').value);
                 }
                 if (this.isRequestOnBehalfOfOther) {
                     newRequest.append('firstName', this.newRequestForm.get('onBehalf_firstname').value);

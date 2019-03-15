@@ -1,12 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { BaseInfo, Request, RequestPayment, RequestSummary } from '../../domain/operation';
+import { RequestResponse } from '../../domain/operation';
 import { paymentStages, requesterPositions, requestTypes, supplierSelectionMethodsMap } from '../../domain/stageDescriptions';
 import { RequestInfo } from '../../domain/requestInfoClasses';
 import { AnchorItem } from '../../shared/dynamic-loader-anchor-components/anchor-item';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ManageRequestsService } from '../../services/manage-requests.service';
 import { AuthenticationService } from '../../services/authentication.service';
-import { mergeMap, tap } from 'rxjs/operators';
 import { HttpErrorResponse, HttpEventType, HttpResponse } from '@angular/common/http';
 import { printRequestPage } from '../print-request-function';
 
@@ -22,10 +21,8 @@ export class RequestStagePaymentComponent implements OnInit {
 
     isSimpleUser: boolean;
     requestId: string;
-    currentRequest: Request;
-    currentRequestPayment: RequestPayment;
-    canEdit: boolean;
-    stages: string[];
+    currentRequestPayment: RequestResponse;
+    stages: string[] = paymentStages;
     reqPositions = requesterPositions;
     selMethods = supplierSelectionMethodsMap;
     stateNames = {
@@ -61,15 +58,10 @@ export class RequestStagePaymentComponent implements OnInit {
         this.notFoundMessage = '';
 
         /*call api to get request info or throw errorMessage*/
-        const result = this.requestService.getRequestPaymentById(this.requestId).pipe(
-            tap(res => this.currentRequestPayment = res),
-            mergeMap( res =>
-                this.requestService.getRequestById(res.requestId, this.authService.getUserProp('email'))
-            ));
-        result.subscribe(
+        this.requestService.getRequestPaymentById(this.requestId).subscribe(
             req => {
-                this.currentRequest = req;
-                console.log(`The archiveid of the currentRequest is ${req.archiveId}`);
+                this.currentRequestPayment = req;
+                console.log(`get payment by id responded ${JSON.stringify(this.currentRequestPayment)}`);
             },
             error => {
                 console.log(error);
@@ -84,24 +76,22 @@ export class RequestStagePaymentComponent implements OnInit {
                 }
             },
             () => {
-                this.stages = paymentStages;
-                this.currentRequestInfo = new RequestInfo(this.currentRequestPayment.id, this.currentRequest.id);
+                this.currentRequestInfo = new RequestInfo(this.currentRequestPayment.baseInfo.id,
+                                                          this.currentRequestPayment.baseInfo.requestId);
                 this.checkIfStageIs7();
                 this.showSpinner = false;
-                // TODO:: REMOVE THE LINE BELOW WHEN THE BACK SENDS THIS INFO
-                this.canEdit = true;
                 this.updateShowStageFields();
             }
         );
     }
 
     checkIfStageIs7() {
-        if ( (this.currentRequestPayment.stage === '7') &&
-             ((this.currentRequest.type === 'REGULAR') || (this.currentRequest.type === 'TRIP')) ) {
+        if ( (this.currentRequestPayment.baseInfo.stage === '7') &&
+             ((this.currentRequestPayment.type === 'REGULAR') || (this.currentRequestPayment.type === 'TRIP')) ) {
 
             this.currentRequestInfo.finalAmount = '';
-            if ( this.currentRequest.stage1.finalAmount ) {
-                this.currentRequestInfo.finalAmount = (this.currentRequest.stage1.finalAmount).toString();
+            if ( this.currentRequestPayment.stages['1']['finalAmount'] ) {
+                this.currentRequestInfo.finalAmount = (this.currentRequestPayment.stages['1']['finalAmount']).toString();
             }
         }
     }
@@ -113,7 +103,7 @@ export class RequestStagePaymentComponent implements OnInit {
 
     getFinalAmount(newVals: string[]) {
         if (newVals && newVals.length === 1) {
-            this.currentRequest.stage1.finalAmount = +newVals[0];
+            this.currentRequestPayment.stages['1']['finalAmount'] = +newVals[0];
         }
     }
 
@@ -122,13 +112,13 @@ export class RequestStagePaymentComponent implements OnInit {
         this.showSpinner = true;
         this.errorMessage = '';
         this.successMessage = '';
-        if (this.currentRequestPayment.stage === '7') {
-            submitted.append('finalAmount', this.currentRequest.stage1.finalAmount.toString());
+        if (this.currentRequestPayment.baseInfo.stage === '7') {
+            submitted.append('finalAmount', this.currentRequestPayment.stages['1']['finalAmount'].toString());
         }
-        this.requestService.submitUpdate<any>('payment', mode, this.currentRequest.id, submitted).subscribe(
+        this.requestService.submitUpdate<any>('payment', mode, this.currentRequestPayment.baseInfo.id, submitted).subscribe(
             event => {
                 if (event.type === HttpEventType.UploadProgress) {
-                    console.log('uploadAttachment responded: ', event.loaded);
+                    console.log('update progress says:', event.loaded);
                 } else if ( event instanceof HttpResponse) {
                     console.log('final event:', event.body);
                 }
@@ -137,7 +127,7 @@ export class RequestStagePaymentComponent implements OnInit {
                 console.log(error);
                 this.showSpinner = false;
                 this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
-                this.getCurrentRequest();
+                // this.getCurrentRequest();
             },
             () => {
                 this.successMessage = 'Οι αλλαγές αποθηκεύτηκαν.';
@@ -154,21 +144,24 @@ export class RequestStagePaymentComponent implements OnInit {
     }
 
     willShowStage(stage: string) {
-        const stageField = 'stage' + stage;
-        if ( (stage === this.currentRequestPayment.stage) &&
-            (this.currentRequestPayment.status !== 'REJECTED') &&
-            (this.currentRequestPayment.status !== 'ACCEPTED') &&
-            (this.currentRequestPayment.status !== 'CANCELLED') &&
-            ( (this.authService.getUserRole().some(x => x.authority === 'ROLE_ADMIN')) || (this.canEdit === true) ) ) {
+        if ( (stage === this.currentRequestPayment.baseInfo.stage) &&
+            (this.currentRequestPayment.baseInfo.status !== 'REJECTED') &&
+            (this.currentRequestPayment.baseInfo.status !== 'ACCEPTED') &&
+            (this.currentRequestPayment.baseInfo.status !== 'CANCELLED') &&
+            ( (this.authService.getUserRole().some(x => x.authority === 'ROLE_ADMIN')) ||
+              (this.currentRequestPayment.canEdit === true) ) ) {
 
+            if (this.currentRequestPayment.stages[stage] == null) {
+                this.currentRequestPayment.stages[stage] = this.currentRequestInfo.createNewStageObject(stage);
+            }
             this.stageLoaderItemList = [
                 new AnchorItem(
                     this.currentRequestInfo[stage]['stageComponent'],
                     {
-                        currentStage: this.currentRequestPayment['stage' + stage],
+                        currentStage: this.currentRequestPayment.stages[stage],
                         currentRequestInfo: this.currentRequestInfo
                     }
-                ),
+                )
             ];
 
             return 1;
@@ -177,27 +170,25 @@ export class RequestStagePaymentComponent implements OnInit {
             if (stage === '1') {
                 return 2;
             }
-            if ( (this.currentRequestPayment[stageField]) && (this.currentRequestPayment[stageField].date) ) {
-
+            if ( (this.currentRequestPayment.stages[stage]) && (this.currentRequestPayment.stages[stage].date) ) {
                 if ( !this.isSimpleUser || (stage === '7') ) {
-
-                    if ( this.stages.indexOf(this.currentRequestPayment.stage) < this.stages.indexOf(stage)) {
+                    if ( this.stages.indexOf(this.currentRequestPayment.baseInfo.stage) < this.stages.indexOf(stage)) {
                         return 4;
                     }
 
-                    if ( (stage === this.currentRequestPayment.stage) && (this.stages.indexOf(stage) > 0) ) {
+                    if ( (stage === this.currentRequestPayment.baseInfo.stage) && (this.stages.indexOf(stage) > 0) ) {
 
-                        const prevStageField = 'stage' + this.stages[this.stages.indexOf(stage) - 1];
-                        if ( (this.currentRequestPayment[prevStageField]) &&
-                             (this.currentRequestPayment[prevStageField].date) &&
-                             (this.currentRequestPayment[prevStageField].date > this.currentRequestPayment[stageField].date) ) {
+                        const prevStage = this.stages[this.stages.indexOf(stage) - 1];
+                        if ( (this.currentRequestPayment.stages[prevStage]) &&
+                             (this.currentRequestPayment.stages[prevStage].date) &&
+                             (this.currentRequestPayment.stages[prevStage].date > this.currentRequestPayment.stages[stage].date) ) {
 
                             return 4;
                         }
                     }
 
-                    if ( ((this.currentRequestPayment[stageField]['approved']) &&
-                          this.currentRequestPayment[stageField]['approved'] === true ) ||
+                    if ( ((this.currentRequestPayment.stages[stage]['approved']) &&
+                          this.currentRequestPayment.stages[stage]['approved'] === true ) ||
                           (stage === '11') ) {
 
                         return 2;
@@ -213,23 +204,20 @@ export class RequestStagePaymentComponent implements OnInit {
     }
 
     linkToFile(fileIndex: number) {
-        if (this.currentRequest.stage1.attachments &&
-            this.currentRequest.stage1.attachments[fileIndex]) {
+        if (this.currentRequestPayment.stages['1'].attachments &&
+            this.currentRequestPayment.stages['1'].attachments[fileIndex] &&
+            this.currentRequestPayment.stages['1'].attachments[fileIndex].url) {
 
             let url = `${window.location.origin}/arc-expenses-service/request/store/download?`;
-            url = `${url}id=${this.currentRequest.id}&stage=1&mode=request`;
-            url = `${url}&filename=${this.currentRequest.stage1.attachments[fileIndex].filename}`;
+            url = `${url}archiveId=${this.currentRequestPayment.stages['1'].attachments[fileIndex].url}`;
+            url = `${url}&filename=${this.currentRequestPayment.stages['1'].attachments[fileIndex].filename}`;
 
             window.open(url, '_blank', 'enabledstatus=0,toolbar=0,menubar=0,location=0');
         }
     }
 
     printRequest(): void {
-        printRequestPage(this.currentRequest.id, this.reqTypes[this.currentRequest.type]);
-    }
-
-    userIsAdmin() {
-        return (this.authService.getUserRole().some(x => x.authority === 'ROLE_ADMIN'));
+        printRequestPage(this.currentRequestPayment.baseInfo.id, this.reqTypes[this.currentRequestPayment.type]);
     }
 
 }

@@ -101,8 +101,7 @@ export class FormUploadFileComponent implements OnInit {
             </div>
         </div>
         <div class="uk-flex-center">
-            <div *ngFor="let f of uploadedFilenames; let i = index"
-                 class="uk-text-bold uk-padding-small uk-display-inline-block uk-margin-small-right">
+            <div *ngFor="let f of uploadedFilenames; let i = index" class="uk-label uk-margin-small-right">
                 <span class="uk-margin-small-right">{{ f }}</span>
                 <span>
                     <a class="uk-link uk-position-z-index" uk-icon="icon: close" (click)="deleteItem(i)"></a>

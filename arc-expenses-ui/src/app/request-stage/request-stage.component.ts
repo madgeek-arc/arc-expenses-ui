@@ -26,8 +26,7 @@ export class RequestStageComponent implements OnInit {
     requestId: string;
     currentRequestApproval: RequestResponse;
     currentRequestPayments: RequestPayment[] = [];
-    currentApprovalStagesList: string[] = [];
-    stages: string[];
+    stages: string[] = approvalStages;
     stagesMap = stageTitles;
     reqPositions = requesterPositions;
     selMethods = supplierSelectionMethodsMap;
@@ -52,6 +51,7 @@ export class RequestStageComponent implements OnInit {
         this.isSimpleUser = (this.authService.getUserRole().some(x => x.authority === 'ROLE_USER') &&
                              (this.authService.getUserRole().length === 1));
         console.log(`current user role is: ${JSON.stringify(this.authService.getUserRole())}`);
+        console.log(`isSimpleUser is: ${this.isSimpleUser}`);
     }
 
     getCurrentRequest() {
@@ -77,11 +77,8 @@ export class RequestStageComponent implements OnInit {
             },
             () => {
                 this.showSpinner = false;
-                this.stages = approvalStages;
                 this.currentRequestInfo = new RequestInfo(this.currentRequestApproval.baseInfo.id,
                                                           this.currentRequestApproval.baseInfo.requestId);
-                // this.currentApprovalStagesList = Object.keys(this.currentRequestApproval.stages).splice(0, 1);
-                // this.currentApprovalStagesList.push(this.currentRequestApproval.baseInfo.stage);
                 this.checkIfStageIs5b();
                 if ((this.currentRequestApproval.type !== 'CONTRACT') &&
                     (this.currentRequestApproval.baseInfo.status === 'ACCEPTED')) {
@@ -155,7 +152,7 @@ export class RequestStageComponent implements OnInit {
             .subscribe(
                 event => {
                     if (event.type === HttpEventType.UploadProgress) {
-                        console.log('uploadAttachment responded: ', event.loaded);
+                        console.log('update progress says:', event.loaded);
                     } else if ( event instanceof HttpResponse) {
                         console.log('final event:', event.body);
                     }
@@ -164,7 +161,7 @@ export class RequestStageComponent implements OnInit {
                     console.log(error);
                     this.showSpinner = false;
                     this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
-                    this.getCurrentRequest();
+                    // this.getCurrentRequest();
                 },
                 () => {
                     this.successMessage = 'Οι αλλαγές αποθηκεύτηκαν.';
@@ -176,6 +173,7 @@ export class RequestStageComponent implements OnInit {
     updateShowStageFields() {
         for ( let i = 1; i < this.stages.length; i++ ) {
             this.currentRequestInfo[this.stages[i]].showStage = this.willShowStage(this.stages[i]);
+            // console.log(`${this.stages[i]} is ${this.currentRequestInfo[this.stages[i]].showStage}`);
         }
     }
 
@@ -198,7 +196,7 @@ export class RequestStageComponent implements OnInit {
                             currentStage: this.currentRequestApproval.stages[stage],
                             currentRequestInfo: this.currentRequestInfo
                         }
-                    ),
+                    )
                 ];
             }
 
@@ -209,14 +207,11 @@ export class RequestStageComponent implements OnInit {
                 return 2;
             }
             if ( (this.currentRequestApproval.stages[stage]) && (this.currentRequestApproval.stages[stage].date)) {
-
                 if (!this.isSimpleUser || (stage === '2') ) {
-
                     if ( this.stages.indexOf(this.currentRequestApproval.baseInfo.stage) < this.stages.indexOf(stage)) {
                         return 4;
                     }
 
-                    // if ( (stage === this.currentRequestApproval.baseInfo.stage) && (this.stages.indexOf(stage) > 0)) {
                     if ( stage === this.currentRequestApproval.baseInfo.stage ) {
 
                         const prevStage = this.stages[this.stages.indexOf(stage) - 1];
@@ -246,10 +241,11 @@ export class RequestStageComponent implements OnInit {
 
     linkToFile(fileIndex: number) {
         if (this.currentRequestApproval.stages['1'].attachments &&
-            this.currentRequestApproval.stages['1'].attachments[fileIndex]) {
+            this.currentRequestApproval.stages['1'].attachments[fileIndex] &&
+            this.currentRequestApproval.stages['1'].attachments[fileIndex].url) {
 
             let url = `${window.location.origin}/arc-expenses-service/request/store/download?`;
-            url = `${url}id=${this.currentRequestApproval.baseInfo.requestId}&stage=1&mode=request`;
+            url = `${url}archiveId=${this.currentRequestApproval.stages['1'].attachments[fileIndex].url}`;
             url = `${url}&filename=${this.currentRequestApproval.stages['1'].attachments[fileIndex].filename}`;
 
             window.open(url, '_blank', 'enabledstatus=0,toolbar=0,menubar=0,location=0');
@@ -271,7 +267,7 @@ export class RequestStageComponent implements OnInit {
                 console.log(error);
                 this.showSpinner = false;
                 this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
-                this.getCurrentRequest();
+                // this.getCurrentRequest();
             },
             () => {
                 this.successMessage = 'Οι αλλαγές αποθηκεύτηκαν.';

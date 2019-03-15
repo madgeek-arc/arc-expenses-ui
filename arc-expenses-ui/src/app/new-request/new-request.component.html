@@ -84,64 +84,38 @@
                       </div>
                     </div>
                     <div class="uk-margin">
-                      <label class="uk-form-label" for="request-program">Επιλέξτε έργο <span>(*)</span></label>
-                      <div class="uk-form-controls">
-                        <div class="uk-grid uk-width-1-1">
-                          <div class="uk-width-1-2@s">
-                            <input class="uk-input" type="text" id="request-program"
-                                   (keyup)="updateSearchTerm($event)" formControlName="program">
-                            <div *ngIf="searchTerm" class="uk-nav uk-padding-small uk-width-large uk-position-absolute" style="background-color: white">
-                              <ul>
-                                <li *ngFor="let project of projects | filterByTerm: searchTerm: 'projectAcronym'">
-                                  <a (click)="updateProgramInput(project)">{{ project.projectAcronym }} ({{ project.instituteName }})</a>
-                                </li>
-                              </ul>
-                            </div>
-                          </div>
-                          <div class="uk-width-1-2@s">
-                            <input class="uk-input" id="request-institute" formControlName="institute" placeholder="Ινστιτούτο/Μονάδα">
-                          </div>
-                        </div>
-                        <div class="uk-comment-body uk-text-small uk-text-muted">
-                          <i>Ξεκινήστε να γράφετε το όνομα του έργου και επιλέξτε το από την λίστα που θα εμφανιστεί.</i>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="uk-margin">
-                      <label class="uk-form-label">Προς</label>
-                      <div class="uk-form-controls">
-                        <div class="uk-width-1-1">
-                          <div class="uk-width-1-1@s">
-                            <input class="uk-input uk-disabled" type="text" id="request-to"
-                                   formControlName="sciCoord">
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="uk-margin">
                       <label class="uk-form-label" for="request-amount">Ποσό (σε EUR) <span>(*)</span></label>
                       <div class="uk-form-controls">
-                        <div class="uk-width-1-1">
-                          <div class="uk-width-small">
-                            <input class="uk-input" type="text" id="request-amount"
-                                   formControlName="amount" placeholder="0" (keyup)="showAmount()"
-                                   (focus)="newRequestForm.get('amount').markAsUntouched()">
+                        <div class="uk-width-1-1 uk-grid uk-child-width-1-2@m">
+                          <div class="uk-width-expand">
+                            <div class="uk-width-small">
+                              <input class="uk-input" type="text" id="request-amount"
+                                     formControlName="amount" placeholder="0" (keyup)="showAmount()"
+                                     (focus)="newRequestForm.get('amount').markAsUntouched()">
+                            </div>
+                            <div *ngIf="showWarning" class="uk-text-primary">
+                              Για ποσά μεταξύ 2.500 € και 20.000 € είναι απαραίτητο να συμπληρώσετε το ακριβές ποσό.
+                            </div>
+                            <div class="uk-comment-body uk-text-small uk-text-muted">
+                              <i>Ο δεκαδικός αριθμός θα πρέπει να είναι της μορφής: <b>1111.11</b></i>
+                            </div>
+                            <div *ngIf="newRequestForm.get('amount').invalid &&
+                                        newRequestForm.get('amount').touched &&
+                                        newRequestForm.get('amount').dirty"
+                                 class="uk-comment-body uk-text-small uk-text-danger">
+                              Ο αριθμός δεν είναι έγκυρος.
+                            </div>
+                            <div *ngIf="requestedAmount && newRequestForm.get('amount').valid"
+                                 class="uk-comment-body uk-text-small uk-text-muted">
+                              Το ποσό είναι: <span class="uk-text-bold">{{ requestedAmount | currency: 'EUR': 'symbol-narrow' }}</span>
+                            </div>
                           </div>
-                          <div *ngIf="showWarning" class="uk-text-primary">
-                            Για ποσά μεταξύ 2.500 € και 20.000 € είναι απαραίτητο να συμπληρώσετε το ακριβές ποσό.
-                          </div>
-                          <div class="uk-comment-body uk-text-small uk-text-muted">
-                            <i>Ο δεκαδικός αριθμός θα πρέπει να είναι της μορφής: <b>1111.11</b></i>
-                          </div>
-                          <div *ngIf="newRequestForm.get('amount').invalid &&
-                                      newRequestForm.get('amount').touched &&
-                                      newRequestForm.get('amount').dirty"
-                               class="uk-comment-body uk-text-small uk-text-danger">
-                            Ο αριθμός δεν είναι έγκυρος.
-                          </div>
-                          <div *ngIf="requestedAmount && newRequestForm.get('amount').valid"
-                               class="uk-comment-body uk-text-small uk-text-muted">
-                            Το ποσό είναι: <span class="uk-text-bold">{{ requestedAmount | currency: 'EUR': 'symbol-narrow' }}</span>
+                          <div *ngIf="requestType === 'SERVICES_CONTRACT'">
+                            <label for="noOfPayments" class="uk-inline uk-margin-right">Αριθμός περαιώσεων</label>
+                            <div class="uk-width-small uk-inline">
+                              <input id="noOfPayments" formControlName="no_of_payments"
+                                     class="uk-input" type="number" step="1">
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -178,6 +152,40 @@
                         </div>
                       </div>
                     </div>
+                      <div class="uk-margin">
+                          <label class="uk-form-label" for="request-program">Επιλέξτε έργο <span>(*)</span></label>
+                          <div class="uk-form-controls">
+                              <div class="uk-grid uk-width-1-1">
+                                  <div class="uk-width-1-2@s">
+                                      <input class="uk-input" type="text" id="request-program"
+                                             (keyup)="updateSearchTerm($event)" formControlName="program">
+                                      <div *ngIf="searchTerm" class="uk-nav uk-padding-small uk-width-large uk-position-absolute" style="background-color: white">
+                                          <ul>
+                                              <li *ngFor="let project of projects | filterByTerm: searchTerm: 'projectAcronym'">
+                                                  <a (click)="updateProgramInput(project)">{{ project.projectAcronym }} ({{ project.instituteName }})</a>
+                                              </li>
+                                          </ul>
+                                      </div>
+                                  </div>
+                                  <div class="uk-width-1-2@s">
+                                      <input class="uk-input" id="request-institute" formControlName="institute" placeholder="Ινστιτούτο/Μονάδα">
+                                  </div>
+                              </div>
+                              <div class="uk-comment-body uk-text-small uk-text-muted">
+                                  <i>Ξεκινήστε να γράφετε το όνομα του έργου και επιλέξτε το από την λίστα που θα εμφανιστεί.</i>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="uk-margin">
+                          <label class="uk-form-label">Προς</label>
+                          <div class="uk-form-controls">
+                              <div class="uk-width-1-1">
+                                  <div class="uk-width-1-1">
+                                      <input class="uk-input uk-disabled" type="text" id="request-to" formControlName="sciCoord">
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
                     <div class="uk-margin">
                       <label class="uk-form-label" for="request-text">Θέμα <span>(*)</span></label>
                       <div class="uk-form-controls">

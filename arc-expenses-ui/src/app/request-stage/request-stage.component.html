@@ -37,7 +37,6 @@
                   <div class="uk-margin-bottom uk-width-1-1 uk-grid">
                     <div class="uk-width-1-2@l">
                       <span class="uk-text-bold uk-margin-small-right">Πρόγραμμα: </span>
-                      <!-- TODO: DISPLAY ACRONYM AND INSTITUTE NAME INSTEAD WHEN THEY BECOME AVAILABLE -->
                       <span *ngIf="currentRequestApproval.projectAcronym">
                         {{ currentRequestApproval.projectAcronym }} ({{currentRequestApproval.instituteName}})
                       </span>
@@ -67,12 +66,9 @@
                       <span>{{ currentRequestApproval.tripDestination }}</span>
                     </div>
                     <div class="uk-width-1-2@l">
-                      <span class="uk-text-bold uk-margin-small-right">Ποσό: </span>
-                      <span>{{ currentRequestApproval.stages['1']['amountInEuros'] | currency: 'EUR': 'symbol-narrow' }}</span>
-                      <!--TODO: RESTORE CODE BELOW WHEN FINALAMOUNT IS BEING SENT IN STAGE1-->
-                      <!--<span class="uk-text-bold uk-margin-small-right">-->
-                        <!--{{ (currentRequestApproval.stages['1']['amountInEuros'] !== currentRequestApproval.stages['1']['finalAmount']) ? 'Τελικό π': 'Π' }}οσό: </span>-->
-                      <!--<span>{{ currentRequestApproval.stages['1']['finalAmount'] | currency: 'EUR': 'symbol-narrow' }}</span>-->
+                      <span class="uk-text-bold uk-margin-small-right">
+                        {{ (currentRequestApproval.stages['1']['amountInEuros'] !== currentRequestApproval.stages['1']['finalAmount']) ? 'Τελικό π': 'Π' }}οσό: </span>
+                      <span>{{ currentRequestApproval.stages['1']['finalAmount'] | currency: 'EUR': 'symbol-narrow' }}</span>
                     </div>
 
                     <div class="uk-width-1-1@l">
@@ -114,10 +110,11 @@
                     Λήψη ως PDF</button>
                 </div>
 
-                <!-- Submitted stages display -->
+                <!-- Submitted stages view -->
                 <hr>
 
-                <div class="uk-margin-top" *ngIf="currentRequestInfo['2'].showStage >= 1">
+                <div class="uk-margin-top" *ngIf="(currentRequestInfo['2'].showStage >= 1) ||
+                                                   ((currentRequestInfo['2'].showStage === 1) && currentRequestApproval.canEdit)">
                     <h4>Ανάληψη υποχρέωσης δαπάνης</h4>
                 </div>
 
@@ -159,7 +156,7 @@
                 </div>
 
 
-                  <!-- Create/Edit pending stage -->
+                  <!-- Form of pending stage -->
                   <div class="uk-margin-medium-top no-print" data-html2canvas-ignore
                        *ngIf="(currentRequestApproval.baseInfo.stage !== '1') &&
                               (currentRequestInfo[currentRequestApproval.baseInfo.stage].showStage === 1)">

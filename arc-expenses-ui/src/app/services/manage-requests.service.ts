@@ -97,10 +97,10 @@ export class ManageRequestsService {
         return this.http.get<RequestResponse>(url, headerOptions);
     }
 
-    getRequestPaymentById(requestPaymentId: string): Observable<RequestPayment> {
+    getRequestPaymentById(requestPaymentId: string): Observable<RequestResponse> {
         const url = `${this.apiUrl}payment/getById/${requestPaymentId}`;
         console.log(`calling ${url}`);
-        return this.http.get<RequestPayment>(url, headerOptions);
+        return this.http.get<RequestResponse>(url, headerOptions);
     }
 
     getPaymentsOfRequest(requestId: string): Observable<Paging<RequestPayment>> {

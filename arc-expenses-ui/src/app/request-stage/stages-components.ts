@@ -103,12 +103,14 @@ export class StageComponent implements OnInit {
 
     linkToFile(i: number) {
         if (this.currentStage.attachments &&
-            this.currentStage.attachments[i] ) {
+            this.currentStage.attachments[i] &&
+            this.currentStage.attachments[i].url) {
 
             const mode: string = (this.currentRequestInfo.phaseId.includes('a') ? 'approval' : 'payment');
 
-            let url = `${window.location.origin}/arc-expenses-service/request/store/download?id=`;
-            url = `${url}${this.currentRequestInfo.phaseId}&stage=${this.stageId}&mode=${mode}`;
+            let url = `${window.location.origin}/arc-expenses-service/request/store/download?`;
+            // url = `${url}id=${this.currentRequestInfo.phaseId}&stage=${this.stageId}&mode=${mode}`;
+            url = `${url}archiveId=${this.currentStage.attachments[i].url}`;
             url = `${url}&filename=${this.currentStage.attachments[i].filename}`;
 
             /* link to download method */
