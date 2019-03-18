@@ -2,28 +2,28 @@
 
     <div *ngIf="errorMessage" class="uk-alert uk-alert-danger">{{ errorMessage }}</div>
 
-    <div *ngIf="currentRequest && updateStage1Form" [formGroup]="updateStage1Form" class="uk-margin-bottom uk-width-1-1 uk-grid">
+    <form *ngIf="currentRequest && updateStage1Form" [formGroup]="updateStage1Form"
+          class="uk-margin-bottom uk-width-1-1 uk-grid">
 
         <div class="uk-width-1-2@l">
             <span class="uk-text-bold uk-margin-small-right">Πρόγραμμα: </span>
-            <!-- TODO: DISPLAY ACRONYM AND INSTITUTE NAME INSTEAD WHEN THEY BECOME AVAILABLE -->
-            <span>{{ currentRequest.projectId }}</span>
-            <!--<span>{{ currentRequest.project.acronym }} ({{currentRequest.project.institute.name}})</span>-->
+            <span>{{ currentRequest.projectAcronym }} ({{currentRequest.instituteName}})</span>
         </div>
         <div class="uk-width-1-2@l">
             <span class="uk-text-bold uk-margin-small-right">Ημερομηνία προηγούμενης υποβολής: </span>
-            <span>{{ currentRequest.stage1.requestDate | date : 'dd-MM-yyyy' }}</span>
+            <span>{{ currentRequest.stages['1']['requestDate'] | date : 'dd-MM-yyyy' }}</span>
         </div>
-        <div class="uk-width-1-1@l">
-            <span class="uk-text-bold uk-margin-small-right">Από: </span>
-            <span>
-                {{ currentRequest.user.firstname }} {{ currentRequest.user.lastname }} ({{ currentRequest.requesterPosition }})
-            </span>
-        </div>
-
-        <div class="uk-width-1-1@l">
-            <label class="uk-text-bold uk-margin-small-right">Θέμα (*):</label>
-            <textarea formControlName="requestText"></textarea>
+        <div class="uk-width-1-1@l uk-grid">
+            <div class="uk-width-1-2@l">
+                <span class="uk-text-bold uk-margin-small-right">Από: </span>
+                <span *ngIf="currentRequest.requesterFullName">
+                    {{ currentRequest.requesterFullName }} ({{ reqPositions[currentRequest.requesterPosition] }})
+                </span>
+            </div>
+            <div *ngIf="currentRequest.onBehalfFullName" class="uk-width-1-2@l">
+                <span class="uk-text-bold uk-margin-small-right">Εκ μέρους του/της: </span>
+                <span>{{ currentRequest.onBehalfFullName }}</span>
+            </div>
         </div>
 
         <div *ngIf="(currentRequest.type !== 'TRIP') &&
@@ -43,6 +43,10 @@
                 <option value="MARKET_RESEARCH">{{ selMethods['MARKET_RESEARCH'] }}</option>
                 <option value="AWARD_PROCEDURE">{{ selMethods['AWARD_PROCEDURE'] }}</option>
             </select>
+        </div>
+        <div *ngIf="currentRequest.type === 'TRIP'" class="uk-width-1-2@l">
+            <span class="uk-text-bold uk-margin-small-right">Προορισμός: </span>
+            <span>{{ currentRequest.tripDestination }}</span>
         </div>
         <div class="uk-width-1-2@l">
             <label class="uk-text-bold uk-margin-small-right">Ποσό (*): </label>
@@ -66,18 +70,12 @@
                 Το ποσό είναι: {{ requestedAmount | currency: 'EUR': 'symbol-narrow' }}
             </div>
         </div>
-        <div class="uk-width-1-2@l"></div>
-        <div *ngIf="(currentRequest.type === 'TRIP') && currentRequest.trip"
-             class="uk-width-1-1@l uk-grid uk-margin-auto-vertical">
 
-            <div class="uk-text-bold uk-inline">Λεπτομέρειες ταξιδίου:</div>
-            <div class="uk-inline">
-                <span class="uk-display-block" *ngIf="currentRequest.trip.email !== currentRequest.user.email">
-                  <u>Ονοματεπώνυμο:</u> {{ currentRequest.trip.firstname }} {{ currentRequest.trip.lastname }}
-                </span>
-                <span><u>Προορισμός:</u> {{ currentRequest.trip.destination }}</span>
-            </div>
+        <div class="uk-width-1-1@l">
+            <label class="uk-text-bold uk-margin-small-right">Θέμα (*):</label>
+            <textarea formControlName="requestText"></textarea>
         </div>
+
         <div class="uk-width-1-1@l">
             <div class="uk-form-controls uk-form-controls-text">
                 <app-form-upload-files [uploadedFilenames]="stage1AttachmentNames"
@@ -88,6 +86,6 @@
         <div class="uk-width-1-1\@l">
             <button class="uk-button uk-button-primary" (click)="updateStage1()">Υποβολή</button>
         </div>
-    </div>
+    </form>
 
 </div>

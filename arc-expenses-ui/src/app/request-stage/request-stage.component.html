@@ -46,10 +46,10 @@
                       <span>{{ currentRequestApproval.stages['1']['requestDate'] | date : 'dd-MM-yyyy' }}</span>
                     </div>
                     <div class="uk-width-1-1@l uk-grid">
-                      <div class="uk-width-1-2@l">
+                      <div *ngIf="currentRequestApproval.requesterFullName" class="uk-width-1-2@l">
                         <span class="uk-text-bold uk-margin-small-right">Από: </span>
-                        <span *ngIf="currentRequestApproval.requesterFullName">
-                        {{ currentRequestApproval.requesterFullName }} ({{ reqPositions[currentRequestApproval.requesterPosition] }})
+                        <span>
+                          {{ currentRequestApproval.requesterFullName }} ({{ reqPositions[currentRequestApproval.requesterPosition] }})
                         </span>
                       </div>
                       <div *ngIf="currentRequestApproval.onBehalfFullName" class="uk-width-1-2@l">

@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { Attachment, Request, Stage5b } from '../../domain/operation';
+import { Attachment, Request, RequestResponse, Stage5b } from '../../domain/operation';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { supplierSelectionMethodsMap } from '../../domain/stageDescriptions';
+import { requesterPositions, supplierSelectionMethodsMap } from '../../domain/stageDescriptions';
 
 @Component({
     selector: 'stage1-form',
@@ -10,7 +10,8 @@ import { supplierSelectionMethodsMap } from '../../domain/stageDescriptions';
 export class Stage1FormComponent implements OnInit {
     errorMessage: string;
 
-    @Input() currentRequest: Request;
+    @Input() currentRequest: RequestResponse;
+    reqPositions = requesterPositions;
 
     /* output variable that sends the new Stage back to the parent component
      * in order to call the api and update the request */
@@ -41,24 +42,24 @@ export class Stage1FormComponent implements OnInit {
             supplierSelectionMethod: [''],
             amount: ['', [Validators.min(1), Validators.pattern('^\\d+(\\.\\d{1,2})?$')] ]
         });
-        this.updateStage1Form.get('requestText').setValue(this.currentRequest.stage1.subject);
+        this.updateStage1Form.get('requestText').setValue(this.currentRequest.stages['1']['subject']);
         this.updateStage1Form.get('requestText').updateValueAndValidity();
-        if ( this.currentRequest.stage1.supplier ) {
-            this.updateStage1Form.get('supplier').setValue(this.currentRequest.stage1.supplier);
+        if ( this.currentRequest.stages['1']['supplier'] ) {
+            this.updateStage1Form.get('supplier').setValue(this.currentRequest.stages['1']['supplier']);
             this.updateStage1Form.get('supplier').updateValueAndValidity();
         }
-        if ( this.currentRequest.stage1.supplierSelectionMethod ) {
-            this.updateStage1Form.get('supplierSelectionMethod').setValue(this.currentRequest.stage1.supplierSelectionMethod);
+        if ( this.currentRequest.stages['1']['supplierSelectionMethod'] ) {
+            this.updateStage1Form.get('supplierSelectionMethod').setValue(this.currentRequest.stages['1']['supplierSelectionMethod']);
             this.updateStage1Form.get('supplierSelectionMethod').updateValueAndValidity();
         }
-        if ( this.currentRequest.stage1.amountInEuros ) {
-            this.updateStage1Form.get('amount').setValue( (this.currentRequest.stage1.amountInEuros).toString() );
+        if ( this.currentRequest.stages['1']['amountInEuros'] ) {
+            this.updateStage1Form.get('amount').setValue( (this.currentRequest.stages['1']['amountInEuros']).toString() );
             this.updateStage1Form.get('amount').updateValueAndValidity();
             this.updateStage1Form.get('amount').markAsTouched();
         }
 
-        if (this.currentRequest.stage1.attachments) {
-            for (const f of this.currentRequest.stage1.attachments) {
+        if (this.currentRequest.stages['1'].attachments) {
+            for (const f of this.currentRequest.stages['1'].attachments) {
                 this.stage1AttachmentNames.push(f.filename);
             }
         }
@@ -77,11 +78,11 @@ export class Stage1FormComponent implements OnInit {
             const i = this.uploadedFiles.findIndex(x => x.name === filename);
             this.uploadedFiles.splice(i, 1);
         }
-        if (this.currentRequest.stage1.attachments &&
-            this.currentRequest.stage1.attachments.some(x => x.filename === filename)) {
+        if (this.currentRequest.stages['1'].attachments &&
+            this.currentRequest.stages['1'].attachments.some(x => x.filename === filename)) {
 
-            const i = this.currentRequest.stage1.attachments.findIndex(x => x.filename === filename);
-            this.currentRequest.stage1.attachments.splice(i, 1);
+            const i = this.currentRequest.stages['1'].attachments.findIndex(x => x.filename === filename);
+            this.currentRequest.stages['1'].attachments.splice(i, 1);
         }
     }
 
@@ -109,12 +110,12 @@ export class Stage1FormComponent implements OnInit {
             } else if ( (( this.updateStage1Form.get('supplierSelectionMethod').value !== 'DIRECT' ) &&
                          ((this.currentRequest.type !== 'TRIP') &&
                           (this.currentRequest.type !== 'CONTRACT') )) &&
-                        ((!this.uploadedFiles) && (!this.currentRequest.stage1.attachments) )) {
+                        ((!this.uploadedFiles) && (!this.currentRequest.stages['1'].attachments) )) {
 
                 this.errorMessage = 'Για αναθέσεις μέσω διαγωνισμού ή έρευνας αγοράς η επισύναψη εγγράφων είναι υποχρεωτική.';
             } else if ( (this.currentRequest.type !== 'SERVICES_CONTRACT') &&
                         (+this.updateStage1Form.get('amount').value > this.lowAmountLimit) &&
-                        (!this.currentRequest.stage1.attachments) &&
+                        (!this.currentRequest.stages['1'].attachments) &&
                         !this.uploadedFiles ) {
 
                 this.errorMessage = 'Για αιτήματα άνω των 2.500 € η επισύναψη εγγράφων είναι υποχρεωτική.';

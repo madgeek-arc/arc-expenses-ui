@@ -259,7 +259,7 @@
                                                 <th><span class="uk-margin-right">Κατασταση</span></th>
                                             </tr>
                                             <tr *ngIf="noRequests">
-                                                <td colspan="7" class="uk-alert uk-width-1-1">{{noRequests}}</td>
+                                                <td colspan="8">{{noRequests}}</td>
                                             </tr>
                                             <tr class="uk-link" *ngFor="let req of listOfRequests"
                                                 routerLink="/requests/{{(req.baseInfo.id).includes('a')? 'request-stage':'request-stage-payment'}}/{{req.baseInfo.id}}"

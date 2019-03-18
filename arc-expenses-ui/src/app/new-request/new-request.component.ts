@@ -193,7 +193,8 @@ export class NewRequestComponent implements OnInit {
                 if (this.requestType === 'SERVICES_CONTRACT') {
                     newRequest.append('cycles', this.newRequestForm.get('no_of_payments').value);
                 }
-                if (this.isRequestOnBehalfOfOther) {
+                if (this.isRequestOnBehalfOfOther === true) {
+                    newRequest.append('onBehalf', 'true');
                     newRequest.append('firstName', this.newRequestForm.get('onBehalf_firstname').value);
                     newRequest.append('lastName', this.newRequestForm.get('onBehalf_lastname').value);
                     newRequest.append('email', this.newRequestForm.get('onBehalf_email').value);
