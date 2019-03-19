@@ -98,7 +98,7 @@ export class ManageRequestsService {
     }
 
     getRequestPaymentById(requestPaymentId: string): Observable<RequestResponse> {
-        const url = `${environment.API_ENDPOINT}payment/getById/${requestPaymentId}`;
+        const url = `${environment.API_ENDPOINT}/payment/getById/${requestPaymentId}`;
         console.log(`calling ${url}`);
         return this.http.get<RequestResponse>(url, headerOptions);
     }
