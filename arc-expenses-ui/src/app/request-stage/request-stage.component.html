@@ -36,38 +36,38 @@
                 <div *ngIf="willShowStage('1') === 2" class="submittedRequest">
                   <div class="uk-margin-bottom uk-width-1-1 uk-grid">
                     <div class="uk-width-1-2@l">
-                      <span class="uk-text-bold uk-margin-small-right">Πρόγραμμα: </span>
+                      <span class="uk-text-bold uk-margin-small-right">Πρόγραμμα:</span>
                       <span *ngIf="currentRequestApproval.projectAcronym">
                         {{ currentRequestApproval.projectAcronym }} ({{currentRequestApproval.instituteName}})
                       </span>
                     </div>
                     <div class="uk-width-1-2@l">
-                      <span class="uk-text-bold uk-margin-small-right">Ημερομηνία υποβολής: </span>
+                      <span class="uk-text-bold uk-margin-small-right">Ημερομηνία υποβολής:</span>
                       <span>{{ currentRequestApproval.stages['1']['requestDate'] | date : 'dd-MM-yyyy' }}</span>
                     </div>
-                    <div class="uk-width-1-1@l uk-grid">
-                      <div *ngIf="currentRequestApproval.requesterFullName" class="uk-width-1-2@l">
-                        <span class="uk-text-bold uk-margin-small-right">Από: </span>
-                        <span>
-                          {{ currentRequestApproval.requesterFullName }} ({{ reqPositions[currentRequestApproval.requesterPosition] }})
-                        </span>
-                      </div>
-                      <div *ngIf="currentRequestApproval.onBehalfFullName" class="uk-width-1-2@l">
-                        <span class="uk-text-bold uk-margin-small-right">Εκ μέρους του/της: </span>
+                    <div class="uk-width-1-2@l">
+                      <span class="uk-text-bold uk-margin-small-right">Από:</span>
+                      <span>
+                        {{ currentRequestApproval.requesterFullName }} ({{ reqPositions[currentRequestApproval.requesterPosition] }})
+                      </span>
+                    </div>
+                    <div class="uk-width-1-2@l">
+                      <div *ngIf="currentRequestApproval.onBehalfFullName">
+                        <span class="uk-text-bold uk-margin-small-right">Εκ μέρους του/της:</span>
                         <span>{{ currentRequestApproval.onBehalfFullName }}</span>
                       </div>
                     </div>
                     <div *ngIf="(currentRequestApproval.type !== 'TRIP') && (currentRequestApproval.type !== 'CONTRACT')" class="uk-width-1-2@l">
-                      <span class="uk-text-bold uk-margin-small-right">Προμηθευτής: </span>
+                      <span class="uk-text-bold uk-margin-small-right">Προμηθευτής:</span>
                       <span>{{ currentRequestApproval.stages['1']['supplier'] }} ({{ selMethods[currentRequestApproval.stages['1']['supplierSelectionMethod']] }})</span>
                     </div>
                     <div *ngIf="currentRequestApproval.type === 'TRIP'" class="uk-width-1-2@l">
-                      <span class="uk-text-bold uk-margin-small-right">Προορισμός: </span>
+                      <span class="uk-text-bold uk-margin-small-right">Προορισμός:</span>
                       <span>{{ currentRequestApproval.tripDestination }}</span>
                     </div>
                     <div class="uk-width-1-2@l">
                       <span class="uk-text-bold uk-margin-small-right">
-                        {{ (currentRequestApproval.stages['1']['amountInEuros'] !== currentRequestApproval.stages['1']['finalAmount']) ? 'Τελικό π': 'Π' }}οσό: </span>
+                        {{ (currentRequestApproval.stages['1']['amountInEuros'] !== currentRequestApproval.stages['1']['finalAmount']) ? 'Τελικό π': 'Π' }}οσό:</span>
                       <span>{{ currentRequestApproval.stages['1']['finalAmount'] | currency: 'EUR': 'symbol-narrow' }}</span>
                     </div>
 

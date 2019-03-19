@@ -170,7 +170,7 @@ export class RequestInfo {
             Stage7Component,
             [commentDesc],
             new SubmittedStageResultMap(
-                'Υποβλήθηκε',
+                'Καταχωρήθηκε το συνοδεύτικό υλικό',
                 'Απορρίφθηκε',
                 'Επεστράφη στο προηγούμενο στάδιο'
             )

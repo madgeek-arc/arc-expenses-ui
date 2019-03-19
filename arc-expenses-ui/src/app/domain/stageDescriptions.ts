@@ -7,6 +7,13 @@ export const requesterPositions = {RESEARCHER: 'Ερευνητής-ΕΛΕ',
                                    ADMINISTRATIVE: 'Διοικητικό-Τεχνικό-Βοηθητικό Προσωπικό'};
 
 export const statesList = ['accepted', 'pending', 'under_review', 'rejected', 'cancelled'];
+export const statusNamesMap = {
+    PENDING: 'βρίσκεται σε εξέλιξη',
+    UNDER_REVIEW: 'βρίσκεται σε εξέλιξη',
+    REJECTED: 'έχει απορριφθεί',
+    ACCEPTED: 'έχει ολοκληρωθεί',
+    CANCELLED: 'έχει ακυρωθεί'
+};
 
 export const supplierSelectionMethods = ['Απ\' ευθείας ανάθεση', 'Έρευνα αγοράς', 'Διαγωνισμός'];
 export const supplierSelectionMethodsMap = {

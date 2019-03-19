@@ -1,6 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { RequestResponse } from '../../domain/operation';
-import { paymentStages, requesterPositions, requestTypes, supplierSelectionMethodsMap } from '../../domain/stageDescriptions';
+import {
+    paymentStages,
+    requesterPositions,
+    requestTypes,
+    statusNamesMap,
+    supplierSelectionMethodsMap
+} from '../../domain/stageDescriptions';
 import { RequestInfo } from '../../domain/requestInfoClasses';
 import { AnchorItem } from '../../shared/dynamic-loader-anchor-components/anchor-item';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -25,13 +31,7 @@ export class RequestStagePaymentComponent implements OnInit {
     stages: string[] = paymentStages;
     reqPositions = requesterPositions;
     selMethods = supplierSelectionMethodsMap;
-    stateNames = {
-        PENDING: 'βρίσκεται σε εξέλιξη',
-        UNDER_REVIEW: 'βρίσκεται σε εξέλιξη',
-        REJECTED: 'έχει απορριφθεί',
-        ACCEPTED: 'έχει ολοκληρωθεί',
-        CANCELLED: 'έχει ακυρωθεί'
-    };
+    stateNames = statusNamesMap;
     reqTypes = requestTypes;
 
     currentRequestInfo: RequestInfo;
@@ -97,7 +97,6 @@ export class RequestStagePaymentComponent implements OnInit {
     }
 
     getSubmittedStage(submittedData: any[]) {
-        console.log(`got ${JSON.stringify(submittedData, null, 1)}`);
         this.updateRequest(submittedData[0], submittedData[1]);
     }
 

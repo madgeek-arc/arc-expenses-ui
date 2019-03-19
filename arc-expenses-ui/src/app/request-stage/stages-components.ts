@@ -256,8 +256,8 @@ export class Stage3Component extends StageComponent implements OnInit {
         }
     }
 
-    onLoanToggle (completedLoan: boolean) {
-        if (completedLoan && (this.stageForm !== undefined) ) {
+    onLoanToggle (checkedLoan: boolean) {
+        if (checkedLoan && (this.stageForm !== undefined) ) {
             this.stageForm.get('loanSource').enable();
             this.stageForm.get('loanSource').setValidators([Validators.required]);
             this.stageForm.get('loanSource').updateValueAndValidity();

@@ -36,38 +36,38 @@
                                 <div class="submittedRequest">
                                     <div class="uk-margin-bottom uk-width-1-1 uk-grid">
                                         <div class="uk-width-1-2@l">
-                                            <span class="uk-text-bold uk-margin-small-right">Πρόγραμμα: </span>
+                                            <span class="uk-text-bold uk-margin-small-right">Πρόγραμμα:</span>
                                             <span *ngIf="currentRequestPayment.projectAcronym">
-                                                {{ currentRequestPayment.projectAcronym }} ({{currentRequestPayment.instituteName}})
+                                              {{ currentRequestPayment.projectAcronym }} ({{currentRequestPayment.instituteName}})
                                             </span>
                                         </div>
                                         <div class="uk-width-1-2@l">
-                                            <span class="uk-text-bold uk-margin-small-right">Ημερομηνία υποβολής: </span>
+                                            <span class="uk-text-bold uk-margin-small-right">Ημερομηνία υποβολής:</span>
                                             <span>{{ currentRequestPayment.stages['1']['requestDate'] | date : 'dd-MM-yyyy' }}</span>
                                         </div>
-                                        <div class="uk-width-1-1@l uk-grid">
-                                            <div class="uk-width-1-2@l">
-                                                <span class="uk-text-bold uk-margin-small-right">Από: </span>
-                                                <span *ngIf="currentRequestPayment.requesterFullName">
-                                                    {{ currentRequestPayment.requesterFullName }} ({{ reqPositions[currentRequestPayment.requesterPosition] }})
-                                                </span>
-                                            </div>
-                                            <div *ngIf="currentRequestPayment.onBehalfFullName" class="uk-width-1-2@l">
-                                                <span class="uk-text-bold uk-margin-small-right">Εκ μέρους του/της: </span>
+                                        <div class="uk-width-1-2@l">
+                                            <span class="uk-text-bold uk-margin-small-right">Από:</span>
+                                            <span>
+                                              {{ currentRequestPayment.requesterFullName }} ({{ reqPositions[currentRequestPayment.requesterPosition] }})
+                                            </span>
+                                        </div>
+                                        <div class="uk-width-1-2@l">
+                                            <div *ngIf="currentRequestPayment.onBehalfFullName">
+                                                <span class="uk-text-bold uk-margin-small-right">Εκ μέρους του/της:</span>
                                                 <span>{{ currentRequestPayment.onBehalfFullName }}</span>
                                             </div>
                                         </div>
                                         <div *ngIf="(currentRequestPayment.type !== 'TRIP') && (currentRequestPayment.type !== 'CONTRACT')" class="uk-width-1-2@l">
-                                            <span class="uk-text-bold uk-margin-small-right">Προμηθευτής: </span>
+                                            <span class="uk-text-bold uk-margin-small-right">Προμηθευτής:</span>
                                             <span>{{ currentRequestPayment.stages['1']['supplier'] }} ({{ selMethods[currentRequestPayment.stages['1']['supplierSelectionMethod']] }})</span>
                                         </div>
                                         <div *ngIf="currentRequestPayment.type === 'TRIP'" class="uk-width-1-2@l">
-                                            <span class="uk-text-bold uk-margin-small-right">Προορισμός: </span>
+                                            <span class="uk-text-bold uk-margin-small-right">Προορισμός:</span>
                                             <span>{{ currentRequestPayment.tripDestination }}</span>
                                         </div>
                                         <div class="uk-width-1-2@l">
                                             <span class="uk-text-bold uk-margin-small-right">
-                                                {{ (currentRequestPayment.stages['1']['amountInEuros'] !== currentRequestPayment.stages['1']['finalAmount']) ? 'Τελικό π': 'Π' }}οσό: </span>
+                                              {{ (currentRequestPayment.stages['1']['amountInEuros'] !== currentRequestPayment.stages['1']['finalAmount']) ? 'Τελικό π': 'Π' }}οσό:</span>
                                             <span>{{ currentRequestPayment.stages['1']['finalAmount'] | currency: 'EUR': 'symbol-narrow' }}</span>
                                         </div>
 
@@ -125,12 +125,6 @@
                                                     [data]="{currentStage: currentRequestPayment.stages['9'], currentRequestInfo: currentRequestInfo}"></stage9-component>
                                 </div>
 
-                                <!-- Message to a simpleUser -->
-                                <div *ngIf="isSimpleUser && (currentRequestPayment.baseInfo.stage !== '7')"
-                                     class="uk-alert uk-alert-primary uk-text-center uk-margin-top">
-                                    Το αίτημά σας {{ stateNames[currentRequestPayment.requestStatus] }}.
-                                </div>
-
                                 <div class="uk-child-width-expand uk-grid" uk-grid
                                      *ngIf="currentRequestInfo['10'].showStage > 1">
                                   <stage10-component class="uk-card uk-card-body uk-card-basic-info uk-margin-left"
@@ -166,6 +160,21 @@
                                                       (newValues)="getFinalAmount($event)"></app-stage-loader>
 
                                 </div>
+
+                                <!-- Message to a simpleUser -->
+                                <div *ngIf="isSimpleUser && (currentRequestPayment.baseInfo.stage !== '7')"
+                                     class="uk-alert uk-alert-primary uk-text-center uk-margin-top">
+                                    Το αίτημά σας {{ stateNames[currentRequestPayment.requestStatus] }}.
+                                </div>
+
+                                <!-- Message to user -->
+                                <div *ngIf=" (currentRequestPayment.requestStatus === 'ACCEPTED') ||
+                                             (currentRequestPayment.requestStatus === 'REJECTED') ||
+                                             (currentRequestPayment.requestStatus === 'CANCELLED')"
+                                     class="uk-alert uk-alert-primary uk-text-center uk-margin-top">
+                                    Το αίτημα {{ stateNames[currentRequestPayment.requestStatus] }}.
+                                </div>
+
 
                             </div>
 

@@ -4,7 +4,14 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ManageRequestsService } from '../services/manage-requests.service';
 import { AuthenticationService } from '../services/authentication.service';
 import { HttpErrorResponse, HttpEventType, HttpResponse } from '@angular/common/http';
-import { approvalStages, requesterPositions, requestTypes, stageTitles, supplierSelectionMethodsMap } from '../domain/stageDescriptions';
+import {
+    approvalStages,
+    requesterPositions,
+    requestTypes,
+    stageTitles,
+    statusNamesMap,
+    supplierSelectionMethodsMap
+} from '../domain/stageDescriptions';
 import { printRequestPage } from './print-request-function';
 import { AnchorItem } from '../shared/dynamic-loader-anchor-components/anchor-item';
 import { RequestInfo } from '../domain/requestInfoClasses';
@@ -30,10 +37,7 @@ export class RequestStageComponent implements OnInit {
     stagesMap = stageTitles;
     reqPositions = requesterPositions;
     selMethods = supplierSelectionMethodsMap;
-    stateNames = {
-        PENDING: 'βρίσκεται σε εξέλιξη', UNDER_REVIEW: 'βρίσκεται σε εξέλιξη',
-        REJECTED: 'έχει απορριφθεί', ACCEPTED: 'έχει ολοκληρωθεί', CANCELLED: 'έχει ακυρωθεί'
-    };
+    stateNames = statusNamesMap;
     reqTypes = requestTypes;
 
     currentRequestInfo: RequestInfo;
@@ -123,7 +127,6 @@ export class RequestStageComponent implements OnInit {
     }
 
     getSubmittedStage(submittedData: any[]) {
-        console.log(`got ${JSON.stringify(submittedData, null, 1)}`);
         this.updateRequest(submittedData[0], submittedData[1]);
     }
 
