@@ -152,7 +152,7 @@ export class StageComponent implements OnInit {
         }
 
         if ((this.stageId !== '6') && (this.stageId !== '11')) {
-            this.currentStage['approvedjson'] = approved;
+            this.currentStage['approved'] = approved;
         }
 
         this.submitForm();
@@ -175,26 +175,25 @@ export class StageComponent implements OnInit {
     submitForm() {
         this.stageFormError = '';
         if (this.stageForm && this.stageForm.valid ) {
-            if ( ( ((this.uploadedFiles == null) || (this.uploadedFiles.length === 0)) &&
+            if ( (this.updateMode === 'approve') &&
+                 ( ((this.uploadedFiles == null) || (this.uploadedFiles.length === 0)) &&
                    ((this.currentStage['attachments'] == null) || (this.currentStage.attachments.length === 0)) ) &&
-                 (this.updateMode === 'downgrade') &&
-                 ( (this.stageId === '6') || (this.stageId === '11') ||
-                   ( (this.stageId === '7') && this.currentStage['approved']) ) ) {
+                 ( (this.stageId === '6') || (this.stageId === '7') || (this.stageId === '11') ) ) {
 
                 this.stageFormError = 'Η επισύναψη εγγράφων είναι υποχρεωτική.';
 
             } else {
-                const stageToSubmit = new FormData();
+                const newStage = new FormData();
                 Object.keys(this.stageForm.controls).forEach(key => {
-                    stageToSubmit.append(key.toString(), this.stageForm.get(key).value);
+                    newStage.append(key.toString(), this.stageForm.get(key).value);
                 });
 
                 if (this.uploadedFiles && (this.uploadedFiles.length > 0)) {
                     for (const f of this.uploadedFiles) {
-                        stageToSubmit.append('attachments', f, f.name);
+                        newStage.append('attachments', f, f.name);
                     }
                 }
-                this.emitStage.emit([this.updateMode, stageToSubmit]);
+                this.emitStage.emit([this.updateMode, newStage]);
 
             }
 

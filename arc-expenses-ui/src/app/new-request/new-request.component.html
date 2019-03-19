@@ -159,7 +159,8 @@
                                   <div class="uk-width-1-2@s">
                                       <input class="uk-input" type="text" id="request-program"
                                              (keyup)="updateSearchTerm($event)" formControlName="program">
-                                      <div *ngIf="searchTerm" class="uk-nav uk-padding-small uk-width-large uk-position-absolute" style="background-color: white">
+                                      <div *ngIf="searchTerm" class="uk-nav uk-padding-small uk-width-large uk-position-absolute"
+                                           style="background-color: white; z-index: 1000 !important;">
                                           <ul>
                                               <li *ngFor="let project of projects | filterByTerm: searchTerm: 'projectAcronym'">
                                                   <a (click)="updateProgramInput(project)">{{ project.projectAcronym }} ({{ project.instituteName }})</a>
