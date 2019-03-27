@@ -26,6 +26,11 @@
             </div>
         </div>
 
+        <div class="uk-width-1-1@l">
+            <label class="uk-text-bold uk-margin-small-right">Θέμα (*):</label>
+            <textarea class="uk-textarea" rows="3" formControlName="requestText"></textarea>
+        </div>
+
         <div *ngIf="(currentRequest.type !== 'TRIP') &&
                     (currentRequest.type !== 'CONTRACT')" class="uk-width-1-2@l">
             <label class="uk-text-bold uk-margin-small-right">Προμηθευτής <span [hidden]="isSupplierRequired === false">(*)</span>:</label>
@@ -49,7 +54,7 @@
             <span>{{ currentRequest.tripDestination }}</span>
         </div>
         <div class="uk-width-1-2@l">
-            <label class="uk-text-bold uk-margin-small-right">Ποσό (*): </label>
+            <label class="uk-text-bold uk-margin-small-right">Ποσό (σε EUR) (*): </label>
             <input class="uk-input" type="text" formControlName="amount" placeholder="0" (keyup)="showAmount()">
             <div *ngIf="showWarning" class="uk-text-primary">
                 Για ποσά μεταξύ 2.500 € και 20.000 € είναι απαραίτητο να συμπληρώσετε το ακριβές ποσό.
@@ -69,11 +74,6 @@
 
                 Το ποσό είναι: {{ requestedAmount | currency: 'EUR': 'symbol-narrow' }}
             </div>
-        </div>
-
-        <div class="uk-width-1-1@l">
-            <label class="uk-text-bold uk-margin-small-right">Θέμα (*):</label>
-            <textarea formControlName="requestText"></textarea>
         </div>
 
         <div class="uk-width-1-1@l">

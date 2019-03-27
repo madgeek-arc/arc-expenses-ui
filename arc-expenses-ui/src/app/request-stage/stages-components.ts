@@ -114,7 +114,7 @@ export class StageComponent implements OnInit {
             url = `${url}&filename=${this.currentStage.attachments[i].filename}`;
 
             /* link to download method */
-            window.open(url, '_blank', 'enabledstatus=0,toolbar=0,menubar=0,location=0');
+            window.open(url, '_blank');
         }
     }
 

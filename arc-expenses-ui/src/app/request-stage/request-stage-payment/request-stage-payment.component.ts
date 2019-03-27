@@ -211,7 +211,7 @@ export class RequestStagePaymentComponent implements OnInit {
             url = `${url}archiveId=${this.currentRequestPayment.stages['1'].attachments[fileIndex].url}`;
             url = `${url}&filename=${this.currentRequestPayment.stages['1'].attachments[fileIndex].filename}`;
 
-            window.open(url, '_blank', 'enabledstatus=0,toolbar=0,menubar=0,location=0');
+            window.open(url, '_blank');
         }
     }
 

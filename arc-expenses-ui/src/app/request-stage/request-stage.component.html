@@ -57,6 +57,12 @@
                         <span>{{ currentRequestApproval.onBehalfFullName }}</span>
                       </div>
                     </div>
+
+                    <div class="uk-width-1-1@l">
+                      <span class="uk-text-bold uk-margin-small-right">Θέμα:</span>
+                      <span>{{ currentRequestApproval.stages['1']['subject'] }}</span>
+                    </div>
+
                     <div *ngIf="(currentRequestApproval.type !== 'TRIP') && (currentRequestApproval.type !== 'CONTRACT')" class="uk-width-1-2@l">
                       <span class="uk-text-bold uk-margin-small-right">Προμηθευτής:</span>
                       <span>{{ currentRequestApproval.stages['1']['supplier'] }} ({{ selMethods[currentRequestApproval.stages['1']['supplierSelectionMethod']] }})</span>
@@ -69,11 +75,6 @@
                       <span class="uk-text-bold uk-margin-small-right">
                         {{ (currentRequestApproval.stages['1']['amountInEuros'] !== currentRequestApproval.stages['1']['finalAmount']) ? 'Τελικό π': 'Π' }}οσό:</span>
                       <span>{{ currentRequestApproval.stages['1']['finalAmount'] | currency: 'EUR': 'symbol-narrow' }}</span>
-                    </div>
-
-                    <div class="uk-width-1-1@l">
-                      <span class="uk-text-bold uk-margin-small-right">Θέμα:</span>
-                      <span>{{ currentRequestApproval.stages['1']['subject'] }}</span>
                     </div>
 
                     <div *ngIf="currentRequestApproval.stages['1'].attachments && (currentRequestApproval.stages['1'].attachments.length > 0)"

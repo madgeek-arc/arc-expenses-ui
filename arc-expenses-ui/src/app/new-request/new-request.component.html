@@ -46,7 +46,7 @@
                           </div>
                           <div class="uk-width-1-2@s">
                             <select class="uk-select" id="request-position" formControlName="position"
-                                    [style]="(newRequestForm.get('position').dirty && newRequestForm.get('position').invalid) ? 'border: 1px solid darkred;': ''">
+                                    [style]="(newRequestForm.get('position').dirty && newRequestForm.get('position').invalid) ? 'border: 1px solid #e44e56;': ''">
                               <option value="">-- επιλέξτε θέση στον φορέα (*) --</option>
                               <option value="RESEARCHER">{{ reqPositions['RESEARCHER'] }}</option>
                               <option value="COLLABORATIVE_RESEARCHER">{{ reqPositions['COLLABORATIVE_RESEARCHER'] }}</option>
@@ -79,6 +79,86 @@
                           <div class="uk-width-1-2@s">
                             <input class="uk-input" type="text"
                                    placeholder="Email (*)" formControlName="onBehalf_email">
+                          </div>
+                        </div>
+                        <div class="uk-text-primary uk-text-small">
+                          <i class="fa fa-info-circle"></i>  Για να έχει ο ενδιαφερόμενος πρόσβαση στο αίτημα, το email που συμπληρώνετε θα πρέπει να είναι το ίδιο με αυτό που θα χρησιμοποιήσει για να συνδεθεί στην πλατφόρμα.
+                        </div>
+                      </div>
+                    </div>
+                    <div class="uk-margin">
+                        <label class="uk-form-label" for="request-program">Επιλέξτε έργο <span>(*)</span></label>
+                        <div class="uk-form-controls">
+                            <div class="uk-grid uk-width-1-1">
+                                <div class="uk-width-1-2@s">
+                                    <input class="uk-input" type="text" id="request-program"
+                                           (keyup)="updateSearchTerm($event)" formControlName="program">
+                                    <div *ngIf="searchTerm" class="uk-nav uk-padding-small uk-width-large uk-position-absolute"
+                                         style="background-color: white; z-index: 1000 !important;">
+                                        <ul>
+                                            <li *ngFor="let project of projects | filterByTerm: searchTerm: 'projectAcronym'">
+                                                <a (click)="updateProgramInput(project)">{{ project.projectAcronym }} ({{ project.instituteName }})</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="uk-width-1-2@s">
+                                    <input class="uk-input" id="request-institute" formControlName="institute" placeholder="Ινστιτούτο/Μονάδα">
+                                </div>
+                            </div>
+                            <div class="uk-comment-body uk-text-small uk-text-muted">
+                                <i>Ξεκινήστε να γράφετε το όνομα του έργου και επιλέξτε το από την λίστα που θα εμφανιστεί.</i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="uk-margin">
+                        <label class="uk-form-label">Προς</label>
+                        <div class="uk-form-controls">
+                            <div class="uk-width-1-1">
+                                <div class="uk-width-1-1">
+                                    <input class="uk-input uk-disabled" type="text" id="request-to" formControlName="sciCoord">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="uk-margin">
+                      <label class="uk-form-label" for="request-text">Θέμα <span>(*)</span></label>
+                      <div class="uk-form-controls">
+                        <div class="uk-width-1-1">
+                          <div class="uk-width-1-1@s">
+                              <textarea class="uk-textarea" id="request-text" formControlName="requestText" rows="3"></textarea>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div *ngIf="isRegularOrServicesContract()" class="uk-margin">
+                      <label class="uk-form-label" for="request-supplier">Προμηθευτής
+                        <span class="uk-display-inline">{{ isSupplierRequired }}</span>
+                      </label>
+                      <div class="uk-form-controls">
+                        <div class="uk-width-1-1 uk-grid">
+                          <div class="uk-width-1-2@l">
+                            <input class="uk-input" type="text" placeholder="" id="request-supplier"
+                                   formControlName="supplier">
+                          </div>
+                          <div class="uk-width-1-2@l">
+                            <select class="uk-select" id="request-ssm"
+                                    formControlName="supplierSelectionMethod" (change)="checkIfSupplierIsRequired()">
+                              <option value="">-- τρόπος επιλογής προμηθευτή (*) --</option>
+                              <option value="DIRECT">{{ selMethods['DIRECT'] }}</option>
+                              <option value="MARKET_RESEARCH">{{ selMethods['MARKET_RESEARCH'] }}</option>
+                              <option value="AWARD_PROCEDURE">{{ selMethods['AWARD_PROCEDURE'] }}</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div *ngIf="(requestType === 'TRIP')" class="uk-margin">
+                      <label class="uk-form-label" for="dest">Προορισμός (*)</label>
+                      <div class="uk-form-controls">
+                        <div class="uk-grid uk-width-1-1">
+                          <div class="uk-width-1-2@s">
+                            <input class="uk-input" type="text" id="dest" formControlName="trip_destination">
                           </div>
                         </div>
                       </div>
@@ -116,84 +196,6 @@
                               <input id="noOfPayments" formControlName="no_of_payments"
                                      class="uk-input" type="number" step="1">
                             </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div *ngIf="isRegularOrServicesContract()" class="uk-margin">
-                      <label class="uk-form-label" for="request-supplier">Προμηθευτής
-                        <span class="uk-display-inline">{{ isSupplierRequired }}</span>
-                      </label>
-                      <div class="uk-form-controls">
-                        <div class="uk-width-1-1 uk-grid">
-                          <div class="uk-width-1-2@l">
-                            <input class="uk-input" type="text" placeholder="" id="request-supplier"
-                                   formControlName="supplier">
-                          </div>
-                          <div class="uk-width-1-2@l">
-                            <select class="uk-select" id="request-ssm"
-                                    formControlName="supplierSelectionMethod" (change)="checkIfSupplierIsRequired()">
-                              <option value="">-- τρόπος επιλογής προμηθευτή (*) --</option>
-                              <option value="DIRECT">{{ selMethods['DIRECT'] }}</option>
-                              <option value="MARKET_RESEARCH">{{ selMethods['MARKET_RESEARCH'] }}</option>
-                              <option value="AWARD_PROCEDURE">{{ selMethods['AWARD_PROCEDURE'] }}</option>
-                            </select>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div *ngIf="(requestType === 'TRIP')" class="uk-margin">
-                      <label class="uk-form-label" for="dest">Προορισμός (*)</label>
-                      <div class="uk-form-controls">
-                        <div class="uk-grid uk-width-1-1">
-                          <div class="uk-width-1-2@s">
-                            <input class="uk-input" type="text" id="dest" formControlName="trip_destination">
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                      <div class="uk-margin">
-                          <label class="uk-form-label" for="request-program">Επιλέξτε έργο <span>(*)</span></label>
-                          <div class="uk-form-controls">
-                              <div class="uk-grid uk-width-1-1">
-                                  <div class="uk-width-1-2@s">
-                                      <input class="uk-input" type="text" id="request-program"
-                                             (keyup)="updateSearchTerm($event)" formControlName="program">
-                                      <div *ngIf="searchTerm" class="uk-nav uk-padding-small uk-width-large uk-position-absolute"
-                                           style="background-color: white; z-index: 1000 !important;">
-                                          <ul>
-                                              <li *ngFor="let project of projects | filterByTerm: searchTerm: 'projectAcronym'">
-                                                  <a (click)="updateProgramInput(project)">{{ project.projectAcronym }} ({{ project.instituteName }})</a>
-                                              </li>
-                                          </ul>
-                                      </div>
-                                  </div>
-                                  <div class="uk-width-1-2@s">
-                                      <input class="uk-input" id="request-institute" formControlName="institute" placeholder="Ινστιτούτο/Μονάδα">
-                                  </div>
-                              </div>
-                              <div class="uk-comment-body uk-text-small uk-text-muted">
-                                  <i>Ξεκινήστε να γράφετε το όνομα του έργου και επιλέξτε το από την λίστα που θα εμφανιστεί.</i>
-                              </div>
-                          </div>
-                      </div>
-                      <div class="uk-margin">
-                          <label class="uk-form-label">Προς</label>
-                          <div class="uk-form-controls">
-                              <div class="uk-width-1-1">
-                                  <div class="uk-width-1-1">
-                                      <input class="uk-input uk-disabled" type="text" id="request-to" formControlName="sciCoord">
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                    <div class="uk-margin">
-                      <label class="uk-form-label" for="request-text">Θέμα <span>(*)</span></label>
-                      <div class="uk-form-controls">
-                        <div class="uk-width-1-1">
-                          <div class="uk-width-1-1@s">
-                              <textarea class="uk-form-help-block uk-text-small uk-width-1-1 uk-height-small" id="request-text"
-                                        formControlName="requestText"></textarea>
                           </div>
                         </div>
                       </div>
