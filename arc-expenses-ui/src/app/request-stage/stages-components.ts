@@ -3,7 +3,6 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Stage } from '../domain/operation';
 import { commentDesc, FieldDescription } from '../domain/stageDescriptions';
 import { DatePipe } from '@angular/common';
-import { AuthenticationService } from '../services/authentication.service';
 import { RequestInfo, StageInfo } from '../domain/requestInfoClasses';
 
 @Component ({
@@ -293,7 +292,7 @@ export class Stage5aComponent extends StageComponent implements OnInit {
 
     ngOnInit () {
         this.stageFormDefinition = {
-            comment: [''],
+            comment: ['']
         };
         this.stageId = '5a';
 
@@ -312,7 +311,7 @@ export class Stage5bComponent extends StageComponent implements OnInit {
 
     ngOnInit () {
         this.stageFormDefinition = {
-            comment: [''],
+            comment: ['']
         };
         this.stageId = '5b';
 
@@ -409,13 +408,13 @@ export class Stage5bComponent extends StageComponent implements OnInit {
 
 @Component ({
     selector: 'stage6-component',
-    templateUrl: './stages-templates/stage6.component.html'
+    templateUrl: './stages-templates/stage6And11.component.html'
 })
 export class Stage6Component extends StageComponent implements OnInit {
 
     ngOnInit () {
         this.stageFormDefinition = {
-            comment: [''],
+            comment: ['']
         };
         this.stageId = '6';
 
@@ -434,7 +433,7 @@ export class Stage7Component extends StageComponent implements OnInit {
 
     ngOnInit () {
         this.stageFormDefinition = {
-            comment: [''],
+            comment: ['']
         };
         this.stageId = '7';
 
@@ -500,7 +499,7 @@ export class Stage8Component extends StageComponent implements OnInit {
         this.stageFormDefinition = {
             checkRegularity: ['', Validators.requiredTrue],
             checkLegality: ['', Validators.requiredTrue],
-            comment: [''],
+            comment: ['']
         };
         this.stageId = '8';
 
@@ -518,7 +517,7 @@ export class Stage9Component extends StageComponent implements OnInit {
         this.stageFormDefinition = {
             checkRegularity: ['', Validators.requiredTrue],
             checkLegality: ['', Validators.requiredTrue],
-            comment: [''],
+            comment: ['']
         };
         this.stageId = '9';
 
@@ -534,7 +533,7 @@ export class Stage10Component extends StageComponent implements OnInit {
 
     ngOnInit () {
         this.stageFormDefinition = {
-            comment: [''],
+            comment: ['']
         };
         this.stageId = '10';
 
@@ -544,13 +543,13 @@ export class Stage10Component extends StageComponent implements OnInit {
 
 @Component ({
     selector: 'stage11-component',
-    templateUrl: './stages-templates/stage11.component.html'
+    templateUrl: './stages-templates/stage6And11.component.html'
 })
 export class Stage11Component extends StageComponent implements OnInit {
 
     ngOnInit () {
         this.stageFormDefinition = {
-            comment: [''],
+            comment: ['']
         };
         this.stageId = '11';
 
@@ -566,7 +565,7 @@ export class Stage12Component extends StageComponent implements OnInit {
 
     ngOnInit () {
         this.stageFormDefinition = {
-            comment: [''],
+            comment: ['']
         };
         this.stageId = '12';
 
@@ -583,7 +582,7 @@ export class Stage13Component extends StageComponent implements OnInit {
 
     ngOnInit () {
         this.stageFormDefinition = {
-            comment: [''],
+            comment: ['']
         };
         this.stageId = '13';
 
