@@ -5,7 +5,7 @@ import { AuthenticationService } from '../services/authentication.service';
 import { Paging } from '../domain/extraClasses';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
-import { approvalStages, paymentStages, requestTypes, stageIds, stageTitles, statesList } from '../domain/stageDescriptions';
+import { approvalStages, paymentStages, requestTypes, stageTitles, statesList } from '../domain/stageDescriptions';
 import { ManageResourcesService } from '../services/manage-resources.service';
 import { ManageProjectService } from '../services/manage-project.service';
 
@@ -63,7 +63,6 @@ export class RequestsComponent implements OnInit {
     /* search result vars */
     searchResults: Paging<RequestSummary>;
     listOfRequests: RequestSummary[] = [];
-    listOfRowColors: string[] = [];
 
     constructor(private requestService: ManageRequestsService,
                 private resourceService: ManageResourcesService,
@@ -74,7 +73,7 @@ export class RequestsComponent implements OnInit {
                 private fb: FormBuilder) {}
 
     ngOnInit() {
-        this.isSimpleUser = (this.authService.getUserRole().some(x => x.authority === 'ROLE_USER') &&
+        this.isSimpleUser = (this.authService.getUserRole().some(x => x['authority'] === 'ROLE_USER') &&
                              (this.authService.getUserRole().length === 1));
 
         /* TODO: add when institutes are added */
@@ -83,13 +82,13 @@ export class RequestsComponent implements OnInit {
     }
 
     initializeParams() {
-        this.statusesChoice = ['pending', 'under_review'];
-        this.stagesChoice = stageIds;
-        this.typesChoice = ['all'];
-        this.institutesChoice = ['all'];
+        this.statusesChoice = [ 'pending', 'under_review' ];
+        this.stagesChoice = [ 'all' ];
+        this.typesChoice = [ 'all' ];
+        this.institutesChoice = [ 'all' ];
 
         this.searchTerm = '';
-        this.keywordField = this.fb.group({ keyword: [''] });
+        this.keywordField = this.fb.group({keyword: [ '' ]});
 
         this.phaseId = 0;
         this.stages = approvalStages.concat(paymentStages);
@@ -101,17 +100,20 @@ export class RequestsComponent implements OnInit {
         this.orderField = 'creation_date';
         this.totalPages = 0;
 
+        this.editableSelected = false;
+
         this.createSearchUrl();
+
     }
 
     readParams() {
-        this.statusesChoice = ['pending', 'under_review'];
-        this.stagesChoice = ['all'];
-        this.typesChoice = ['all'];
-        this.institutesChoice = ['all'];
+        this.statusesChoice = [ 'pending', 'under_review' ];
+        this.stagesChoice = [ 'all' ];
+        this.typesChoice = [ 'all' ];
+        this.institutesChoice = [ 'all' ];
 
         this.searchTerm = '';
-        this.keywordField = this.fb.group({ keyword: [''] });
+        this.keywordField = this.fb.group({keyword: [ '' ]});
 
         this.phaseId = 0;
         this.stages = approvalStages.concat(paymentStages);
@@ -123,9 +125,11 @@ export class RequestsComponent implements OnInit {
         this.orderField = 'creation_date';
         this.totalPages = 0;
 
+        this.editableSelected = false;
+
         this.route.queryParamMap.subscribe(
             params => {
-                // console.log(JSON.stringify(params, null, 2));
+                console.log('yeeep!');
                 if ( params.has('status') ) { this.statusesChoice = params.getAll('status'); }
                 if ( params.has('stage') ) { this.stagesChoice = params.getAll('stage'); }
                 if ( params.has('phase') && !isNaN(+params.get('phase')) ) {
@@ -159,11 +163,11 @@ export class RequestsComponent implements OnInit {
                 if ( params.has('orderField') ) { this.orderField = params.get('orderField'); }
                 if ( params.has('order') ) { this.order = params.get('order'); }
                 if ( params.has('editable') ) { this.editableSelected = (params.get('editable') === 'true'); }
+
+                this.initializeFiltersForm();
+                this.getListOfRequests();
             }
         );
-
-        this.initializeFiltersForm();
-        this.getListOfRequests();
     }
 
     initializeFiltersForm() {
@@ -337,7 +341,6 @@ export class RequestsComponent implements OnInit {
             this.orderField = category;
         }
         this.currentPage = 0;
-        // this.getListOfRequests();
         this.createSearchUrl();
     }
 
@@ -361,7 +364,6 @@ export class RequestsComponent implements OnInit {
     goToPreviousPage() {
         if (this.currentPage > 0) {
             this.currentPage--;
-            // this.getListOfRequests();
             this.createSearchUrl();
         }
     }
@@ -369,7 +371,6 @@ export class RequestsComponent implements OnInit {
     goToNextPage() {
         if ( (this.currentPage + 1) < this.totalPages) {
             this.currentPage++;
-            // this.getListOfRequests();
             this.createSearchUrl();
         }
     }
@@ -377,7 +378,6 @@ export class RequestsComponent implements OnInit {
     getItemsPerPage(event: any) {
         this.itemsPerPage = event.target.value;
         this.currentPage = 0;
-        // this.getListOfRequests();
         this.createSearchUrl();
     }
 
@@ -395,7 +395,6 @@ export class RequestsComponent implements OnInit {
         this.setAllStageValues(false);
         this.initFormArray('stageChoices', { stage: [false] }, this.stages.length);
         this.currentPage = 0;
-        // this.getListOfRequests();
         this.createSearchUrl();
     }
 
@@ -414,7 +413,6 @@ export class RequestsComponent implements OnInit {
             this.getStageChoices();
             console.log('after getStageChoices list is', JSON.stringify(this.stagesChoice));
             this.currentPage = 0;
-            // this.getListOfRequests();
             this.createSearchUrl();
         }
     }
@@ -423,7 +421,6 @@ export class RequestsComponent implements OnInit {
         this.getStatusChoices();
         console.log('after getStatusChoices list is', JSON.stringify(this.statusesChoice));
         this.currentPage = 0;
-        // this.getListOfRequests();
         this.createSearchUrl();
     }
 
@@ -431,7 +428,6 @@ export class RequestsComponent implements OnInit {
         this.getTypeChoices();
         console.log('after getTypeChoices list is', JSON.stringify(this.typesChoice));
         this.currentPage = 0;
-        // this.getListOfRequests();
         this.createSearchUrl();
     }
 
@@ -439,7 +435,6 @@ export class RequestsComponent implements OnInit {
         this.getInstituteChoices();
         console.log('after getInstituteChoices list is', JSON.stringify(this.institutesChoice));
         this.currentPage = 0;
-        // this.getListOfRequests();
         this.createSearchUrl();
     }
 
@@ -447,7 +442,6 @@ export class RequestsComponent implements OnInit {
         this.searchTerm = this.keywordField.get('keyword').value;
         console.log('this.searchTerm is', this.searchTerm);
         this.currentPage = 0;
-        // this.getListOfRequests();
         this.createSearchUrl();
     }
 
@@ -466,21 +460,18 @@ export class RequestsComponent implements OnInit {
         this.stages = approvalStages.concat(paymentStages);
         this.initFormArray('stageChoices', { stage: [false]}, this.stages.length);
         this.currentPage = 0;
-        // this.getListOfRequests();
         this.createSearchUrl();
     }
 
     toggleSearchAllStages(event: any) {
         this.setAllStageValues(event.target.checked);
         this.currentPage = 0;
-        // this.getListOfRequests();
         this.createSearchUrl();
     }
 
     toggleSearchAllStatuses(event: any) {
         this.setAllStatusValues(event.target.checked);
         this.currentPage = 0;
-        // this.getListOfRequests();
         this.createSearchUrl();
     }
 
@@ -490,7 +481,6 @@ export class RequestsComponent implements OnInit {
         this.typesChoice = [];
         this.typesChoice.push('all');
         this.currentPage = 0;
-        // this.getListOfRequests();
         this.createSearchUrl();
     }
 
@@ -695,8 +685,7 @@ export class RequestsComponent implements OnInit {
             url.set('editable', 'true');
         }
 
-        this.router.navigateByUrl(`/requests?${url.toString()}`)
-            .then(() => this.readParams() );
+        this.router.navigateByUrl(`/requests?${url.toString()}`);
     }
 
 }
