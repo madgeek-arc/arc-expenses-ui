@@ -128,7 +128,7 @@ export class NewRequestComponent implements OnInit {
             onBehalf_email: [''],
             trip_destination: [''],
             amount: ['', [Validators.required, Validators.min(0), Validators.pattern('^\\d+(\\.\\d{1,2})?$')] ],
-            no_of_payments: [1, Validators.min(1)],
+            no_of_payments: [0],
             sciCoord: ['']
         });
         this.newRequestForm.get('name').setValue(`${this.currentUser.firstname} ${this.currentUser.lastname}`);
@@ -137,6 +137,10 @@ export class NewRequestComponent implements OnInit {
         if (this.requestType === 'TRIP') {
             this.newRequestForm.get('trip_destination').setValidators([Validators.required]);
             this.newRequestForm.get('trip_destination').updateValueAndValidity();
+        }
+        if (this.requestType === 'SERVICES_CONTRACT') {
+            this.newRequestForm.get('no_of_payments').setValidators([Validators.required, Validators.min(1)]);
+            this.newRequestForm.get('no_of_payments').updateValueAndValidity();
         }
         if ((this.requestType === 'TRIP') || (this.requestType === 'CONTRACT')) {
             this.newRequestForm.get('supplierSelectionMethod').clearValidators();

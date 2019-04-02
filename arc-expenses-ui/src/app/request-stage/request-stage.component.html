@@ -25,12 +25,12 @@
             </aside-help-content>
 
             <!-- MIDDLE -->
-            <div id="printable-section" class=" uk-width-expand@m">
+            <div class=" uk-width-expand@m">
               <div *ngIf="errorMessage" class="uk-alert uk-alert-danger">{{ errorMessage }}</div>
               <div *ngIf="successMessage" class="uk-alert uk-alert-success">{{ successMessage }}</div>
               <div *ngIf="notFoundMessage" class="uk-alert">{{ notFoundMessage }}</div>
 
-              <div *ngIf="!showSpinner && currentRequestInfo">
+              <div id="printable-section" *ngIf="!showSpinner && currentRequestInfo">
 
                 <!--1st stage-->
                 <div *ngIf="willShowStage('1') === 2" class="submittedRequest">

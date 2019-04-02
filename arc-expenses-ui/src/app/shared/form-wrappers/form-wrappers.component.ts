@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FieldDescription } from '../../domain/stageDescriptions';
+import * as uikit from 'uikit';
 
 @Component({
   selector: 'app-form-field',
@@ -147,8 +148,16 @@ export class FormUploadFilesComponent implements OnInit {
 
     loadFilesToUploadedList(files: File[]) {
         for (const f of files) {
-            this.uploadedFilenames.push(f.name);
-            this.uploadedFiles.push(f);
+            if (this.uploadedFilenames.includes(f.name)) {
+                uikit.modal.alert(`<h6 class="uk-modal-title">Το αρχείο υπάρχει ήδη</h6>
+                                   <div class="uk-modal-body">
+                                        <div>Υπάρχει ήδη ένα αρχείο με όνομα ${f.name} στην λίστα.</div>
+                                   </div>`);
+                break;
+            } else {
+                this.uploadedFilenames.push(f.name);
+                this.uploadedFiles.push(f);
+            }
         }
     }
 
