@@ -208,8 +208,10 @@ export class RequestStagePaymentComponent implements OnInit {
             this.currentRequestPayment.stages['1'].attachments[fileIndex].url) {
 
             let url = `${window.location.origin}/arc-expenses-service/request/store/download?`;
-            url = `${url}archiveId=${this.currentRequestPayment.stages['1'].attachments[fileIndex].url}`;
-            url = `${url}&filename=${this.currentRequestPayment.stages['1'].attachments[fileIndex].filename}`;
+            url = `${url}archiveId=${encodeURIComponent(this.currentRequestPayment.stages['1'].attachments[fileIndex].url)}`;
+            url = `${url}&id=${this.currentRequestPayment.baseInfo.requestId}-a1`;
+            url = `${url}&mode=approval`;
+            url = `${url}&filename=${encodeURIComponent(this.currentRequestPayment.stages['1'].attachments[fileIndex].filename)}`;
 
             window.open(url, '_blank');
         }

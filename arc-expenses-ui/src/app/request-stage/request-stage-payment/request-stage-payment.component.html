@@ -78,7 +78,7 @@
                                         </div>
 
                                         <div *ngIf="currentRequestPayment.stages['1'].attachments && (currentRequestPayment.stages['1'].attachments.length > 0)"
-                                             class="uk-margin-small-top no-print" data-html2canvas-ignore>
+                                             class="uk-margin-small-top uk-width-1-1@l no-print" data-html2canvas-ignore>
                                             Για λήψη του αρχείου που επιθυμείτε, πατήστε στον αντίστοιχο σύνδεσμο:
                                             <span *ngFor="let f of currentRequestPayment.stages['1'].attachments; let i = index">
                                             <a class="uk-link uk-width-1-1@l" (click)="linkToFile(i)">

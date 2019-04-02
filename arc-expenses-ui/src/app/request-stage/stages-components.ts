@@ -108,9 +108,10 @@ export class StageComponent implements OnInit {
             const mode: string = (this.currentRequestInfo.phaseId.includes('a') ? 'approval' : 'payment');
 
             let url = `${window.location.origin}/arc-expenses-service/request/store/download?`;
-            // url = `${url}id=${this.currentRequestInfo.phaseId}&stage=${this.stageId}&mode=${mode}`;
-            url = `${url}archiveId=${this.currentStage.attachments[i].url}`;
-            url = `${url}&filename=${this.currentStage.attachments[i].filename}`;
+            url = `${url}archiveId=${encodeURIComponent(this.currentStage.attachments[i].url)}`;
+            url = `${url}&id=${this.currentRequestInfo.phaseId}`;
+            url = `${url}&mode=${mode}`;
+            url = `${url}&filename=${encodeURIComponent(this.currentStage.attachments[i].filename)}`;
 
             /* link to download method */
             window.open(url, '_blank');

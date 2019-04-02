@@ -60,11 +60,22 @@ export class NewRequestComponent implements OnInit {
 
 
     ngOnInit() {
-        console.log('in new-request, request type is:', this.route.snapshot.url[this.route.snapshot.url.length - 1].path );
-        this.requestType = this.route.snapshot.url[this.route.snapshot.url.length - 1].path;
-        this.requestType = this.requestType.toUpperCase();
         this.getUserInfo();
         this.getProjects();
+        this.route.paramMap.subscribe(
+            param => {
+                if (param.has('type')) {
+                    this.requestType = param.get('type');
+                } else {
+                    this.requestType = 'reqular';
+                }
+                this.requestType = this.requestType.toUpperCase();
+                console.log('in new-request, request type is:', this.requestType );
+                console.log('current type is:', this.requestType);
+                this.title = this.reqTypes[this.requestType];
+                this.createForm();
+            }
+        );
     }
 
     getUserInfo() {
@@ -76,14 +87,6 @@ export class NewRequestComponent implements OnInit {
         this.currentUser.firstnameLatin = this.authService.getUserProp('firstnameLatin');
         this.currentUser.lastnameLatin = this.authService.getUserProp('lastnameLatin');
         console.log('this.currentUser is: ', this.currentUser);
-
-        console.log('current type is:', this.requestType);
-        this.title = this.reqTypes[this.requestType];
-        this.createForm();
-        if ( this.requestType === 'REGULAR') {
-            this.isSupplierRequired = '(*)';
-        }
-
     }
 
     getProjects() {
