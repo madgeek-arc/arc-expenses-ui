@@ -16,6 +16,7 @@ export class RequestResponse {
     instituteName: string;
     requesterFullName: string;
     onBehalfFullName: string;
+    onBehalfEmail: string;
     tripDestination: string;
     canEdit: boolean;
 }

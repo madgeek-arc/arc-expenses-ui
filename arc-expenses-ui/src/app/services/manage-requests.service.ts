@@ -12,6 +12,7 @@ import { Paging } from '../domain/extraClasses';
 import { ContactUsMail } from '../domain/operation';
 import {environment} from '../../environments/environment';
 import index from '@angular/cli/lib/cli';
+import { c } from '@angular/core/src/render3';
 
 const headerOptions = {
     headers : new HttpHeaders().set('Content-Type', 'application/json').set('Accept', 'application/json'),
@@ -52,26 +53,21 @@ export class ManageRequestsService {
         return this.http.request(req).pipe(catchError(this.handleError));
     }
 
-    addRequest(newRequest: Request): Observable<Request> {
-        const url = `${this.apiUrl}addRequest`;
+    cancelRequestPayment(paymentId: string, cancelRequest: boolean): Observable<any> {
+        const url = `${environment.API_ENDPOINT}/payment/cancel/${paymentId}`;
         console.log(`calling ${url}`);
-        console.log(`sending ${JSON.stringify(newRequest)}`);
 
-        return this.http.post<Request>(url, JSON.stringify(newRequest), headerOptions)
-            .pipe(
-                catchError(this.handleError)
-            );
+        const formData = new FormData();
+        formData.append('cancel_request', cancelRequest ? 'true' : 'false');
+
+        return this.http.post<any>(url, formData, headerOptions).pipe(catchError(this.handleError));
     }
 
-    addRequestApproval(newRequestApproval: RequestApproval): Observable<RequestApproval> {
-        const url = `${this.apiUrl}addRequestApproval`;
+    finalizeRequest(requestId: string): Observable<any> {
+        const url = `${this.apiUrl}finalize/${requestId}`;
         console.log(`calling ${url}`);
-        console.log(`sending ${JSON.stringify(newRequestApproval)}`);
 
-        return this.http.post<RequestApproval>(url, JSON.stringify(newRequestApproval), headerOptions)
-            .pipe(
-                catchError(this.handleError)
-            );
+        return this.http.post<any>(url, {}, headerOptions).pipe(catchError(this.handleError));
     }
 
     addRequestPayment(requestId: string): Observable<RequestPayment> {
@@ -83,12 +79,6 @@ export class ManageRequestsService {
             .pipe(
                 catchError(this.handleError)
             );
-    }
-
-    getRequestById(requestId: string, userEmail: string): Observable<Request> {
-        const url = `${this.apiUrl}getById/${requestId}`;
-        console.log(`calling ${url}`);
-        return this.http.get<Request>(url, headerOptions);
     }
 
     getRequestApprovalById(requestApproval: string): Observable<RequestResponse> {
@@ -107,81 +97,6 @@ export class ManageRequestsService {
         const url = `${this.apiUrl}payments/getByRequestId/${requestId}`;
         console.log(`calling ${url}`);
         return this.http.get<Paging<RequestPayment>>(url, headerOptions);
-    }
-
-    updateRequest(updatedRequest: Request, userEmail: string): Observable<Request> {
-        const url = `${this.apiUrl}updateRequest`;
-        console.log(`calling ${url}`);
-        return this.http.post<Request>(url, updatedRequest, headerOptions)
-            .pipe(
-                catchError(this.handleError)
-            );
-    }
-
-    updateRequestApproval(updatedRequestApproval: RequestApproval): Observable<RequestApproval> {
-        const url = `${this.apiUrl}updateRequestApproval`;
-        console.log(`calling ${url}`);
-        return this.http.post<RequestApproval>(url, updatedRequestApproval, headerOptions)
-            .pipe(
-                catchError(this.handleError)
-            );
-    }
-
-    updateRequestPayment(updatedRequestPayment: RequestPayment): Observable<RequestPayment> {
-        const url = `${this.apiUrl}updateRequestPayment`;
-        console.log(`calling ${url}`);
-        return this.http.post<RequestPayment>(url, updatedRequestPayment, headerOptions)
-            .pipe(
-                catchError(this.handleError)
-            );
-    }
-
-    isEditable(req: RequestSummary, email: string): Observable<boolean> {
-        const url = `${this.apiUrl}isEditable?email=${encodeURIComponent(email)}`;
-        console.log(`calling ${url}`);
-        // console.log(`sending ${JSON.stringify(req)}`);
-        return this.http.post<boolean>(url, JSON.stringify(req), headerOptions).pipe(
-            catchError(this.handleError)
-        );
-    }
-
-    uploadAttachment<T>(archiveid: string, stage: string, file: File, mode: string): Observable<HttpEvent<T>> {
-        const url = `${this.apiUrl}store/uploadFile?archiveID=${archiveid}&stage=${stage}&mode=${mode}`;
-        console.log(`calling ${url}`);
-
-        const formBody: FormData = new FormData();
-        formBody.append('file', file, file.name);
-        const req = new HttpRequest('POST', url, formBody, {
-            reportProgress: true,
-            responseType: 'text',
-            withCredentials: true
-        });
-        return this.http.request(req).pipe(catchError(this.handleError));
-        /*return this.http.request<HttpEvent<T>>('POST', url, {body: formBody, headers: headerOptions.headers, withCredentials: true});*/
-    }
-
-    uploadAttachments<T>(archiveid: string, stage: string, files: File[], mode: string): Observable<HttpEvent<T>> {
-        const url = `${this.apiUrl}store/uploadFile?archiveID=${archiveid}&stage=${stage}&mode=${mode}`;
-        console.log(`calling ${url}`);
-
-        const formBody: FormData = new FormData();
-        for (const f of files) {
-            formBody.append('file', f, f.name);
-        }
-
-        const req = new HttpRequest('POST', url, formBody, {
-            reportProgress: true,
-            responseType: 'text',
-            withCredentials: true
-        });
-        return this.http.request(req).pipe(catchError(this.handleError));
-        /*return this.http.request<HttpEvent<T>>('POST', url, {body: formBody, headers: headerOptions.headers, withCredentials: true});*/
-    }
-
-    getAttachment (requestId: string, stage: string): Observable<any> {
-        const url = `${this.apiUrl}store/download?requestId=${requestId}&stage=${stage}`;
-        console.log(`calling ${url}`);
-        return this.http.get<any>(url, headerOptions).pipe(catchError(this.handleError));
     }
 
     searchAllRequestSummaries(searchField: string, status: string[], type: string[],

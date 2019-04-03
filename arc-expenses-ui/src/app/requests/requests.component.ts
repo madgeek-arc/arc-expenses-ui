@@ -129,7 +129,6 @@ export class RequestsComponent implements OnInit {
 
         this.route.queryParamMap.subscribe(
             params => {
-                console.log('yeeep!');
                 if ( params.has('status') ) { this.statusesChoice = params.getAll('status'); }
                 if ( params.has('stage') ) { this.stagesChoice = params.getAll('stage'); }
                 if ( params.has('phase') && !isNaN(+params.get('phase')) ) {

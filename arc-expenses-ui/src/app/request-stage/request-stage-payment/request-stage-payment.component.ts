@@ -1,12 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { RequestResponse } from '../../domain/operation';
-import {
-    paymentStages,
-    requesterPositions,
-    requestTypes,
-    statusNamesMap,
-    supplierSelectionMethodsMap
-} from '../../domain/stageDescriptions';
+import { paymentStages, requesterPositions, requestTypes,
+         statusNamesMap, supplierSelectionMethodsMap } from '../../domain/stageDescriptions';
 import { RequestInfo } from '../../domain/requestInfoClasses';
 import { AnchorItem } from '../../shared/dynamic-loader-anchor-components/anchor-item';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -14,6 +9,9 @@ import { ManageRequestsService } from '../../services/manage-requests.service';
 import { AuthenticationService } from '../../services/authentication.service';
 import { HttpErrorResponse, HttpEventType, HttpResponse } from '@angular/common/http';
 import { printRequestPage } from '../print-request-function';
+import { mergeMap, tap } from 'rxjs/operators';
+
+declare var UIkit: any;
 
 @Component({
     selector: 'app-request-stage-payment',
@@ -28,6 +26,7 @@ export class RequestStagePaymentComponent implements OnInit {
     isSimpleUser: boolean;
     requestId: string;
     currentRequestPayment: RequestResponse;
+    totalPaymentsOfRequest: number;
     stages: string[] = paymentStages;
     reqPositions = requesterPositions;
     selMethods = supplierSelectionMethodsMap;
@@ -57,11 +56,17 @@ export class RequestStagePaymentComponent implements OnInit {
         this.errorMessage = '';
         this.notFoundMessage = '';
 
-        /*call api to get request info or throw errorMessage*/
-        this.requestService.getRequestPaymentById(this.requestId).subscribe(
+        const result = this.requestService.getRequestPaymentById(this.requestId).pipe(
+            tap(res => this.currentRequestPayment = res),
+            mergeMap( res =>
+                this.requestService.getPaymentsOfRequest(res.baseInfo.requestId)
+            ));
+
+        /* get request info */
+        result.subscribe(
             req => {
-                this.currentRequestPayment = req;
-                console.log(`get payment by id responded ${JSON.stringify(this.currentRequestPayment)}`);
+                this.totalPaymentsOfRequest = req.total;
+                console.log(`total payments are: ${this.totalPaymentsOfRequest}`);
             },
             error => {
                 console.log(error);
@@ -147,8 +152,7 @@ export class RequestStagePaymentComponent implements OnInit {
             (this.currentRequestPayment.baseInfo.status !== 'REJECTED') &&
             (this.currentRequestPayment.baseInfo.status !== 'ACCEPTED') &&
             (this.currentRequestPayment.baseInfo.status !== 'CANCELLED') &&
-            ( (this.authService.getUserRole().some(x => x.authority === 'ROLE_ADMIN')) ||
-              (this.currentRequestPayment.canEdit === true) ) ) {
+            ( this.userIsAdmin() || (this.currentRequestPayment.canEdit === true) ) ) {
 
             if (this.currentRequestPayment.stages[stage] == null) {
                 this.currentRequestPayment.stages[stage] = this.currentRequestInfo.createNewStageObject(stage);
@@ -202,6 +206,49 @@ export class RequestStagePaymentComponent implements OnInit {
         return 0;
     }
 
+    userIsAdmin() {
+        return (this.authService.getUserRole().some(x => x.authority === 'ROLE_ADMIN'));
+    }
+
+    userIsRequester() {
+        return (this.authService.getUserProp('email') === this.currentRequestPayment.stages['1'].user.email);
+    }
+
+    userIsOnBehalfUser() {
+        return (this.authService.getUserProp('email') === this.currentRequestPayment.onBehalfEmail);
+    }
+
+    confirmedCancel(cancelWholeRequest: boolean) {
+        /* TODO:: !!!!!!!!!!!!!!! on payment AND request cancel, also cancel the approval???? */
+        window.scrollTo(0, 0);
+        this.showSpinner = true;
+        this.errorMessage = '';
+        this.successMessage = '';
+        this.requestService.cancelRequestPayment(this.currentRequestPayment.baseInfo.id, cancelWholeRequest).subscribe(
+            res => console.log('cancel payment responded: ', JSON.stringify(res)),
+            error => {
+                console.log(error);
+                this.showSpinner = false;
+                this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
+                this.getCurrentRequest();
+                UIkit.modal('#cancellationModal').hide();
+            },
+            () => {
+                this.errorMessage = '';
+                this.showSpinner = false;
+                if (cancelWholeRequest) {
+                    this.router.navigate(['/requests']);
+                } else if (this.totalPaymentsOfRequest > 1) {
+                    this.router.navigate(['/requests/request-stage', this.currentRequestPayment.baseInfo.requestId + '-a1']);
+                } else {
+                    this.getCurrentRequest();
+                    UIkit.modal('#cancellationModal').hide();
+                }
+            }
+        );
+    }
+
+
     linkToFile(fileIndex: number) {
         if (this.currentRequestPayment.stages['1'].attachments &&
             this.currentRequestPayment.stages['1'].attachments[fileIndex] &&
@@ -218,7 +265,7 @@ export class RequestStagePaymentComponent implements OnInit {
     }
 
     printRequest(): void {
-        printRequestPage(this.currentRequestPayment.baseInfo.id, this.reqTypes[this.currentRequestPayment.type]);
+        printRequestPage(this.currentRequestPayment.baseInfo.id);
     }
 
 }

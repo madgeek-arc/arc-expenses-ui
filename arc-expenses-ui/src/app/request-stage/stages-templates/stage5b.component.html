@@ -16,7 +16,7 @@
         </div>
 
         <!-- display links to attachments -->
-        <div *ngIf="currentStage['attachments'] && (currentStage.attachments.length > 0)" class="uk-margin-small-top no-print" data-html2canvas-ignore>
+        <div *ngIf="currentStage['attachments'] && (currentStage.attachments.length > 0)" class="uk-margin-small-top " data-html2canvas-ignore>
             Για λήψη του αρχείου που επιθυμείτε, πατήστε στον αντίστοιχο σύνδεσμο:
             <span *ngFor="let f of currentStage.attachments; let i = index">
               <a class="uk-link uk-width-1-1@l" (click)="linkToFile(i)">

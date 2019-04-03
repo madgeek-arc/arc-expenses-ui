@@ -258,7 +258,7 @@ export class RequestStageComponent implements OnInit {
     }
 
     printRequest() {
-        printRequestPage(this.currentRequestApproval.baseInfo.requestId, this.reqTypes[this.currentRequestApproval.type]);
+        printRequestPage(this.currentRequestApproval.baseInfo.requestId);
     }
 
     createRequestPayment() {
@@ -297,8 +297,11 @@ export class RequestStageComponent implements OnInit {
     }
 
     userIsRequester() {
-        return ((this.authService.getUserProp('firstname') + ' ' + this.authService.getUserProp('lastname')) ===
-                this.currentRequestApproval.requesterFullName);
+        return (this.authService.getUserProp('email') === this.currentRequestApproval.stages['1'].user.email);
+    }
+
+    userIsOnBehalfUser() {
+        return (this.authService.getUserProp('email') === this.currentRequestApproval.onBehalfEmail);
     }
 
     confirmedCancel() {
@@ -327,8 +330,29 @@ export class RequestStageComponent implements OnInit {
         );
     }
 
+    /* TODO:: call the method when it becomes available */
     confirmedFinalize() {
-        UIkit.modal('#finalizingModal').hide();
+        window.scrollTo(0, 0);
+        this.showSpinner = true;
+        this.errorMessage = '';
+        this.successMessage = '';
+        this.requestService.finalizeRequest(this.currentRequestApproval.baseInfo.requestId).subscribe(
+            res => console.log('finalize request responded: ', JSON.stringify(res)),
+            error => {
+                console.log(error);
+                this.showSpinner = false;
+                this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
+                this.getCurrentRequest();
+                UIkit.modal('#finalizingModal').hide();
+            },
+            () => {
+                this.errorMessage = '';
+                this.showSpinner = false;
+                /* TODO:: Add message in html? Is there a status "finalized" ?? */
+                this.successMessage = 'Το αίτημα ολοκληρώθηκε.';
+                UIkit.modal('#finalizingModal').hide();
+            }
+        );
     }
 
 }

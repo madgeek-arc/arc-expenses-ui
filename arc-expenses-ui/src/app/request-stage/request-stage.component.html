@@ -78,7 +78,7 @@
                     </div>
 
                     <div *ngIf="currentRequestApproval.stages['1'].attachments && (currentRequestApproval.stages['1'].attachments.length > 0)"
-                         class="uk-margin-small-top uk-width-1-1@l no-print" data-html2canvas-ignore>
+                         class="uk-margin-small-top uk-width-1-1@l " data-html2canvas-ignore>
                       Για λήψη του αρχείου που επιθυμείτε, πατήστε στον αντίστοιχο σύνδεσμο:
                       <span *ngFor="let f of currentRequestApproval.stages['1'].attachments; let i = index">
                         <a class="uk-link uk-width-1-1@l" (click)="linkToFile(i)">
@@ -99,14 +99,14 @@
 
 
                 <!--end of 1st stage-->
-                <div *ngIf="(userIsAdmin() || userIsRequester()) && (currentRequestPayments.length === 0)"
-                     class="uk-text-right no-print" data-html2canvas-ignore>
+                <div *ngIf="(userIsAdmin() || userIsRequester() || userIsOnBehalfUser()) && (currentRequestPayments.length === 0)"
+                     class="uk-text-right " data-html2canvas-ignore>
                   <button class="uk-button uk-button-primary" type="button" uk-toggle="target: #cancellationModal">
                     Ακύρωση Αιτήματος
                   </button>
                 </div>
 
-                <div class="uk-text-right uk-margin-small-top no-print" data-html2canvas-ignore>
+                <div class="uk-text-right uk-margin-small-top " data-html2canvas-ignore>
                   <button class="uk-button uk-button-default" (click)="printRequest()"
                           title="Πατήστε για λήψη του<br>αιτήματος σε μορφή pdf" uk-tooltip>
                     Λήψη ως PDF</button>
@@ -159,7 +159,7 @@
 
 
                   <!-- Form of pending stage -->
-                  <div class="uk-margin-medium-top no-print" data-html2canvas-ignore
+                  <div class="uk-margin-medium-top " data-html2canvas-ignore
                        *ngIf="(currentRequestApproval.baseInfo.stage !== '1') &&
                               (currentRequestInfo[currentRequestApproval.baseInfo.stage].showStage === 1)">
 
@@ -173,7 +173,6 @@
                 <div *ngIf="isSimpleUser && (currentRequestApproval.baseInfo.stage !== '1')"
                      class="uk-alert uk-alert-primary uk-text-center uk-margin-top">
                   Το αίτημά σας {{ stateNames[currentRequestApproval.requestStatus] }}.
-                    <!-- TODO: add message about payments?? -->
                 </div>
 
                 <!-- Message to user -->
@@ -200,12 +199,12 @@
                     <div *ngIf="(currentRequestPayments && (currentRequestPayments.length > 0))">
 
                       <!-- Link to Payment -->
-                      <div *ngIf="(currentRequestApproval.type !== 'SERVICES_CONTRACT')" class="no-print" data-html2canvas-ignore>
+                      <div *ngIf="(currentRequestApproval.type !== 'SERVICES_CONTRACT')" class="" data-html2canvas-ignore>
                           <a [routerLink]="['/requests/request-stage-payment', currentRequestPayments[0].id]">Προβολή Περαίωσης</a>
                       </div>
 
                       <!-- Payments list -->
-                      <div *ngIf="(currentRequestApproval.type === 'SERVICES_CONTRACT')" class="no-print" data-html2canvas-ignore>
+                      <div *ngIf="(currentRequestApproval.type === 'SERVICES_CONTRACT')" class="" data-html2canvas-ignore>
 
                         <div>
                           <h4>Περαιώσεις του αιτήματος</h4>
@@ -231,11 +230,12 @@
                           </div>
                         </div>
 
-                      <div *ngIf="( userIsRequester() || userIsAdmin() )">
+                      <div *ngIf="( userIsRequester() || userIsAdmin() || userIsOnBehalfUser() )">
                           <button class="uk-button uk-button-primary"
                                   (click)="createRequestPayment()">Προσθήκη Νέας Περαίωσης</button>
                       </div>
-                      <div *ngIf="( userIsRequester() || userIsAdmin() )">
+                      <!-- TODO:: Add condition when request is finalized -->
+                      <div *ngIf="( userIsRequester() || userIsAdmin() || userIsOnBehalfUser() )">
                           <button class="uk-button uk-button-primary" type="button" uk-toggle="target: #finalizingModal">
                               Ολοκλήρωση Αιτήματος</button>
                       </div>
@@ -275,8 +275,8 @@
     <div class="uk-modal-body">
       Είστε βέβαιοι ότι επιθυμείτε να ακυρώσετε το αίτημα με αρ.Πρ.{{ currentRequestApproval.baseInfo.requestId }};
     </div>
-    <button class="uk-button uk-button-primary uk-margin-small-right" (click)="confirmedCancel()">Ακύρωση αιτήματος</button>
-    <button class="uk-button uk-button-primary uk-modal-close">Επιστροφή στην σελίδα</button>
+    <button class="uk-button uk-button-primary uk-margin-small-right" (click)="confirmedCancel()">Ακύρωση του αιτήματος</button>
+    <button class="uk-button uk-button-primary uk-modal-close">Κλείσιμο</button>
   </div>
 </div>
 
@@ -289,7 +289,7 @@
         Μετά από αυτή την ενέργεια δεν θα είναι δυνατή η προσθήκη νέων περαιώσεων.
     </div>
     <button class="uk-button uk-button-primary uk-margin-small-right" (click)="confirmedFinalize()">Ολοκλήρωση αιτήματος</button>
-    <button class="uk-button uk-button-primary uk-modal-close">Επιστροφή στην σελίδα</button>
+    <button class="uk-button uk-button-primary uk-modal-close">Κλείσιμο</button>
   </div>
 </div>
 
