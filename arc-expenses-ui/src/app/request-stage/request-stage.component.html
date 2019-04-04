@@ -230,15 +230,11 @@
                           </div>
                         </div>
 
-                      <div *ngIf="( userIsRequester() || userIsAdmin() || userIsOnBehalfUser() )">
-                          <button class="uk-button uk-button-primary"
-                                  (click)="createRequestPayment()">Προσθήκη Νέας Περαίωσης</button>
-                      </div>
-                      <!-- TODO:: Add condition when request is finalized -->
-                      <div *ngIf="( userIsRequester() || userIsAdmin() || userIsOnBehalfUser() )">
+                      <div *ngIf="( userIsRequester() || userIsAdmin() || userIsOnBehalfUser() ) && (currentRequestApproval.requestStatus === 'PENDING')">
+                          <button class="uk-button uk-button-primary" type="button" (click)="createRequestPayment()">
+                            Προσθήκη Νέας Περαίωσης</button>
                           <button class="uk-button uk-button-primary" type="button" uk-toggle="target: #finalizingModal">
-                              Ολοκλήρωση Αιτήματος</button>
-                      </div>
+                            Ολοκλήρωση Αιτήματος</button>
                       </div>
                     </div>
 

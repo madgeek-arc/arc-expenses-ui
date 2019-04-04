@@ -265,19 +265,15 @@ export class RequestStageComponent implements OnInit {
 
         this.requestService.addRequestPayment(this.currentRequestApproval.baseInfo.requestId).subscribe(
             res => {
-                    console.log(JSON.stringify(res));
-                    this.router.navigate(['/requests/request-stage-payment', res.id]);
-                },
+                console.log(JSON.stringify(res));
+                this.showSpinner = false;
+                this.router.navigate(['/requests/request-stage-payment/', res['id']]);
+            },
             error => {
+                window.scroll(1, 1);
                 console.log(error);
                 this.showSpinner = false;
                 this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
-                // this.getCurrentRequest();
-            },
-            () => {
-                this.successMessage = 'Οι αλλαγές αποθηκεύτηκαν.';
-                this.showSpinner = false;
-                this.getCurrentRequest();
             }
         );
     }

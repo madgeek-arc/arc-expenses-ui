@@ -70,12 +70,12 @@ export class ManageRequestsService {
         return this.http.post<any>(url, {}, headerOptions).pipe(catchError(this.handleError));
     }
 
-    addRequestPayment(requestId: string): Observable<RequestPayment> {
-        const url = `${this.apiUrl}addPayment/${requestId}`;
+    addRequestPayment(requestId: string): Observable<any> {
+        const url = `${environment.API_ENDPOINT}/payment/add/${requestId}`;
         console.log(`calling ${url}`);
         console.log(`sending ${JSON.stringify(requestId)}`);
 
-        return this.http.post<RequestPayment>(url, {}, headerOptions)
+        return this.http.post<any>(url, {}, headerOptions)
             .pipe(
                 catchError(this.handleError)
             );
