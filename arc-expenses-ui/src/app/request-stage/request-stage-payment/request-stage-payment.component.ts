@@ -83,6 +83,8 @@ export class RequestStagePaymentComponent implements OnInit {
             () => {
                 this.currentRequestInfo = new RequestInfo(this.currentRequestPayment.baseInfo.id,
                                                           this.currentRequestPayment.baseInfo.requestId);
+                console.log(this.authService.getUserProp('email'));
+                console.log(JSON.stringify(this.currentRequestPayment.baseInfo));
                 this.checkIfStageIs7();
                 this.showSpinner = false;
                 this.updateShowStageFields();
@@ -211,7 +213,7 @@ export class RequestStagePaymentComponent implements OnInit {
     }
 
     userIsRequester() {
-        return (this.authService.getUserProp('email') === this.currentRequestPayment.stages['1'].user.email);
+        return (this.authService.getUserProp('email') === this.currentRequestPayment.requesterEmail);
     }
 
     userIsOnBehalfUser() {

@@ -297,7 +297,7 @@ export class RequestStageComponent implements OnInit {
     }
 
     userIsRequester() {
-        return (this.authService.getUserProp('email') === this.currentRequestApproval.stages['1'].user.email);
+        return (this.authService.getUserProp('email') === this.currentRequestApproval.requesterEmail);
     }
 
     userIsOnBehalfUser() {

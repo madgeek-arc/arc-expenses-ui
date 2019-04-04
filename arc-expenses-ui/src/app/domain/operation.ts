@@ -15,6 +15,7 @@ export class RequestResponse {
     projectAcronym: string;
     instituteName: string;
     requesterFullName: string;
+    requesterEmail: string;
     onBehalfFullName: string;
     onBehalfEmail: string;
     tripDestination: string;
@@ -115,13 +116,14 @@ export class Project {
 
 export class Request {
     currentStage: string;
-    stage1: Stage1;
     id: string;
     type: Type;
     archiveId: string;
+    finalAmount: number;
+    paymentCycles: number;
     projectId: string;
     user: User;
-    onBehalfOf: string;
+    onBehalfOf: PersonOfInterest;
     diataktis: PersonOfInterest;
     requesterPosition: RequesterPosition;
     requestStatus: RequestStatus;
@@ -130,6 +132,8 @@ export class Request {
 }
 
 export class RequestApproval extends BaseInfo {
+    currentStage: string;
+    stage1: Stage1;
     stage2: Stage2;
     stage3: Stage3;
     stage4: Stage4;
@@ -139,6 +143,7 @@ export class RequestApproval extends BaseInfo {
 }
 
 export class RequestPayment extends BaseInfo {
+    currentStage: string;
     stage7: Stage7;
     stage8: Stage8;
     stage9: Stage9;
@@ -244,14 +249,6 @@ export class User {
     receiveEmails: string;
     immediateEmails: string;
 }
-
-export type OrderByField = 'REQUEST_PROJECT_ACRONYM' | 'REQUEST_INSTITUTE' | 'CREATION_DATE';
-
-export type OrderByType = 'ASC' | 'DSC';
-
-export type StageEvents = 'APPROVE' | 'REJECT' | 'DOWNGRADE' | 'CANCEL';
-
-export type Stages = 'CANCELLED' | 'REJECTED' | 'Stage1' | 'Stage2' | 'Stage3' | 'Stage4' | 'Stage5' | 'Stage5a' | 'Stage5b' | 'Stage6' | 'Stage7' | 'Stage8' | 'Stage9' | 'Stage10' | 'Stage11' | 'Stage12' | 'Stage13';
 
 export type Type = 'REGULAR' | 'CONTRACT' | 'SERVICES_CONTRACT' | 'TRIP';
 

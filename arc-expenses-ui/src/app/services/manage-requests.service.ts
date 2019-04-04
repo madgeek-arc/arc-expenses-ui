@@ -101,7 +101,7 @@ export class ManageRequestsService {
 
     searchAllRequestSummaries(searchField: string, status: string[], type: string[],
                               stage: string[], from: string, quantity: string,
-                              order: string, orderField: string, editable: string): Observable<Paging<RequestSummary>> {
+                              order: string, orderField: string, editable: string, isMine: string): Observable<Paging<RequestSummary>> {
         let statusList = '';
         status.forEach( x => statusList = statusList + '&status=' + x.toUpperCase() );
         let typesList = '';
@@ -110,7 +110,7 @@ export class ManageRequestsService {
         stage.forEach( x => stagesList = stagesList + '&stage=' + x );
         let url = `${this.apiUrl}getAll?from=${from}&quantity=${quantity}${statusList}${typesList}${stagesList}`;
         url = url + `&order=${order}&orderField=${orderField.toUpperCase()}`;
-        url = url + `&editable=${editable}&searchField=${searchField}`;
+        url = url + `&editable=${editable}&isMine=${isMine}&searchField=${searchField}`;
 
         console.log(`calling ${url}`);
         return this.http.get<Paging<RequestSummary>>(url, headerOptions).pipe(

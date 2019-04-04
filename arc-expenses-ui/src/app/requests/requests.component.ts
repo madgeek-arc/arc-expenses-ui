@@ -37,6 +37,7 @@ export class RequestsComponent implements OnInit {
     /* flags */
     isSimpleUser: boolean;
     editableSelected: boolean;
+    myRequestsSelected: boolean;
     allStatusSelected: boolean;
     allStagesSelected: boolean;
     allPhasesSelected: boolean;
@@ -100,35 +101,37 @@ export class RequestsComponent implements OnInit {
         this.orderField = 'creation_date';
         this.totalPages = 0;
 
-        this.editableSelected = false;
+        this.editableSelected = true;
+        this.myRequestsSelected = false;
 
         this.createSearchUrl();
 
     }
 
     readParams() {
-        this.statusesChoice = [ 'pending', 'under_review' ];
-        this.stagesChoice = [ 'all' ];
-        this.typesChoice = [ 'all' ];
-        this.institutesChoice = [ 'all' ];
-
-        this.searchTerm = '';
-        this.keywordField = this.fb.group({keyword: [ '' ]});
-
-        this.phaseId = 0;
-        this.stages = approvalStages.concat(paymentStages);
-
-        this.currentPage = 0;
-        this.itemsPerPage = 10;
-
-        this.order = 'DSC';
-        this.orderField = 'creation_date';
-        this.totalPages = 0;
-
-        this.editableSelected = false;
-
         this.route.queryParamMap.subscribe(
             params => {
+                this.statusesChoice = [ 'pending', 'under_review' ];
+                this.stagesChoice = [ 'all' ];
+                this.typesChoice = [ 'all' ];
+                this.institutesChoice = [ 'all' ];
+
+                this.searchTerm = '';
+                this.keywordField = this.fb.group({keyword: [ '' ]});
+
+                this.phaseId = 0;
+                this.stages = approvalStages.concat(paymentStages);
+
+                this.currentPage = 0;
+                this.itemsPerPage = 10;
+
+                this.order = 'DSC';
+                this.orderField = 'creation_date';
+                this.totalPages = 0;
+
+                this.editableSelected = true;
+                this.myRequestsSelected = false;
+
                 if ( params.has('status') ) { this.statusesChoice = params.getAll('status'); }
                 if ( params.has('stage') ) { this.stagesChoice = params.getAll('stage'); }
                 if ( params.has('phase') && !isNaN(+params.get('phase')) ) {
@@ -162,6 +165,7 @@ export class RequestsComponent implements OnInit {
                 if ( params.has('orderField') ) { this.orderField = params.get('orderField'); }
                 if ( params.has('order') ) { this.order = params.get('order'); }
                 if ( params.has('editable') ) { this.editableSelected = (params.get('editable') === 'true'); }
+                if ( params.has('isMine') ) { this.myRequestsSelected = (params.get('isMine') === 'true'); }
 
                 this.initializeFiltersForm();
                 this.getListOfRequests();
@@ -287,6 +291,7 @@ export class RequestsComponent implements OnInit {
             finalStages = this.stages;
         }
         const editable = this.editableSelected ? 'true' : 'false';
+        const isMine = this.myRequestsSelected ? 'true' : 'false';
 
         this.requestService.searchAllRequestSummaries(this.searchTerm,
                                                       finalStatuses,
@@ -296,7 +301,8 @@ export class RequestsComponent implements OnInit {
                                                       this.itemsPerPage.toString(),
                                                       this.order,
                                                       this.orderField,
-                                                      editable).subscribe(
+                                                      editable,
+                                                      isMine).subscribe(
             res => {
                 if (res) {
                     this.searchResults = res;
@@ -449,6 +455,11 @@ export class RequestsComponent implements OnInit {
         if (this.editableSelected) {
             this.statusesChoice = ['pending', 'under_review'];
         }
+        this.createSearchUrl();
+    }
+
+    toggleIsMine(event: any) {
+        this.myRequestsSelected = event.target.checked;
         this.createSearchUrl();
     }
 
@@ -682,6 +693,13 @@ export class RequestsComponent implements OnInit {
         url.set('order', this.order);
         if (this.editableSelected) {
             url.set('editable', 'true');
+        } else {
+            url.set('editable', 'false');
+        }
+        if (this.myRequestsSelected) {
+            url.set('isMine', 'true');
+        } else {
+            url.set('isMine', 'false');
         }
 
         this.router.navigateByUrl(`/requests?${url.toString()}`);
