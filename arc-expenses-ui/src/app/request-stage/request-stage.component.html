@@ -99,24 +99,26 @@
 
 
                 <!--end of 1st stage-->
-                <div *ngIf="(userIsAdmin() || userIsRequester() || userIsOnBehalfUser()) && (currentRequestPayments.length === 0)"
-                     class="uk-text-right " data-html2canvas-ignore>
-                  <button class="uk-button uk-button-primary" type="button" uk-toggle="target: #cancellationModal">
-                    Ακύρωση Αιτήματος
-                  </button>
-                </div>
+                <div class="uk-text-right" data-html2canvas-ignore>
+                  <span *ngIf="canBeCancelled()"
+                        class="uk-margin-small-right"
+                        title="{{ getTooltipText() }}" uk-tooltip>
+                    <button class="uk-button uk-button-danger" style="min-width: 200px;" type="button"
+                            [disabled]="currentRequestPayments.length > 0"
+                            uk-toggle="target: #cancellationModal">
+                      Ακύρωση Αιτήματος
+                    </button>
+                  </span>
 
-                <div class="uk-text-right uk-margin-small-top " data-html2canvas-ignore>
-                  <button class="uk-button uk-button-default" (click)="printRequest()"
-                          title="Πατήστε για λήψη του<br>αιτήματος σε μορφή pdf" uk-tooltip>
+                  <button class="uk-button uk-button-primary" (click)="printRequest()"
+                          title="Πατήστε για λήψη του<br>αιτήματος σε μορφή pdf" uk-tooltip  style="min-width: 200px;">
                     Λήψη ως PDF</button>
                 </div>
 
                 <!-- Submitted stages view -->
                 <hr>
 
-                <div class="uk-margin-top" *ngIf="(currentRequestInfo['2'].showStage >= 1) ||
-                                                   ((currentRequestInfo['2'].showStage === 1) && currentRequestApproval.canEdit)">
+                <div class="uk-margin-top" *ngIf="(currentRequestInfo['2'].showStage >= 1)">
                     <h4>Ανάληψη υποχρέωσης δαπάνης</h4>
                 </div>
 
@@ -192,7 +194,7 @@
                     <div *ngIf="(!currentRequestPayments || (currentRequestPayments.length === 0)) && userIsAdmin()"
                          class="uk-margin-top">
 
-                        <button class="uk-button uk-button-primary"
+                        <button class="uk-button uk-button-primary" style="min-width: 200px"
                                 (click)="createRequestPayment()">Προσθήκη Περαίωσης</button>
                     </div>
 
@@ -231,10 +233,12 @@
                         </div>
 
                       <div *ngIf="( userIsRequester() || userIsAdmin() || userIsOnBehalfUser() ) && (currentRequestApproval.requestStatus === 'PENDING')">
-                          <button class="uk-button uk-button-primary" type="button" (click)="createRequestPayment()">
-                            Προσθήκη Νέας Περαίωσης</button>
-                          <button class="uk-button uk-button-primary" type="button" uk-toggle="target: #finalizingModal">
+                          <button class="uk-button uk-button-primary uk-margin-small-right" style="min-width: 200px;" type="button"
+                                  uk-toggle="target: #finalizingModal">
                             Ολοκλήρωση Αιτήματος</button>
+                          <button class="uk-button uk-button-primary" style="min-width: 200px;" type="button"
+                                  (click)="createRequestPayment()">
+                            Προσθήκη Νέας Περαίωσης</button>
                       </div>
                     </div>
 
@@ -269,10 +273,10 @@
   <div class="uk-modal-dialog uk-modal-body">
     <h4 class="uk-modal-title uk-h4">Επιβεβαίωση ακύρωσης</h4>
     <div class="uk-modal-body">
-      Είστε βέβαιοι ότι επιθυμείτε να ακυρώσετε το αίτημα με αρ.Πρ.{{ currentRequestApproval.baseInfo.requestId }};
+      Είστε βέβαιοι ότι επιθυμείτε να ακυρώσετε το αίτημα<br>με αρ.Πρωτ.{{ currentRequestApproval.baseInfo.requestId }};
     </div>
-    <button class="uk-button uk-button-primary uk-margin-small-right" (click)="confirmedCancel()">Ακύρωση του αιτήματος</button>
-    <button class="uk-button uk-button-primary uk-modal-close">Κλείσιμο</button>
+    <button class="uk-button uk-button-danger uk-margin-small-right" (click)="confirmedCancel()">Ακύρωση του αιτήματος</button>
+    <button class="uk-button uk-button-default uk-modal-close">Κλείσιμο</button>
   </div>
 </div>
 
@@ -280,12 +284,12 @@
   <div class="uk-modal-dialog uk-modal-body">
     <h4 class="uk-modal-title uk-h4">Επιβεβαίωση ολοκλήρωσης</h4>
     <div class="uk-modal-body">
-        Είστε βέβαιοι ότι επιθυμείτε να ολοκληρώσετε το αίτημα με αρ.Πρ.{{ currentRequestApproval.baseInfo.requestId }};
+        Είστε βέβαιοι ότι επιθυμείτε να ολοκληρώσετε το αίτημα<br>με αρ.Πρωτ.{{ currentRequestApproval.baseInfo.requestId }};
         <br>
         Μετά από αυτή την ενέργεια δεν θα είναι δυνατή η προσθήκη νέων περαιώσεων.
     </div>
     <button class="uk-button uk-button-primary uk-margin-small-right" (click)="confirmedFinalize()">Ολοκλήρωση αιτήματος</button>
-    <button class="uk-button uk-button-primary uk-modal-close">Κλείσιμο</button>
+    <button class="uk-button uk-button-default uk-modal-close">Κλείσιμο</button>
   </div>
 </div>
 

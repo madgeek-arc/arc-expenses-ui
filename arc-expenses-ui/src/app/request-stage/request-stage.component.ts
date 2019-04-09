@@ -288,6 +288,26 @@ export class RequestStageComponent implements OnInit {
         }
     }
 
+    getTooltipText() {
+        if (this.currentRequestApproval.baseInfo.status === 'ACCEPTED') {
+            return 'Για την ακύρωση του αιτήματος παρακαλώ μεταβείτε στην σελίδα της περαίωσης.';
+        } else {
+            return 'Πατήστε για να<br>ακυρώσετε το αίτημα';
+        }
+    }
+
+    canBeCancelled() {
+        if (this.userIsAdmin() || this.userIsRequester() || this.userIsOnBehalfUser()) {
+            if (this.currentRequestApproval.type === 'CONTRACT') {
+                return (this.currentRequestApproval.baseInfo.status === 'PENDING');
+            } else {
+                return ((this.currentRequestApproval.baseInfo.status !== 'REJECTED') &&
+                        (this.currentRequestApproval.baseInfo.status !== 'CANCELLED'));
+            }
+        }
+        return false;
+    }
+
     userIsAdmin() {
         return (this.authService.getUserRole().some(x => x.authority === 'ROLE_ADMIN'));
     }
@@ -320,8 +340,8 @@ export class RequestStageComponent implements OnInit {
             () => {
                 this.successMessage = 'Το αίτημα ακυρώθηκε.';
                 this.showSpinner = false;
-                this.getCurrentRequest();
                 UIkit.modal('#cancellationModal').hide();
+                this.getCurrentRequest();
             }
         );
     }

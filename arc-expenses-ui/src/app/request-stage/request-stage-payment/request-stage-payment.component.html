@@ -90,28 +90,28 @@
                                     </div>
 
                                     <div class="uk-margin uk-margin-remove-left " data-html2canvas-ignore>
-                                        <a [routerLink]="['/requests/request-stage',currentRequestPayment.baseInfo.requestId+'-a1']">
+                                        <a [routerLink]="['/requests/request-stage', currentRequestPayment.baseInfo.requestId+'-a1']">
                                             Μετάβαση στην σελίδα έγκρισης της ανάληψης υποχρέωσης δαπάνης</a>
                                     </div>
                                 </div>
 
-                                <div *ngIf="(userIsAdmin() || userIsRequester() || userIsOnBehalfUser())"
-                                     class="uk-text-right " data-html2canvas-ignore>
-                                    <button class="uk-button uk-button-primary" type="button" uk-toggle="target: #cancellationModal">
-                                        Ακύρωση Αιτήματος
+                                <div class="uk-text-right" data-html2canvas-ignore>
+                                    <button *ngIf="canBeCancelled()" type="button"
+                                            class="uk-button uk-button-danger uk-margin-small-right" style="min-width: 200px;"
+                                            uk-toggle="target: #cancellationModal"
+                                            title="Πατήστε για να<br>ακυρώσετε το αίτημα" uk-tooltip>
+                                        Ακύρωση Περαίωσης
                                     </button>
-                                </div>
 
-                                <div class="uk-text-right uk-margin-small-top " data-html2canvas-ignore>
-                                    <button class="uk-button uk-button-default" (click)="printRequest()"
-                                            title="Πατήστε για λήψη του αιτήματος<br>σε μορφή αρχείου pdf" uk-tooltip>
+                                    <button class="uk-button uk-button-primary"  style="min-width: 200px;"
+                                            (click)="printRequest()"
+                                            title="Πατήστε για λήψη του<br>αιτήματος σε μορφή pdf" uk-tooltip>
                                         Λήψη ως PDF</button>
                                 </div>
 
                                 <!-- Submitted stages display -->
                                 <hr>
-                                <div class="uk-margin-top" *ngIf="(currentRequestInfo['7'].showStage > 1) ||
-                                                                  ((currentRequestInfo['7'].showStage === 1) && currentRequestPayment.canEdit)">
+                                <div class="uk-margin-top" *ngIf="(currentRequestInfo['7'].showStage >= 1)">
                                   <h4>Εξόφληση Δαπάνης</h4>
                                 </div>
 
@@ -215,11 +215,11 @@
             Είστε βέβαιοι ότι επιθυμείτε να ακυρώσετε την παρούσα περαίωση του αιτήματος {{ currentRequestPayment.baseInfo.requestId }};
         </div>
         <div *ngIf="(currentRequestPayment.type !== 'SERVICES_CONTRACT') || (totalPaymentsOfRequest == 1)" class="uk-modal-body">
-            Επιθυμείτε να ακυρώσετε ολόκληρο το αίτημα με αρ.Πρ.{{ currentRequestPayment.baseInfo.requestId }} ή να ακυρώσετε και να επανεκκινήσετε την διαδικασία περαίωσής του;
+            Επιθυμείτε να ακυρώσετε ολόκληρο το αίτημα με αρ.Πρωτ.{{ currentRequestPayment.baseInfo.requestId }} ή να ακυρώσετε και να επανεκκινήσετε την διαδικασία της περαίωσης;
         </div>
         <button *ngIf="(currentRequestPayment.type !== 'SERVICES_CONTRACT') || (totalPaymentsOfRequest == 1)"
-                class="uk-button uk-button-primary uk-margin-small-right" (click)="confirmedCancel(true)">Ακύρωση του αιτήματος</button>
+                class="uk-button uk-button-danger uk-margin-small-right" (click)="confirmedCancel(true)">Ακύρωση του αιτήματος</button>
         <button class="uk-button uk-button-primary uk-margin-small-right" (click)="confirmedCancel(false)">Ακύρωση της περαίωσης</button>
-        <button class="uk-button uk-button-primary uk-modal-close">Κλείσιμο</button>
+        <button class="uk-button uk-button-default uk-modal-close">Κλείσιμο</button>
     </div>
 </div>

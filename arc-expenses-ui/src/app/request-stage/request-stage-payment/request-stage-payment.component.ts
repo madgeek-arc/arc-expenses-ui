@@ -208,6 +208,14 @@ export class RequestStagePaymentComponent implements OnInit {
         return 0;
     }
 
+    canBeCancelled() {
+        if (this.userIsAdmin() || this.userIsRequester() || this.userIsOnBehalfUser()) {
+            return ((this.currentRequestPayment.baseInfo.status === 'PENDING') ||
+                    (this.currentRequestPayment.baseInfo.status === 'UNDER_REVIEW'));
+        }
+        return false;
+    }
+
     userIsAdmin() {
         return (this.authService.getUserRole().some(x => x.authority === 'ROLE_ADMIN'));
     }
@@ -221,7 +229,7 @@ export class RequestStagePaymentComponent implements OnInit {
     }
 
     confirmedCancel(cancelWholeRequest: boolean) {
-        /* TODO:: !!!!!!!!!!!!!!! on payment AND request cancel, also cancel the approval???? */
+        /* TODO:: !!!!!!!!!!!!!!! on payment AND request cancel, also cancel the approval */
         window.scrollTo(0, 0);
         this.showSpinner = true;
         this.errorMessage = '';
@@ -238,13 +246,13 @@ export class RequestStagePaymentComponent implements OnInit {
             () => {
                 this.errorMessage = '';
                 this.showSpinner = false;
+                UIkit.modal('#cancellationModal').hide();
                 if (cancelWholeRequest) {
                     this.router.navigate(['/requests']);
                 } else if (this.totalPaymentsOfRequest > 1) {
                     this.router.navigate(['/requests/request-stage', this.currentRequestPayment.baseInfo.requestId + '-a1']);
                 } else {
                     this.getCurrentRequest();
-                    UIkit.modal('#cancellationModal').hide();
                 }
             }
         );
