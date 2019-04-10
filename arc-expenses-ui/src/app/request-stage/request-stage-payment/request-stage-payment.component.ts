@@ -45,14 +45,28 @@ export class RequestStagePaymentComponent implements OnInit {
 
     ngOnInit() {
         this.isSimpleUser = (this.authService.getUserRole().some(x => x.authority === 'ROLE_USER') &&
-                             (this.authService.getUserRole().length === 1));
-        console.log(`current user role is: ${JSON.stringify(this.authService.getUserRole())}`);
-        this.getCurrentRequest();
+            (this.authService.getUserRole().length === 1));
+
+        this.route.paramMap.subscribe(
+            params => {
+                this.initializeVariables();
+                if (params.has('id')) {
+                    this.requestId = params.get('id');
+                    this.getCurrentRequest();
+                }
+            }
+        );
+    }
+
+    initializeVariables() {
+        this.currentRequestPayment = null;
+        this.currentRequestInfo = null;
+        this.stageLoaderItemList = [];
+        this.totalPaymentsOfRequest = 0;
     }
 
     getCurrentRequest() {
         this.showSpinner = true;
-        this.requestId = this.route.snapshot.paramMap.get('id');
         this.errorMessage = '';
         this.notFoundMessage = '';
 
@@ -133,11 +147,10 @@ export class RequestStagePaymentComponent implements OnInit {
                 console.log(error);
                 this.showSpinner = false;
                 this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
-                // this.getCurrentRequest();
             },
             () => {
                 this.successMessage = 'Οι αλλαγές αποθηκεύτηκαν.';
-                this.getCurrentRequest();
+                this.router.navigate(['/requests/request-stage-payment', this.currentRequestPayment.baseInfo.id]);
             }
         );
     }
@@ -229,21 +242,13 @@ export class RequestStagePaymentComponent implements OnInit {
     }
 
     confirmedCancel(cancelWholeRequest: boolean) {
-        /* TODO:: !!!!!!!!!!!!!!! on payment AND request cancel, also cancel the approval */
         window.scrollTo(0, 0);
         this.showSpinner = true;
         this.errorMessage = '';
         this.successMessage = '';
         this.requestService.cancelRequestPayment(this.currentRequestPayment.baseInfo.id, cancelWholeRequest).subscribe(
-            res => console.log('cancel payment responded: ', JSON.stringify(res)),
-            error => {
-                console.log(error);
-                this.showSpinner = false;
-                this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
-                this.getCurrentRequest();
-                UIkit.modal('#cancellationModal').hide();
-            },
-            () => {
+            res => {
+                console.log('cancel payment responded: ', JSON.stringify(res));
                 this.errorMessage = '';
                 this.showSpinner = false;
                 UIkit.modal('#cancellationModal').hide();
@@ -252,8 +257,14 @@ export class RequestStagePaymentComponent implements OnInit {
                 } else if (this.totalPaymentsOfRequest > 1) {
                     this.router.navigate(['/requests/request-stage', this.currentRequestPayment.baseInfo.requestId + '-a1']);
                 } else {
-                    this.getCurrentRequest();
+                    this.router.navigate(['/requests/request-stage-payment', res['id']]);
                 }
+            },
+            error => {
+                console.log(error);
+                this.showSpinner = false;
+                this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
+                UIkit.modal('#cancellationModal').hide();
             }
         );
     }

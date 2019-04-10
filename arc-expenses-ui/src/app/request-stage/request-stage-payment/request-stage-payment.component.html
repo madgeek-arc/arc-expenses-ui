@@ -211,15 +211,16 @@
 <div *ngIf="currentRequestPayment && totalPaymentsOfRequest" id="cancellationModal" uk-modal>
     <div class="uk-modal-dialog uk-modal-body">
         <h4 class="uk-modal-title uk-h4">Επιβεβαίωση ακύρωσης</h4>
-        <div *ngIf="(currentRequestPayment.type === 'SERVICES_CONTRACT') && (totalPaymentsOfRequest > 1)" class="uk-modal-body">
+        <div *ngIf="totalPaymentsOfRequest > 1" class="uk-modal-body">
             Είστε βέβαιοι ότι επιθυμείτε να ακυρώσετε την παρούσα περαίωση του αιτήματος {{ currentRequestPayment.baseInfo.requestId }};
         </div>
         <div *ngIf="(currentRequestPayment.type !== 'SERVICES_CONTRACT') || (totalPaymentsOfRequest == 1)" class="uk-modal-body">
             Επιθυμείτε να ακυρώσετε ολόκληρο το αίτημα με αρ.Πρωτ.{{ currentRequestPayment.baseInfo.requestId }} ή να ακυρώσετε και να επανεκκινήσετε την διαδικασία της περαίωσης;
         </div>
         <button *ngIf="(currentRequestPayment.type !== 'SERVICES_CONTRACT') || (totalPaymentsOfRequest == 1)"
-                class="uk-button uk-button-danger uk-margin-small-right" (click)="confirmedCancel(true)">Ακύρωση του αιτήματος</button>
-        <button class="uk-button uk-button-primary uk-margin-small-right" (click)="confirmedCancel(false)">Ακύρωση της περαίωσης</button>
+                class="uk-button uk-button-danger uk-margin-small-right" (click)="confirmedCancel(true)">Ακύρωση αιτήματος</button>
+        <button class="uk-button uk-button-primary uk-margin-small-right" (click)="confirmedCancel(false)">
+            {{ totalPaymentsOfRequest > 1 ? 'Ακύρωση' : 'Επανεκκίνηση' }} περαίωσης</button>
         <button class="uk-button uk-button-default uk-modal-close">Κλείσιμο</button>
     </div>
 </div>

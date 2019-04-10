@@ -51,11 +51,25 @@ export class RequestStageComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.getCurrentRequest();
         this.isSimpleUser = (this.authService.getUserRole().some(x => x.authority === 'ROLE_USER') &&
                              (this.authService.getUserRole().length === 1));
-        console.log(`current user role is: ${JSON.stringify(this.authService.getUserRole())}`);
-        console.log(`isSimpleUser is: ${this.isSimpleUser}`);
+
+        this.route.paramMap.subscribe(
+            params => {
+                this.initializeVariables();
+                if (params.has('id')) {
+                    this.requestId = params.get('id');
+                    this.getCurrentRequest();
+                }
+            }
+        );
+    }
+
+    initializeVariables() {
+        this.currentRequestApproval = null;
+        this.currentRequestInfo = null;
+        this.currentRequestPayments = [];
+        this.stageLoaderItemList = [];
     }
 
     getCurrentRequest() {
@@ -334,14 +348,13 @@ export class RequestStageComponent implements OnInit {
                 console.log(error);
                 this.showSpinner = false;
                 this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
-                this.getCurrentRequest();
                 UIkit.modal('#cancellationModal').hide();
             },
             () => {
                 this.successMessage = 'Το αίτημα ακυρώθηκε.';
                 this.showSpinner = false;
                 UIkit.modal('#cancellationModal').hide();
-                this.getCurrentRequest();
+                this.router.navigate(['/requests/request-stage', this.currentRequestApproval.baseInfo.id]);
             }
         );
     }
@@ -358,15 +371,14 @@ export class RequestStageComponent implements OnInit {
                 console.log(error);
                 this.showSpinner = false;
                 this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
-                this.getCurrentRequest();
                 UIkit.modal('#finalizingModal').hide();
             },
             () => {
                 this.errorMessage = '';
                 this.showSpinner = false;
-                /* TODO:: Add message in html? Is there a status "finalized" ?? */
                 this.successMessage = 'Το αίτημα ολοκληρώθηκε.';
                 UIkit.modal('#finalizingModal').hide();
+                this.router.navigate(['/requests/request-stage', this.currentRequestApproval.baseInfo.id]);
             }
         );
     }
