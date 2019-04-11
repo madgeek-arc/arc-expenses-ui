@@ -14,6 +14,7 @@ export class StagesLoaderComponent implements OnInit {
 
     @Output() emitStage: EventEmitter<any> = new EventEmitter<any>();
     @Output() newValues: EventEmitter<string[]> = new EventEmitter<string[]>();
+    @Output() promptEdit: EventEmitter<string> = new EventEmitter<string>();
 
     constructor(private componentFactoryResolver: ComponentFactoryResolver) { }
 
@@ -35,6 +36,7 @@ export class StagesLoaderComponent implements OnInit {
         const componentRef = viewContainerRef.createComponent(componentFactory);
         componentRef.instance['emitStage'].subscribe(emitted => this.emitStage.emit(emitted));
         componentRef.instance['newValues'].subscribe(emitted => this.newValues.emit(emitted));
+        componentRef.instance['promptEdit'].subscribe(emitted => this.promptEdit.emit(emitted));
 
         (<AnchorInterfaceComponent>componentRef.instance).data = anchorItem.data;
     }

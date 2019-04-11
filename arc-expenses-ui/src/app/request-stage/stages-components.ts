@@ -28,6 +28,7 @@ export class StageComponent implements OnInit {
                                    4 -> was returned to previous*/
 
     @Output() newValues: EventEmitter<string[]> = new EventEmitter<string[]>();
+    @Output() promptEdit: EventEmitter<string> = new EventEmitter<string>();
 
 
     /*  phrase mentioning the result of a submitted stage
@@ -49,6 +50,8 @@ export class StageComponent implements OnInit {
     currentRequestInfo: RequestInfo;
     currentStageInfo: StageInfo;
 
+    canEditStage: boolean; // true when this stage was the last to be submitted amd it can be edited by the current user
+
     datePipe = new DatePipe('el');
 
     constructor(private fb: FormBuilder) {}
@@ -63,6 +66,8 @@ export class StageComponent implements OnInit {
             this.showStage = this.currentStageInfo.showStage;
             this.stageTitle = this.currentStageInfo.title;
             this.stageFields = this.currentStageInfo.stageFields;
+            this.canEditStage = ((this.currentRequestInfo.previousStage != null) &&
+                                 (this.stageId === this.currentRequestInfo.previousStage));
             if (this.showStage > 1) {
                 this.submittedStageResult = this.currentStageInfo.submittedStageResultMap[this.showStage.toString()];
             }
@@ -139,6 +144,10 @@ export class StageComponent implements OnInit {
         }
     }
 
+    editStage() {
+        this.promptEdit.emit(this.stageId);
+    }
+
     approveRequest( approved: boolean ) {
         console.log('approved is:', approved);
         if (!approved) {
@@ -172,10 +181,16 @@ export class StageComponent implements OnInit {
         }
     }
 
+    resubmitPreviousStage() {
+        // TODO:: WHAT HAPPENS WHEN THERE ARE NEW VALUES?
+        this.updateMode = 'edit';
+        this.submitForm();
+    }
+
     submitForm() {
         this.stageFormError = '';
         if (this.stageForm && this.stageForm.valid ) {
-            if ( (this.updateMode === 'approve') &&
+            if ( ((this.updateMode === 'approve') || (this.updateMode === 'edit')) &&
                  ( ((this.uploadedFiles == null) || (this.uploadedFiles.length === 0)) &&
                    ((this.currentStage['attachments'] == null) || (this.currentStage.attachments.length === 0)) ) &&
                  ( (this.stageId === '6') || (this.stageId === '7') || (this.stageId === '11') ) ) {

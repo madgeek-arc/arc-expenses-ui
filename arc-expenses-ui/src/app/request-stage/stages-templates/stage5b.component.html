@@ -4,6 +4,9 @@
     <!-- STAGE RESULT DISPLAY -->
     <div *ngIf="showStage > 1" class="uk-form-controls">
         <!--<h5>{{ stageTitle }}</h5>-->
+        <div *ngIf="canEditStage">
+            <a class="uk-link" (click)="editStage()"><i class="uk-icon" uk-icon="pencil"></i> Επεξεργασία</a>
+        </div>
         <div>
             {{ submittedStageResult }}{{ getDelegateName() }}
             στις {{ currentStage['date'] | date : 'dd-MM-yyyy' }}
@@ -80,11 +83,15 @@
         </app-form-upload-files>
 
         <!--BUTTONS-->
-        <button class="uk-button uk-button-primary" (click)="emitNewValues(true)">Εγκρίνεται</button>
+        <div *ngIf="!canEditStage">
+            <button class="uk-button uk-button-primary" (click)="emitNewValues(true)">Εγκρίνεται</button>
+            <button class="uk-button uk-button-primary" (click)="emitNewValues(false)">Απορρίπτεται</button>
+            <button class="uk-button uk-button-primary" (click)="emitNewValuesAndGoBack()">Επιστροφή στο προηγούμενο στάδιο</button>
+        </div>
 
-        <button class="uk-button uk-button-primary" (click)="emitNewValues(false)">Απορρίπτεται</button>
-
-        <button class="uk-button uk-button-primary" (click)="emitNewValuesAndGoBack()">Επιστροφή στο προηγούμενο στάδιο</button>
+        <div *ngIf="canEditStage">
+            <button class="uk-button uk-button-primary" (click)="resubmitPreviousStage()">Αποθήκευση αλλαγών</button>
+        </div>
 
         <!-- CURRENT DATE DISPLAY -->
         <div>

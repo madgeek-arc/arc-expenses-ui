@@ -23,13 +23,12 @@ export class SubmittedStageResultMap {
 /* Information describing a stage */
 export class StageInfo {
     title: string;                                      // a title
-    prev: string[];                                     // list of the possible ids of the previous stage
-    next: string[];                                     // list of the possible ids of the next stage
+    prev: string[];                                     // list with the id(s) of the previous stage(s)
+    next: string[];                                     // list with the id(s) of the next stage(s)
     stageComponent: Type<any>;                          // the stage-component that corresponds to the stage
     stageFields: FieldDescription [];                   // a list of the stage's fields descriptions
-    // stagePOIs: PersonOfInterest[];                      // a list of possible POIs for the stage
-    submittedStageResultMap: SubmittedStageResultMap;   // a map with descriptions of the stage's result (if submitted)
-    showStage: number;                                  // an indicator of the stage's display status
+    submittedStageResultMap: SubmittedStageResultMap;   // a map with the displayed text according to a submitted stage's status
+    showStage: number;                                  // a numeric code indicating if and how the stage should be displayed in the page
 
     constructor(title: string,
                 prev: string[],
@@ -43,7 +42,6 @@ export class StageInfo {
         this.next = next;
         this.stageComponent = stageComponent;
         this.stageFields = stageFields;
-        // this.stagePOIs = stagePOIs;
         this.submittedStageResultMap = submittedStageResultMap;
     }
 }
@@ -55,10 +53,10 @@ export class RequestInfo {
 
     requestedAmount: string;
     supplier: string;
-    // requester: User;
-    // travellerEmail: string;
 
     finalAmount: string;
+
+    previousStage: string;
 
     '2': StageInfo;
     '3': StageInfo;
@@ -78,8 +76,6 @@ export class RequestInfo {
 
         this.phaseId = phaseId;
         this.requestId = requestId;
-        // this.requester = requester;
-        // this.travellerEmail = travellerEmail;
         this.initiateStagesInfo();
 
     }

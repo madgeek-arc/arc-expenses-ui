@@ -196,7 +196,14 @@ export class RequestStagePaymentComponent implements OnInit {
 
                     if ( (stage === this.currentRequestPayment.baseInfo.stage) && (this.stages.indexOf(stage) > 0) ) {
 
-                        const prevStage = this.stages[this.stages.indexOf(stage) - 1];
+                        // const prevStage = this.stages[this.stages.indexOf(stage) - 1];
+                        let prevStage;
+                        for (const p of this.currentRequestInfo[stage].prev) {
+                            if (this.currentRequestPayment.stages[p] != null) {
+                                prevStage = p;
+                                break;
+                            }
+                        }
                         if ( (this.currentRequestPayment.stages[prevStage]) &&
                              (this.currentRequestPayment.stages[prevStage].date) &&
                              (this.currentRequestPayment.stages[prevStage].date > this.currentRequestPayment.stages[stage].date) ) {

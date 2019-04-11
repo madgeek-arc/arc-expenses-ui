@@ -39,7 +39,8 @@ export class ManageRequestsService {
     }
 
     submitUpdate<T>(phase: string, mode: string, requestId: string, submittedStage?: FormData): Observable<HttpEvent<T>> {
-        /* AVAILABLE MODES: approve, reject, downgrade, cancel */
+        /* ACCEPTED PHASE VALUES: request, payment */
+        /* ACCEPTED MODE VALUES: approve, reject, downgrade, cancel */
         const url = `${environment.API_ENDPOINT}/${phase}/${mode}/${requestId}`;
         console.log(`calling ${url}`);
 
@@ -60,6 +61,7 @@ export class ManageRequestsService {
         const formData = new FormData();
         formData.append('cancel_request', cancelRequest ? 'true' : 'false');
 
+        // returns json of the form {id: paymentID}
         return this.http.post<any>(url, formData, headerOptions).pipe(catchError(this.handleError));
     }
 

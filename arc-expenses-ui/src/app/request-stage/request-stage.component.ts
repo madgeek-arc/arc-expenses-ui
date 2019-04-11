@@ -44,6 +44,9 @@ export class RequestStageComponent implements OnInit {
 
     stageLoaderItemList: AnchorItem[];
 
+    prevStageLoaderItemList: AnchorItem[];
+    showStage1: boolean;
+
     constructor(private route: ActivatedRoute,
                 private router: Router,
                 private requestService: ManageRequestsService,
@@ -70,6 +73,7 @@ export class RequestStageComponent implements OnInit {
         this.currentRequestInfo = null;
         this.currentRequestPayments = [];
         this.stageLoaderItemList = [];
+        this.prevStageLoaderItemList = [];
     }
 
     getCurrentRequest() {
@@ -97,6 +101,7 @@ export class RequestStageComponent implements OnInit {
                 this.showSpinner = false;
                 this.currentRequestInfo = new RequestInfo(this.currentRequestApproval.baseInfo.id,
                                                           this.currentRequestApproval.baseInfo.requestId);
+                this.findPreviousStage();
                 this.checkIfStageIs5b();
                 if ((this.currentRequestApproval.type !== 'CONTRACT') &&
                     (this.currentRequestApproval.baseInfo.status === 'ACCEPTED')) {
@@ -107,6 +112,38 @@ export class RequestStageComponent implements OnInit {
 
             }
         );
+    }
+
+    // detects previous stage and checks if the current user has permission to edit it
+    findPreviousStage() {
+        if ((this.currentRequestApproval.requestStatus === 'PENDING') &&
+            (this.currentRequestApproval.baseInfo.stage !== '1')) {
+            const i = this.stages.indexOf(this.currentRequestApproval.baseInfo.stage);
+            if (i > -1) {
+                let prevStage: string;
+
+                if (this.currentRequestApproval.baseInfo.status === 'ACCEPTED') {
+                    prevStage = '6';
+                } else {
+                    for (const p of this.currentRequestInfo[ this.stages[i] ].prev) {
+                        if (this.currentRequestApproval.stages[p] != null) {
+                            prevStage = p;
+                            break;
+                        }
+                    }
+                }
+                // TODO:: CHECK INSTEAD, IF canEditPrevious is true WHEN IT BECOMES AVAILABLE
+                // MAKE SURE THE canEditPrevious value is the correct one when prevStage == 6
+                if ((prevStage != null) &&
+                    (((prevStage === '1') && (this.authService.getUserProp('email') === this.currentRequestApproval.requesterEmail)) ||
+                     ((prevStage !== '1') &&
+                      (this.authService.getUserProp('email') === this.currentRequestApproval.stages[prevStage].user.email)) ||
+                     (this.userIsAdmin()))) {
+
+                    this.currentRequestInfo.previousStage = prevStage;
+                }
+            }
+        }
     }
 
     checkIfStageIs5b() {
@@ -141,11 +178,21 @@ export class RequestStageComponent implements OnInit {
     }
 
     getSubmittedStage(submittedData: any[]) {
-        this.updateRequest(submittedData[0], submittedData[1]);
+        if (submittedData[0] === 'edit') {
+            // TODO:: add update stage function
+            console.log(JSON.stringify(submittedData[1]));
+        } else {
+            this.updateRequest(submittedData[0], submittedData[1]);
+        }
     }
 
     getUpdatedRequest(updatedRequest: FormData) {
-        this.updateRequest('approve', updatedRequest);
+        if ((this.currentRequestInfo.previousStage != null) &&
+            (this.currentRequestInfo.previousStage === '1')) {
+            this.updateRequest('edit', updatedRequest);
+        } else {
+            this.updateRequest('approve', updatedRequest);
+        }
     }
 
     getNewSupplierAndAmount(newVals: string[]) {
@@ -192,9 +239,36 @@ export class RequestStageComponent implements OnInit {
             this.currentRequestInfo[this.stages[i]].showStage = this.willShowStage(this.stages[i]);
             // console.log(`${this.stages[i]} is ${this.currentRequestInfo[this.stages[i]].showStage}`);
         }
+        this.showStage1 = (this.willShowStage('1') === 2);
+    }
+
+    editStage1() {
+        this.showStage1 = false;
+    }
+
+    editPreviousStage(stageToEdit: string) {
+        if (this.currentRequestInfo.previousStage && (stageToEdit === this.currentRequestInfo.previousStage)) {
+            // prepare forms list
+            this.prevStageLoaderItemList = [
+                new AnchorItem(
+                    this.currentRequestInfo[stageToEdit]['stageComponent'],
+                    {
+                        currentStage: this.currentRequestApproval.stages[stageToEdit],
+                        currentRequestInfo: this.currentRequestInfo
+                    }
+                )
+            ];
+            this.currentRequestInfo[stageToEdit].showStage = 1;
+        }
     }
 
     willShowStage(stage: string) {
+        /* return values:  0 -> don't show
+                           1 -> show form
+                           2 -> was approved
+                           3 -> was rejected
+                           4 -> was returned to previous*/
+
         if ((stage === this.currentRequestApproval.baseInfo.stage) &&
             (this.currentRequestApproval.baseInfo.status !== 'REJECTED') &&
             (this.currentRequestApproval.baseInfo.status !== 'ACCEPTED') &&
@@ -231,7 +305,14 @@ export class RequestStageComponent implements OnInit {
 
                     if ( stage === this.currentRequestApproval.baseInfo.stage ) {
 
-                        const prevStage = this.stages[this.stages.indexOf(stage) - 1];
+                        // const prevStage = this.stages[this.stages.indexOf(stage) - 1];
+                        let prevStage;
+                        for (const p of this.currentRequestInfo[stage].prev) {
+                            if (this.currentRequestApproval.stages[p] != null) {
+                                prevStage = p;
+                                break;
+                            }
+                        }
                         if ((this.currentRequestApproval.stages[prevStage]) &&
                             (this.currentRequestApproval.stages[prevStage].date) &&
                             (this.currentRequestApproval.stages[prevStage].date > this.currentRequestApproval.stages[stage].date) ) {

@@ -33,7 +33,11 @@
               <div id="printable-section" *ngIf="!showSpinner && currentRequestInfo">
 
                 <!--1st stage-->
-                <div *ngIf="willShowStage('1') === 2" class="submittedRequest">
+                <div *ngIf="showStage1" class="submittedRequest">
+                  <div *ngIf="currentRequestInfo.previousStage && (currentRequestInfo.previousStage === '1')">
+                    <button class="uk-button uk-button-small uk-button-primary" style="border-radius: 3px !important;"
+                            (click)="editStage1()">Επεξεργασία</button>
+                  </div>
                   <div class="uk-margin-bottom uk-width-1-1 uk-grid">
                     <div class="uk-width-1-2@l">
                       <span class="uk-text-bold uk-margin-small-right">Πρόγραμμα:</span>
@@ -92,7 +96,7 @@
                 </div>
 
                 <!-- stage 1 form -->
-                <div *ngIf="willShowStage('1') === 1" data-html2canvas-ignore>
+                <div *ngIf="!showStage1" data-html2canvas-ignore>
                   <stage1-form [currentRequest]="currentRequestApproval"
                                (emitRequest)="getUpdatedRequest($event)"></stage1-form>
                 </div>
@@ -128,15 +132,18 @@
 
                   <stage2-component class="uk-card uk-card-body uk-card-basic-info uk-margin-left"
                                     *ngIf="currentRequestInfo['2'].showStage > 1"
-                                    [data]="{currentStage: currentRequestApproval.stages['2'], currentRequestInfo: currentRequestInfo}"></stage2-component>
+                                    [data]="{currentStage: currentRequestApproval.stages['2'], currentRequestInfo: currentRequestInfo}"
+                                    (promptEdit)="editPreviousStage($event)"></stage2-component>
 
                   <stage3-component class="uk-card uk-card-body uk-card-basic-info uk-margin-left"
                                     *ngIf="currentRequestInfo['3'].showStage > 1"
-                                    [data]="{currentStage: currentRequestApproval.stages['3'], currentRequestInfo: currentRequestInfo}"></stage3-component>
+                                    [data]="{currentStage: currentRequestApproval.stages['3'], currentRequestInfo: currentRequestInfo}"
+                                    (promptEdit)="editPreviousStage($event)"></stage3-component>
 
                   <stage4-component class="uk-card uk-card-body uk-card-basic-info uk-margin-left"
                                     *ngIf="currentRequestInfo['4'].showStage > 1"
-                                    [data]="{currentStage: currentRequestApproval.stages['4'], currentRequestInfo: currentRequestInfo}"></stage4-component>
+                                    [data]="{currentStage: currentRequestApproval.stages['4'], currentRequestInfo: currentRequestInfo}"
+                                    (promptEdit)="editPreviousStage($event)"></stage4-component>
 
                 </div>
 
@@ -147,18 +154,32 @@
 
                   <stage5a-component class="uk-card uk-card-body uk-card-basic-info uk-margin-left"
                                      *ngIf="currentRequestInfo['5a'].showStage > 1"
-                                     [data]="{currentStage: currentRequestApproval.stages['5a'], currentRequestInfo: currentRequestInfo}"></stage5a-component>
+                                     [data]="{currentStage: currentRequestApproval.stages['5a'], currentRequestInfo: currentRequestInfo}"
+                                     (promptEdit)="editPreviousStage($event)"></stage5a-component>
 
                   <stage5b-component class="uk-card uk-card-body uk-card-basic-info uk-margin-left"
                                      *ngIf="currentRequestInfo['5b'].showStage > 1"
-                                     [data]="{currentStage: currentRequestApproval.stages['5b'], currentRequestInfo: currentRequestInfo}"></stage5b-component>
+                                     [data]="{currentStage: currentRequestApproval.stages['5b'], currentRequestInfo: currentRequestInfo}"
+                                     (promptEdit)="editPreviousStage($event)"></stage5b-component>
 
                   <stage6-component class="uk-card uk-card-body uk-card-basic-info uk-margin-left"
                                     *ngIf="currentRequestInfo['6'].showStage > 1"
-                                    [data]="{currentStage: currentRequestApproval.stages['6'], currentRequestInfo: currentRequestInfo}"></stage6-component>
+                                    [data]="{currentStage: currentRequestApproval.stages['6'], currentRequestInfo: currentRequestInfo}"
+                                    (promptEdit)="editPreviousStage($event)"></stage6-component>
 
                 </div>
 
+                  <!-- Form for editing previous stage -->
+                  <div class="uk-margin-medium-top" data-html2canvas-ignore
+                       *ngIf="(currentRequestInfo.previousStage) &&
+                              (currentRequestInfo.previousStage !== '1') &&
+                              (currentRequestInfo[currentRequestInfo.previousStage].showStage === 1)">
+
+                    <app-stage-loader [stages]="prevStageLoaderItemList"
+                                      (emitStage)="getSubmittedStage($event)"
+                                      (newValues)="getNewSupplierAndAmount($event)"></app-stage-loader>
+
+                  </div>
 
                   <!-- Form of pending stage -->
                   <div class="uk-margin-medium-top " data-html2canvas-ignore
