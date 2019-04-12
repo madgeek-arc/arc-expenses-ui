@@ -21,14 +21,14 @@ export class StageComponent implements OnInit {
     updateMode: string; /* approve, reject or downgrade */
 
     /* input variable that defines the status of the current stage */
-    showStage: number; /* values:  0 -> don't show
-                                   1 -> show form
-                                   2 -> was approved
-                                   3 -> was rejected
-                                   4 -> was returned to previous*/
+    @Input() showStage: number; /* values:  0 -> don't show
+                                            1 -> show form
+                                            2 -> was approved
+                                            3 -> was rejected
+                                            4 -> was returned to previous*/
 
     @Output() newValues: EventEmitter<string[]> = new EventEmitter<string[]>();
-    @Output() promptEdit: EventEmitter<string> = new EventEmitter<string>();
+    @Output() promptEdit: EventEmitter<boolean> = new EventEmitter<boolean>();
 
 
     /*  phrase mentioning the result of a submitted stage
@@ -144,8 +144,8 @@ export class StageComponent implements OnInit {
         }
     }
 
-    editStage() {
-        this.promptEdit.emit(this.stageId);
+    editStage(openForm: boolean) {
+        this.promptEdit.emit(openForm);
     }
 
     approveRequest( approved: boolean ) {

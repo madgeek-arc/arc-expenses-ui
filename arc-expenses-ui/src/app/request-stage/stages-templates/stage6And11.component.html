@@ -5,7 +5,7 @@
     <div *ngIf="showStage > 1" class="uk-form-controls">
         <!--<h5>{{ stageTitle }}</h5>-->
         <div *ngIf="canEditStage">
-            <a class="uk-link" (click)="editStage()"><i class="uk-icon" uk-icon="pencil"></i> Επεξεργασία</a>
+            <a class="uk-link" (click)="editStage(true)"><i class="uk-icon" uk-icon="pencil"></i> Επεξεργασία</a>
         </div>
         <div>
             {{ submittedStageResult }}{{ getDelegateName() }}
@@ -57,6 +57,7 @@
 
         <div *ngIf="canEditStage">
             <button class="uk-button uk-button-primary" (click)="resubmitPreviousStage()">Αποθήκευση αλλαγών</button>
+            <button class="uk-button uk-button-default" (click)="editStage(false)">Κλείσιμο</button>
         </div>
 
         <!-- CURRENT DATE DISPLAY -->

@@ -122,26 +122,31 @@
 
                                   <stage7-component class="uk-card uk-card-body uk-card-basic-info uk-margin-left"
                                                     *ngIf="currentRequestInfo['7'].showStage > 1"
-                                                    [data]="{currentStage: currentRequestPayment.stages['7'], currentRequestInfo: currentRequestInfo}"></stage7-component>
+                                                    [data]="{currentStage: currentRequestPayment.stages['7'], currentRequestInfo: currentRequestInfo}"
+                                                    (promptEdit)="editPreviousStage($event)"></stage7-component>
 
                                   <stage8-component class="uk-card uk-card-body uk-card-basic-info uk-margin-left"
                                                     *ngIf="currentRequestInfo['8'].showStage > 1"
-                                                    [data]="{currentStage: currentRequestPayment.stages['8'], currentRequestInfo: currentRequestInfo}"></stage8-component>
+                                                    [data]="{currentStage: currentRequestPayment.stages['8'], currentRequestInfo: currentRequestInfo}"
+                                                    (promptEdit)="editPreviousStage($event)"></stage8-component>
 
                                   <stage9-component class="uk-card uk-card-body uk-card-basic-info uk-margin-left"
                                                     *ngIf="currentRequestInfo['9'].showStage > 1"
-                                                    [data]="{currentStage: currentRequestPayment.stages['9'], currentRequestInfo: currentRequestInfo}"></stage9-component>
+                                                    [data]="{currentStage: currentRequestPayment.stages['9'], currentRequestInfo: currentRequestInfo}"
+                                                    (promptEdit)="editPreviousStage($event)"></stage9-component>
                                 </div>
 
                                 <div class="uk-child-width-expand uk-grid" uk-grid
                                      *ngIf="currentRequestInfo['10'].showStage > 1">
                                   <stage10-component class="uk-card uk-card-body uk-card-basic-info uk-margin-left"
                                                      *ngIf="currentRequestInfo['10'].showStage > 1"
-                                                     [data]="{currentStage: currentRequestPayment.stages['10'], currentRequestInfo: currentRequestInfo}"></stage10-component>
+                                                     [data]="{currentStage: currentRequestPayment.stages['10'], currentRequestInfo: currentRequestInfo}"
+                                                     (promptEdit)="editPreviousStage($event)"></stage10-component>
 
                                   <stage11-component class="uk-card uk-card-body uk-card-basic-info uk-margin-left"
                                                      *ngIf="currentRequestInfo['11'].showStage > 1"
-                                                     [data]="{currentStage: currentRequestPayment.stages['11'], currentRequestInfo: currentRequestInfo}"></stage11-component>
+                                                     [data]="{currentStage: currentRequestPayment.stages['11'], currentRequestInfo: currentRequestInfo}"
+                                                     (promptEdit)="editPreviousStage($event)"></stage11-component>
                                 </div>
 
 
@@ -149,21 +154,34 @@
                                      *ngIf="currentRequestInfo['12'].showStage > 1">
                                   <stage12-component class="uk-card uk-card-body uk-card-basic-info uk-margin-left"
                                                      *ngIf="currentRequestInfo['12'].showStage > 1"
-                                                     [data]="{currentStage: currentRequestPayment.stages['12'], currentRequestInfo: currentRequestInfo}"></stage12-component>
+                                                     [data]="{currentStage: currentRequestPayment.stages['12'], currentRequestInfo: currentRequestInfo}"
+                                                     (promptEdit)="editPreviousStage($event)"></stage12-component>
 
                                   <stage13-component class="uk-card uk-card-body uk-card-basic-info uk-margin-left"
                                                      *ngIf="currentRequestInfo['13'].showStage > 1"
-                                                     [data]="{currentStage: currentRequestPayment.stages['13'], currentRequestInfo: currentRequestInfo}"></stage13-component>
+                                                     [data]="{currentStage: currentRequestPayment.stages['13'], currentRequestInfo: currentRequestInfo}"
+                                                     (promptEdit)="editPreviousStage($event)"></stage13-component>
                                 </div>
 
 
+                                <!-- Form for editing previous stage -->
+                                <div class="uk-margin-medium-top" data-html2canvas-ignore
+                                     *ngIf="(currentRequestInfo.previousStage) &&
+                                            (currentRequestInfo[currentRequestInfo.previousStage].showStage === 1)">
+
+                                    <app-stage-loader [stage]="prevStageLoaderAnchorItem"
+                                                      (emitStage)="getSubmittedStage($event)"
+                                                      (newValues)="getFinalAmount($event)"
+                                                      (promptEdit)="editPreviousStage($event)"></app-stage-loader>
+
+                                </div>
 
                                 <!-- Create/Edit pending stage -->
                                 <div class="uk-margin-medium-top " data-html2canvas-ignore
                                      *ngIf="currentRequestInfo[currentRequestPayment.baseInfo.stage].showStage === 1">
                                     <!--<hr>-->
 
-                                    <app-stage-loader [stages]="stageLoaderItemList"
+                                    <app-stage-loader [stage]="stageLoaderAnchorItem"
                                                       (emitStage)="getSubmittedStage($event)"
                                                       (newValues)="getFinalAmount($event)"></app-stage-loader>
 

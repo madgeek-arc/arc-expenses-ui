@@ -8,25 +8,21 @@ import { AnchorDirective } from '../../shared/dynamic-loader-anchor-components/a
     template: `<ng-template anchor-host></ng-template>`
 })
 export class StagesLoaderComponent implements OnInit {
-    @Input() stages: AnchorItem[] = [];
-    currentIndex = -1;
+    @Input() stage: AnchorItem;
     @ViewChild(AnchorDirective) stageHost: AnchorDirective;
 
     @Output() emitStage: EventEmitter<any> = new EventEmitter<any>();
     @Output() newValues: EventEmitter<string[]> = new EventEmitter<string[]>();
-    @Output() promptEdit: EventEmitter<string> = new EventEmitter<string>();
+    @Output() promptEdit: EventEmitter<boolean> = new EventEmitter<boolean>();
 
     constructor(private componentFactoryResolver: ComponentFactoryResolver) { }
 
     ngOnInit() {
-        for (const stage of this.stages) {
-            this.loadComponent();
-        }
+        this.loadComponent();
     }
 
     loadComponent() {
-        this.currentIndex = (this.currentIndex + 1) % this.stages.length;
-        const anchorItem = this.stages[this.currentIndex];
+        const anchorItem = this.stage;
 
         const componentFactory = this.componentFactoryResolver.resolveComponentFactory(anchorItem.component);
 

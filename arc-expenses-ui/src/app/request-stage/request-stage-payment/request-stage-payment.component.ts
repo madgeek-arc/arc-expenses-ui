@@ -35,7 +35,8 @@ export class RequestStagePaymentComponent implements OnInit {
 
     currentRequestInfo: RequestInfo;
 
-    stageLoaderItemList: AnchorItem[];
+    stageLoaderAnchorItem: AnchorItem;
+    prevStageLoaderAnchorItem: AnchorItem;
 
     constructor(private route: ActivatedRoute,
                 private router: Router,
@@ -61,7 +62,7 @@ export class RequestStagePaymentComponent implements OnInit {
     initializeVariables() {
         this.currentRequestPayment = null;
         this.currentRequestInfo = null;
-        this.stageLoaderItemList = [];
+        this.stageLoaderAnchorItem = null;
         this.totalPaymentsOfRequest = 0;
     }
 
@@ -97,17 +98,44 @@ export class RequestStagePaymentComponent implements OnInit {
             () => {
                 this.currentRequestInfo = new RequestInfo(this.currentRequestPayment.baseInfo.id,
                                                           this.currentRequestPayment.baseInfo.requestId);
-                console.log(this.authService.getUserProp('email'));
-                console.log(JSON.stringify(this.currentRequestPayment.baseInfo));
-                this.checkIfStageIs7();
+                this.findPreviousStage();
+                this.checkIfStageIs7(this.currentRequestPayment.baseInfo.stage);
                 this.showSpinner = false;
                 this.updateShowStageFields();
             }
         );
     }
 
-    checkIfStageIs7() {
-        if ( (this.currentRequestPayment.baseInfo.stage === '7') &&
+    // detects previous stage and checks if the current user has permission to edit it
+    findPreviousStage() {
+        if (((this.currentRequestPayment.baseInfo.status === 'PENDING') ||
+             (this.currentRequestPayment.baseInfo.status === 'UNDER_REVIEW')) &&
+            (this.currentRequestPayment.baseInfo.stage !== '7')) {
+            const i = this.stages.indexOf(this.currentRequestPayment.baseInfo.stage);
+            if (i > -1) {
+                let prevStage: string;
+
+                for (const p of this.currentRequestInfo[ this.stages[i] ].prev) {
+                    if (this.currentRequestPayment.stages[p] != null) {
+                        prevStage = p;
+                        break;
+                    }
+                }
+
+                // TODO:: CHECK INSTEAD, IF canEditPrevious is true WHEN IT BECOMES AVAILABLE
+                // MAKE SURE THE canEditPrevious value is the correct one when prevStage == 6
+                if ((prevStage != null) &&
+                    ((this.authService.getUserProp('email') === this.currentRequestPayment.stages[prevStage].user.email) ||
+                     (this.userIsAdmin()))) {
+
+                    this.currentRequestInfo.previousStage = prevStage;
+                }
+            }
+        }
+    }
+
+    checkIfStageIs7(stage: string) {
+        if ( (stage === '7') &&
              ((this.currentRequestPayment.type === 'REGULAR') || (this.currentRequestPayment.type === 'TRIP')) ) {
 
             this.currentRequestInfo.finalAmount = '';
@@ -150,11 +178,32 @@ export class RequestStagePaymentComponent implements OnInit {
             },
             () => {
                 this.successMessage = 'Οι αλλαγές αποθηκεύτηκαν.';
-                this.router.navigate(['/requests/request-stage-payment', this.currentRequestPayment.baseInfo.id]);
+                this.getCurrentRequest();
             }
         );
     }
 
+
+    editPreviousStage(openForm: boolean) {
+        if (this.currentRequestInfo.previousStage != null) {
+            const prevStage = this.currentRequestInfo.previousStage;
+            if (openForm === true) {
+                // send data to the form component
+                this.checkIfStageIs7(this.currentRequestInfo.previousStage);
+                this.prevStageLoaderAnchorItem = new AnchorItem(
+                    this.currentRequestInfo[prevStage]['stageComponent'],
+                    {
+                        currentStage: this.currentRequestPayment.stages[prevStage],
+                        currentRequestInfo: this.currentRequestInfo
+                    }
+                );
+                this.currentRequestInfo[prevStage].showStage = 1;
+            } else {
+                this.currentRequestInfo[prevStage].showStage = this.willShowStage(prevStage);
+                this.prevStageLoaderAnchorItem = null;
+            }
+        }
+    }
 
     updateShowStageFields() {
         for ( let i = 0; i < this.stages.length; i++ ) {
@@ -172,15 +221,13 @@ export class RequestStagePaymentComponent implements OnInit {
             if (this.currentRequestPayment.stages[stage] == null) {
                 this.currentRequestPayment.stages[stage] = this.currentRequestInfo.createNewStageObject(stage);
             }
-            this.stageLoaderItemList = [
-                new AnchorItem(
+            this.stageLoaderAnchorItem = new AnchorItem(
                     this.currentRequestInfo[stage]['stageComponent'],
                     {
                         currentStage: this.currentRequestPayment.stages[stage],
                         currentRequestInfo: this.currentRequestInfo
                     }
-                )
-            ];
+                );
 
             return 1;
 

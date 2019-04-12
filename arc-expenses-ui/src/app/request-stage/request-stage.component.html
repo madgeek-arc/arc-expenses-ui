@@ -175,7 +175,7 @@
                               (currentRequestInfo.previousStage !== '1') &&
                               (currentRequestInfo[currentRequestInfo.previousStage].showStage === 1)">
 
-                    <app-stage-loader [stages]="prevStageLoaderItemList"
+                    <app-stage-loader [stage]="prevStageLoaderAnchorItem"
                                       (emitStage)="getSubmittedStage($event)"
                                       (newValues)="getNewSupplierAndAmount($event)"></app-stage-loader>
 
@@ -186,7 +186,7 @@
                        *ngIf="(currentRequestApproval.baseInfo.stage !== '1') &&
                               (currentRequestInfo[currentRequestApproval.baseInfo.stage].showStage === 1)">
 
-                      <app-stage-loader [stages]="stageLoaderItemList"
+                      <app-stage-loader [stage]="stageLoaderAnchorItem"
                                         (emitStage)="getSubmittedStage($event)"
                                         (newValues)="getNewSupplierAndAmount($event)"></app-stage-loader>
 

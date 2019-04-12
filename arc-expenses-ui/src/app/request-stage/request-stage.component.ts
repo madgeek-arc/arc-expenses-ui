@@ -4,14 +4,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ManageRequestsService } from '../services/manage-requests.service';
 import { AuthenticationService } from '../services/authentication.service';
 import { HttpErrorResponse, HttpEventType, HttpResponse } from '@angular/common/http';
-import {
-    approvalStages,
-    requesterPositions,
-    requestTypes,
-    stageTitles,
-    statusNamesMap,
-    supplierSelectionMethodsMap
-} from '../domain/stageDescriptions';
+import { approvalStages, requesterPositions, requestTypes, stageTitles,
+         statusNamesMap, supplierSelectionMethodsMap } from '../domain/stageDescriptions';
 import { printRequestPage } from './print-request-function';
 import { AnchorItem } from '../shared/dynamic-loader-anchor-components/anchor-item';
 import { RequestInfo } from '../domain/requestInfoClasses';
@@ -42,9 +36,8 @@ export class RequestStageComponent implements OnInit {
 
     currentRequestInfo: RequestInfo;
 
-    stageLoaderItemList: AnchorItem[];
-
-    prevStageLoaderItemList: AnchorItem[];
+    stageLoaderAnchorItem: AnchorItem;
+    prevStageLoaderAnchorItem: AnchorItem;
     showStage1: boolean;
 
     constructor(private route: ActivatedRoute,
@@ -72,8 +65,8 @@ export class RequestStageComponent implements OnInit {
         this.currentRequestApproval = null;
         this.currentRequestInfo = null;
         this.currentRequestPayments = [];
-        this.stageLoaderItemList = [];
-        this.prevStageLoaderItemList = [];
+        this.stageLoaderAnchorItem = null;
+        this.prevStageLoaderAnchorItem = null;
     }
 
     getCurrentRequest() {
@@ -82,7 +75,7 @@ export class RequestStageComponent implements OnInit {
         this.errorMessage = '';
         this.notFoundMessage = '';
 
-        /*call api to get request info or throw errorMessage*/
+        /* get request info */
         this.requestService.getRequestApprovalById(this.requestId).subscribe(
             res => this.currentRequestApproval = res,
             error => {
@@ -102,7 +95,7 @@ export class RequestStageComponent implements OnInit {
                 this.currentRequestInfo = new RequestInfo(this.currentRequestApproval.baseInfo.id,
                                                           this.currentRequestApproval.baseInfo.requestId);
                 this.findPreviousStage();
-                this.checkIfStageIs5b();
+                this.checkIfStageIs5b(this.currentRequestApproval.baseInfo.stage);
                 if ((this.currentRequestApproval.type !== 'CONTRACT') &&
                     (this.currentRequestApproval.baseInfo.status === 'ACCEPTED')) {
                     this.getRequestPayments();
@@ -146,8 +139,8 @@ export class RequestStageComponent implements OnInit {
         }
     }
 
-    checkIfStageIs5b() {
-        if ( (this.currentRequestApproval.baseInfo.stage === '5b') &&
+    checkIfStageIs5b(stage: string) {
+        if ( (stage === '5b') &&
              (this.currentRequestApproval.stages['1']['supplierSelectionMethod'] === 'AWARD_PROCEDURE') ) {
 
             this.currentRequestInfo.supplier = '';
@@ -178,12 +171,7 @@ export class RequestStageComponent implements OnInit {
     }
 
     getSubmittedStage(submittedData: any[]) {
-        if (submittedData[0] === 'edit') {
-            // TODO:: add update stage function
-            console.log(JSON.stringify(submittedData[1]));
-        } else {
-            this.updateRequest(submittedData[0], submittedData[1]);
-        }
+        this.updateRequest(submittedData[0], submittedData[1]);
     }
 
     getUpdatedRequest(updatedRequest: FormData) {
@@ -225,7 +213,6 @@ export class RequestStageComponent implements OnInit {
                     console.log(error);
                     this.showSpinner = false;
                     this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
-                    // this.getCurrentRequest();
                 },
                 () => {
                     this.successMessage = 'Οι αλλαγές αποθηκεύτηκαν.';
@@ -246,19 +233,26 @@ export class RequestStageComponent implements OnInit {
         this.showStage1 = false;
     }
 
-    editPreviousStage(stageToEdit: string) {
-        if (this.currentRequestInfo.previousStage && (stageToEdit === this.currentRequestInfo.previousStage)) {
-            // prepare forms list
-            this.prevStageLoaderItemList = [
-                new AnchorItem(
-                    this.currentRequestInfo[stageToEdit]['stageComponent'],
+    editPreviousStage(openForm: boolean) {
+        if (this.currentRequestInfo.previousStage) {
+            const prevStage = this.currentRequestInfo.previousStage;
+
+            if (openForm) {
+                // send data to the form component
+                this.checkIfStageIs5b(prevStage);
+                this.prevStageLoaderAnchorItem = new AnchorItem(
+                    this.currentRequestInfo[prevStage][ 'stageComponent' ],
                     {
-                        currentStage: this.currentRequestApproval.stages[stageToEdit],
+                        currentStage: this.currentRequestApproval.stages[prevStage],
                         currentRequestInfo: this.currentRequestInfo
                     }
-                )
-            ];
-            this.currentRequestInfo[stageToEdit].showStage = 1;
+                );
+                this.currentRequestInfo[prevStage].showStage = 1;
+            } else {
+                this.currentRequestInfo[prevStage].showStage = this.willShowStage(prevStage);
+                this.prevStageLoaderAnchorItem = null;
+                this.currentRequestInfo.previousStage = null;
+            }
         }
     }
 
@@ -280,15 +274,13 @@ export class RequestStageComponent implements OnInit {
                 if (this.currentRequestApproval.stages[stage] == null) {
                     this.currentRequestApproval.stages[stage] = this.currentRequestInfo.createNewStageObject(stage);
                 }
-                this.stageLoaderItemList = [
-                    new AnchorItem(
+                this.stageLoaderAnchorItem =  new AnchorItem(
                         this.currentRequestInfo[stage]['stageComponent'],
                         {
                             currentStage: this.currentRequestApproval.stages[stage],
                             currentRequestInfo: this.currentRequestInfo
                         }
-                    )
-                ];
+                    );
             }
 
             return 1;
@@ -440,7 +432,6 @@ export class RequestStageComponent implements OnInit {
         );
     }
 
-    /* TODO:: call the method when it becomes available */
     confirmedFinalize() {
         window.scrollTo(0, 0);
         this.showSpinner = true;
