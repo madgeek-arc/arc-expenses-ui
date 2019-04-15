@@ -177,7 +177,8 @@
 
                     <app-stage-loader [stage]="prevStageLoaderAnchorItem"
                                       (emitStage)="getSubmittedStage($event)"
-                                      (newValues)="getNewSupplierAndAmount($event)"></app-stage-loader>
+                                      (newValues)="getNewSupplierAndAmount($event)"
+                                      (promptEdit)="editPreviousStage($event)"></app-stage-loader>
 
                   </div>
 

@@ -184,10 +184,10 @@ export class RequestStagePaymentComponent implements OnInit {
     }
 
 
-    editPreviousStage(openForm: boolean) {
+    editPreviousStage(showForm: boolean) {
         if (this.currentRequestInfo.previousStage != null) {
             const prevStage = this.currentRequestInfo.previousStage;
-            if (openForm === true) {
+            if (showForm === true) {
                 // send data to the form component
                 this.checkIfStageIs7(this.currentRequestInfo.previousStage);
                 this.prevStageLoaderAnchorItem = new AnchorItem(

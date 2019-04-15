@@ -16,7 +16,7 @@ import { RequestStageComponent } from './request-stage/request-stage.component';
 import {
     Stage2Component, Stage3Component, StageComponent, Stage4Component, Stage6Component,
     Stage7Component, Stage8Component, Stage9Component, Stage10Component, Stage11Component,
-    Stage12Component, Stage5aComponent, Stage5bComponent, Stage13Component
+    Stage12Component, Stage5aComponent, Stage5bComponent, Stage13Component, Stage7aComponent
 } from './request-stage/stages-components';
 import { ManageRequestsService } from './services/manage-requests.service';
 import { AuthenticationService } from './services/authentication.service';
@@ -45,6 +45,7 @@ const stagesList = [
     Stage5bComponent,
     Stage6Component,
     Stage7Component,
+    Stage7aComponent,
     Stage8Component,
     Stage9Component,
     Stage10Component,

@@ -144,8 +144,8 @@ export class StageComponent implements OnInit {
         }
     }
 
-    editStage(openForm: boolean) {
-        this.promptEdit.emit(openForm);
+    editStage(showForm: boolean) {
+        this.promptEdit.emit(showForm);
     }
 
     approveRequest( approved: boolean ) {
@@ -182,7 +182,6 @@ export class StageComponent implements OnInit {
     }
 
     resubmitPreviousStage() {
-        // TODO:: WHAT HAPPENS WHEN THERE ARE NEW VALUES?
         this.updateMode = 'edit';
         this.submitForm();
     }
@@ -193,7 +192,8 @@ export class StageComponent implements OnInit {
             if ( ((this.updateMode === 'approve') || (this.updateMode === 'edit')) &&
                  ( ((this.uploadedFiles == null) || (this.uploadedFiles.length === 0)) &&
                    ((this.currentStage['attachments'] == null) || (this.currentStage.attachments.length === 0)) ) &&
-                 ( (this.stageId === '6') || (this.stageId === '7') || (this.stageId === '11') ) ) {
+                 ( (this.stageId === '6') || (this.stageId === '11') ||
+                   (this.stageId === '7') || (this.stageId === '7a')) ) {
 
                 this.stageFormError = 'Η επισύναψη εγγράφων είναι υποχρεωτική.';
 
@@ -504,6 +504,23 @@ export class Stage7Component extends StageComponent implements OnInit {
     }
 
 }
+
+@Component ({
+    selector: 'stage7a-component',
+    templateUrl: './stages-components.html'
+})
+export class Stage7aComponent extends StageComponent implements OnInit {
+
+    ngOnInit () {
+        this.stageFormDefinition = {
+            comment: ['']
+        };
+        this.stageId = '7a';
+
+        super.ngOnInit();
+    }
+}
+
 
 @Component ({
     selector: 'stage8-component',

@@ -125,19 +125,25 @@
                                                     [data]="{currentStage: currentRequestPayment.stages['7'], currentRequestInfo: currentRequestInfo}"
                                                     (promptEdit)="editPreviousStage($event)"></stage7-component>
 
+                                  <stage7a-component class="uk-card uk-card-body uk-card-basic-info uk-margin-left"
+                                                    *ngIf="currentRequestInfo['7a'].showStage > 1"
+                                                    [data]="{currentStage: currentRequestPayment.stages['7a'], currentRequestInfo: currentRequestInfo}"
+                                                    (promptEdit)="editPreviousStage($event)"></stage7a-component>
+
                                   <stage8-component class="uk-card uk-card-body uk-card-basic-info uk-margin-left"
-                                                    *ngIf="currentRequestInfo['8'].showStage > 1"
-                                                    [data]="{currentStage: currentRequestPayment.stages['8'], currentRequestInfo: currentRequestInfo}"
-                                                    (promptEdit)="editPreviousStage($event)"></stage8-component>
+                                                  *ngIf="currentRequestInfo['8'].showStage > 1"
+                                                  [data]="{currentStage: currentRequestPayment.stages['8'], currentRequestInfo: currentRequestInfo}"
+                                                  (promptEdit)="editPreviousStage($event)"></stage8-component>
+                                </div>
+
+                                <div class="uk-child-width-expand uk-grid" uk-grid
+                                     *ngIf="currentRequestInfo['9'].showStage > 1">
 
                                   <stage9-component class="uk-card uk-card-body uk-card-basic-info uk-margin-left"
                                                     *ngIf="currentRequestInfo['9'].showStage > 1"
                                                     [data]="{currentStage: currentRequestPayment.stages['9'], currentRequestInfo: currentRequestInfo}"
                                                     (promptEdit)="editPreviousStage($event)"></stage9-component>
-                                </div>
 
-                                <div class="uk-child-width-expand uk-grid" uk-grid
-                                     *ngIf="currentRequestInfo['10'].showStage > 1">
                                   <stage10-component class="uk-card uk-card-body uk-card-basic-info uk-margin-left"
                                                      *ngIf="currentRequestInfo['10'].showStage > 1"
                                                      [data]="{currentStage: currentRequestPayment.stages['10'], currentRequestInfo: currentRequestInfo}"

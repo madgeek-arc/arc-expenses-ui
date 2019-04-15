@@ -145,6 +145,7 @@ export class RequestApproval extends BaseInfo {
 export class RequestPayment extends BaseInfo {
     currentStage: string;
     stage7: Stage7;
+    stage7a: Stage7a;
     stage8: Stage8;
     stage9: Stage9;
     stage10: Stage10;
@@ -217,6 +218,10 @@ export class Stage6 extends Stage {
 }
 
 export class Stage7 extends Stage {
+    approved: boolean;
+}
+
+export class Stage7a extends Stage {
     approved: boolean;
 }
 

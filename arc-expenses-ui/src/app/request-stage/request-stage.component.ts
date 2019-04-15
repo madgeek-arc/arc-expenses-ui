@@ -233,11 +233,11 @@ export class RequestStageComponent implements OnInit {
         this.showStage1 = false;
     }
 
-    editPreviousStage(openForm: boolean) {
+    editPreviousStage(showForm: boolean) {
         if (this.currentRequestInfo.previousStage) {
             const prevStage = this.currentRequestInfo.previousStage;
 
-            if (openForm) {
+            if (showForm) {
                 // send data to the form component
                 this.checkIfStageIs5b(prevStage);
                 this.prevStageLoaderAnchorItem = new AnchorItem(

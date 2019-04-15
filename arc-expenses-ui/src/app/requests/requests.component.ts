@@ -642,7 +642,7 @@ export class RequestsComponent implements OnInit {
             error => {
                 console.log(error);
                 this.showSpinner = false;
-                this.errorMessage = 'Παρουσιάστηκε πρόωλημα με την ανάκτηση των απαραίτητων πληροφοριών.';
+                this.errorMessage = 'Παρουσιάστηκε πρόβλημα με την ανάκτηση των απαραίτητων πληροφοριών.';
             },
             () => {
                 this.showSpinner = false;

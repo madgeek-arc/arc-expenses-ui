@@ -4,7 +4,8 @@ import { Type } from '@angular/core';
 import { Stage10Component, Stage11Component, Stage12Component, Stage13Component, Stage2Component,
          Stage3Component, Stage4Component, Stage5aComponent, Stage5bComponent, Stage6Component,
          Stage7Component, Stage8Component, Stage9Component } from '../request-stage/stages-components';
-import { Stage10, Stage11, Stage12, Stage13, Stage2, Stage3, Stage4, Stage5a, Stage5b, Stage6, Stage7, Stage8, Stage9 } from './operation';
+import { Stage10, Stage11, Stage12, Stage13, Stage2, Stage3, Stage4, Stage5a,
+         Stage5b, Stage6, Stage7, Stage7a, Stage8, Stage9 } from './operation';
 
 
 /* Map of the displayed messages according to the stage's outcome (if submitted) */
@@ -65,6 +66,7 @@ export class RequestInfo {
     '5b': StageInfo;
     '6': StageInfo;
     '7': StageInfo;
+    '7a': StageInfo;
     '8': StageInfo;
     '9': StageInfo;
     '10': StageInfo;
@@ -162,7 +164,7 @@ export class RequestInfo {
         this['7'] = new StageInfo(
             stageTitles['7'],
             [],
-            ['8'],
+            ['7a', '8'],
             Stage7Component,
             [commentDesc],
             new SubmittedStageResultMap(
@@ -172,9 +174,22 @@ export class RequestInfo {
             )
         );
 
+        this['7a'] = new StageInfo(
+            stageTitles['7a'],
+            ['7'],
+            ['8'],
+            Stage5bComponent,
+            [commentDesc],
+            new SubmittedStageResultMap(
+                'Εγκρίθηκε από το Διοικητικό Συμβούλιο',
+                'Απορρίφθηκε από το Διοικητικό Συμβούλιο',
+                'Επεστράφη στο προηγούμενο στάδιο από το Διοικητικό Συμβούλιο'
+            )
+        );
+
         this['8'] = new StageInfo(
             stageTitles['8'],
-            ['7'],
+            ['7a', '7'],
             ['9'],
             Stage8Component,
             [checkRegularityDesc, checkLegalityDesc, commentDesc],
@@ -269,6 +284,8 @@ export class RequestInfo {
                 return new Stage6();
             case '7':
                 return new Stage7();
+            case '7a':
+                return new Stage7a();
             case '8':
                 return new Stage8();
             case '9':
