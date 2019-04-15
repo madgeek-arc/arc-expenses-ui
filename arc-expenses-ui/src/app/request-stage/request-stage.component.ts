@@ -198,7 +198,7 @@ export class RequestStageComponent implements OnInit {
         this.successMessage = '';
         if (this.currentRequestApproval.baseInfo.stage === '5b') {
             submitted.append('supplier', this.currentRequestApproval.stages['1']['supplier']);
-            submitted.append('amount', this.currentRequestApproval.stages['1']['amountInEuros'].toString());
+            submitted.append('amountInEuros', this.currentRequestApproval.stages['1']['amountInEuros'].toString());
         }
         this.requestService.submitUpdate<any>('request', mode, this.currentRequestApproval.baseInfo.requestId, submitted)
             .subscribe(

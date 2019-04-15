@@ -122,10 +122,10 @@ export class Stage1FormComponent implements OnInit {
             } else {
                 const updatedRequest = new FormData();
                 updatedRequest.append('subject', this.updateStage1Form.get('requestText').value);
-                updatedRequest.append('amount', this.updateStage1Form.get('amount').value);
+                updatedRequest.append('amountInEuros', this.updateStage1Form.get('amount').value);
                 if ((this.currentRequest.type !== 'CONTRACT') && (this.currentRequest.type !== 'TRIP')) {
                     updatedRequest.append('supplier', this.updateStage1Form.get('supplier').value);
-                    updatedRequest.append('supplier_selection_method', this.updateStage1Form.get('supplierSelectionMethod').value);
+                    updatedRequest.append('supplierSelectionMethod', this.updateStage1Form.get('supplierSelectionMethod').value);
                 }
                 if ( this.uploadedFiles && (this.uploadedFiles.length > 0) ) {
                     for (const file of this.uploadedFiles) {

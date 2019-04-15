@@ -186,19 +186,19 @@ export class NewRequestComponent implements OnInit {
                 const newRequest = new FormData();
                 newRequest.append('type', this.requestType);
                 newRequest.append('projectId', this.chosenProgramID);
-                newRequest.append('requester_position', this.newRequestForm.get('position').value);
+                newRequest.append('requesterPosition', this.newRequestForm.get('position').value);
                 newRequest.append('subject', this.newRequestForm.get('requestText').value);
                 if ( this.isRegularOrServicesContract() ) {
                     newRequest.append('supplier', this.newRequestForm.get('supplier').value);
-                    newRequest.append('supplier_selection_method', this.newRequestForm.get('supplierSelectionMethod').value);
+                    newRequest.append('supplierSelectionMethod', this.newRequestForm.get('supplierSelectionMethod').value);
                 }
-                newRequest.append('amount', this.newRequestForm.get('amount').value);
+                newRequest.append('amountInEuros', this.newRequestForm.get('amount').value);
 
                 if (this.requestType === 'TRIP') {
                     newRequest.append('destination', this.newRequestForm.get('trip_destination').value);
                 }
                 if (this.requestType === 'SERVICES_CONTRACT') {
-                    newRequest.append('cycles', this.newRequestForm.get('no_of_payments').value);
+                    newRequest.append('paymentCycles', this.newRequestForm.get('no_of_payments').value);
                 }
                 if (this.isRequestOnBehalfOfOther === true) {
                     newRequest.append('onBehalf', 'true');

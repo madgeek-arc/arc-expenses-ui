@@ -18,7 +18,7 @@ export class StageComponent implements OnInit {
      * in order to call the api and update the request */
     @Output() emitStage: EventEmitter<any[]> = new EventEmitter<any[]>();
 
-    updateMode: string; /* approve, reject or downgrade */
+    updateMode: string; /* approve, reject, downgrade or edit */
 
     /* input variable that defines the status of the current stage */
     @Input() showStage: number; /* values:  0 -> don't show
