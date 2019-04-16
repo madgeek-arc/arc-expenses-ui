@@ -1,6 +1,8 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FieldDescription } from '../../domain/stageDescriptions';
 import * as uikit from 'uikit';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { DOCUMENT } from '@angular/common';
 
 @Component({
   selector: 'app-form-field',
@@ -185,3 +187,58 @@ export class FormUploadFilesComponent implements OnInit {
 
 
 }
+
+@Component({
+    selector: 'dropdown-search',
+    template: `
+        <form *ngIf="(id != null) && (formgroup != null)" [formGroup]="formgroup">
+
+            <div class="uk-grid-small uk-flex-middle" uk-grid>
+                <div class="uk-width-expand">
+                    <div class="uk-width-1-1">
+                        <input class="uk-search-input" type="search" placeholder="Search..." autofocus
+                               formControlName="searchField">
+                    </div>
+                </div>
+                <div class="uk-width-auto">
+                    <button type="submit" class="uk-icon" uk-icon="search"
+                            (click)="submitSearch()" hidden></button>
+                    <button class="uk-icon" id="{{id + '_btn'}}" uk-icon="close"></button>
+                </div>
+            </div>
+
+        </form>
+    `
+})
+export class DropdownSearchComponent implements OnInit, AfterViewInit {
+    formgroup: FormGroup;
+
+    @Input() id: string;
+    @Output() emitSearchTerm: EventEmitter<string[]> = new EventEmitter<string[]>();
+
+    constructor(private fb: FormBuilder, @Inject(DOCUMENT) private document) {}
+
+    ngOnInit(): void {
+        this.formgroup = this.fb.group({searchField : ['']});
+    }
+
+    ngAfterViewInit(): void {
+        if (this.id) {
+            this.addToggle();
+        }
+    }
+
+    // closes popup search form on submit
+    addToggle() {
+        const btn = document.getElementById(this.id + '_btn');
+        btn.setAttribute('uk-toggle', 'target: #' + this.id);
+    }
+
+    submitSearch() {
+        console.log(`searchTerm is ${this.formgroup.get('searchField').value}`);
+        this.emitSearchTerm.emit([this.id, this.formgroup.get('searchField').value]);
+        this.formgroup.reset();
+    }
+
+}
+

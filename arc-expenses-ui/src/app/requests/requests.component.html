@@ -44,7 +44,6 @@
             <!--<aside-help-content #leftHelperContent [position]="'left'"
                                 [ngClass]="leftHelperContent.isPresent()?'tm-sidebar uk-width-1-4@m uk-first-column':'clear-style'">
             </aside-help-content>-->
-          <!--<div>-->
 
               <!-- FILTERS SIDEMENU -->
             <div *ngIf="filtersForm" [formGroup]="filtersForm"
@@ -159,27 +158,8 @@
                        </div>
                    </div>
                </div>
-               <!--<div class="uk-margin-bottom">
-                   <div formArrayName="projectChoices" class="show-options uk-inline">
-                       <label class="filterLabel uk-text-bold uk-margin-large-bottom" for="selectAllProjects">
-                           <input class="uk-checkbox" type="checkbox" id="selectAllProjects" [checked]="allProjectsSelected"
-                                  (change)="toggleSearchAllProjects($event)">&nbsp;&nbsp;Στάδιο</label>
-                       <div *ngFor="let proj of projects; let proj_i = index">
-                           <div [formGroupName]="proj_i">
-                               <read-more [maxHeight]="245">
-                                   <label for="proj_{{ proj_i }}">
-                                       <input class="uk-checkbox" type="checkbox" formControlName="project" id="proj_{{ proj_i }}"
-                                              (change)="chooseProject()">
-                                        {{ proj.projectAcronym }} ({{ proj.instituteName }})
-                                   </label>
-                               </read-more>
-                           </div>
-                       </div>
-                   </div>
-               </div>-->
 
            </div>
-          <!--</div>-->
 
               <!-- MIDDLE -->
             <div class="uk-width-expand">
@@ -246,44 +226,48 @@
                                             <tr>
                                                 <th></th>
                                                 <th>Αρ.Πρωτ./Ειδος</th>
-                                                <th><a (click)="sortBy('request_project_acronym')" title="Ταξινόμηση με βάση το ακρώνυμο του έργου">
+                                                <th><a class="uk-margin-small-right" title="Ταξινόμηση με βάση το ακρώνυμο του έργου"
+                                                       (click)="sortBy('request_project_acronym')">
                                                     Εργο&nbsp;
                                                     <span *ngIf="orderField && (orderField === 'request_project_acronym')"
                                                           [innerHtml]="getOrderSign()"></span>
                                                     </a>
-                                                    <!--TODO:: add search by acronym, institute name and requester-->
-                                                    <!--<a class="uk-navbar-toggle uk-link uk-icon-link"-->
-                                                       <!--uk-icon="icon: search; ratio: 1"-->
-                                                       <!--href="target: #searchProj"-->
-                                                       <!--title="Αναζήτηση ακρωνύμου"></a>-->
-                                                    <!--&lt;!&ndash;<div class="uk-overlay uk-position-top">&ndash;&gt;-->
-                                                        <!--&lt;!&ndash;<input class="uk-input" placeholder="bla">&ndash;&gt;-->
-                                                    <!--&lt;!&ndash;</div>&ndash;&gt;-->
-                                                    <!--&lt;!&ndash;<a class="uk-navbar-toggle uk-icon-link" href="#" uk-icon="icon: search; ratio: 1"></a>&ndash;&gt;-->
-                                                    <!--<div class="uk-navbar-dropdown uk-padding-small" id="searchProj"-->
-                                                         <!--uk-drop="mode: click; cls-drop: uk-navbar-dropdown; boundary: !nav">-->
+                                                    <a class="uk-link uk-icon-link" uk-icon="icon: search; ratio: 1"
+                                                       uk-toggle="target: #project" title="Αναζήτηση ακρωνύμου"></a>
+                                                    <div class="uk-navbar-dropdown uk-padding-small" style="display: block;" id="project" hidden>
+                                                        <dropdown-search [id]="'project'"
+                                                                         (emitSearchTerm)="getSearchByField($event)"></dropdown-search>
+                                                    </div>
 
-                                                        <!--<div class="uk-grid-small uk-flex-middle" uk-grid>-->
-                                                            <!--<div class="uk-width-expand">-->
-                                                                <!--<div class="uk-search uk-search-navbar uk-width-1-1">-->
-                                                                    <!--<input class="uk-input" type="search" placeholder="Aκρώνυμο" autofocus>-->
-                                                                <!--</div>-->
-                                                            <!--</div>-->
-                                                            <!--<div class="uk-width-auto">-->
-                                                                <!--<a class="uk-navbar-dropdown-close" href="#searchProj" uk-close></a>-->
-                                                            <!--</div>-->
-                                                        <!--</div>-->
-
-                                                    <!--</div>-->
                                                 </th>
-                                                <th><a (click)="sortBy('request_institute')" title="Ταξινόμηση με βάση το όνομα του Ινστιτούτου ή της Μονάδας" class="uk-margin-large-right">
+                                                <th>
+                                                    <a class="uk-margin-small-right" title="Ταξινόμηση με βάση το όνομα του Ινστιτούτου ή της Μονάδας"
+                                                       (click)="sortBy('request_institute')">
                                                     Ινστιτουτο / Μοναδα
                                                     <span *ngIf="orderField && (orderField === 'request_institute')"
                                                           [innerHtml]="getOrderSign()"></span>
-                                                </a></th>
+                                                    </a>
+                                                    <a class="uk-link uk-icon-link" uk-icon="icon: search; ratio: 1"
+                                                       uk-toggle="target: #institute" title="Αναζήτηση ινστιτούτου/μονάδας"></a>
+                                                    <div class="uk-navbar-dropdown uk-padding-small" style="display: block;" id="institute" hidden>
+                                                        <dropdown-search [id]="'institute'"
+                                                                         (emitSearchTerm)="getSearchByField($event)"></dropdown-search>
+                                                    </div>
 
-                                                <th>Αιτων</th>
-                                                <th><a (click)="sortBy('creation_date')" title="Ταξινόμηση με βάση την ημερομηνία υποβολής του αιτήματος">
+                                                </th>
+
+                                                <th>
+                                                    Αιτων
+                                                    <a class="uk-link uk-icon-link uk-margin-small-left"
+                                                       uk-icon="icon: search; ratio: 1"
+                                                       uk-toggle="target: #requester" title="Αναζήτηση ινστιτούτου/μονάδας"></a>
+                                                    <div class="uk-navbar-dropdown uk-padding-small" style="display: block;" id="requester" hidden>
+                                                        <dropdown-search [id]="'requester'"
+                                                                         (emitSearchTerm)="getSearchByField($event)"></dropdown-search>
+                                                    </div>
+                                                </th>
+                                                <th><a title="Ταξινόμηση με βάση την ημερομηνία υποβολής του αιτήματος"
+                                                       (click)="sortBy('creation_date')">
                                                     Ημ/νια&nbsp;
                                                     <span *ngIf="orderField && (orderField === 'creation_date')"
                                                           [innerHtml]="getOrderSign()"></span>

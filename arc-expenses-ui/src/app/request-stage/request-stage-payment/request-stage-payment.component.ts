@@ -94,6 +94,7 @@ export class RequestStagePaymentComponent implements OnInit {
                         this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την ανάκτηση του αιτήματος.';
                     }
                 }
+                window.scrollTo(1, 1);
             },
             () => {
                 this.currentRequestInfo = new RequestInfo(this.currentRequestPayment.baseInfo.id,
@@ -102,6 +103,7 @@ export class RequestStagePaymentComponent implements OnInit {
                 this.checkIfStageIs7(this.currentRequestPayment.baseInfo.stage);
                 this.showSpinner = false;
                 this.updateShowStageFields();
+                window.scrollTo(1, 1);
             }
         );
     }
@@ -175,6 +177,7 @@ export class RequestStagePaymentComponent implements OnInit {
                 console.log(error);
                 this.showSpinner = false;
                 this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
+                window.scrollTo(1, 1);
             },
             () => {
                 this.successMessage = 'Οι αλλαγές αποθηκεύτηκαν.';
@@ -319,6 +322,7 @@ export class RequestStagePaymentComponent implements OnInit {
                 this.showSpinner = false;
                 this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
                 UIkit.modal('#cancellationModal').hide();
+                window.scrollTo(1, 1);
             }
         );
     }

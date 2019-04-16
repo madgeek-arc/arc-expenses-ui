@@ -5,11 +5,18 @@ import { ReadMoreComponent } from './read-more/read-more.component';
 import { Stage1FormComponent } from '../request-stage/stage1-form/stage1-form.component';
 import { FilterByTerm } from './search-term.pipe';
 import { AnchorDirective } from './dynamic-loader-anchor-components/anchor.directive';
-import { FormFieldComponent, FormUploadFileComponent, FormUploadFilesComponent } from './form-wrappers/form-wrappers.component';
+import {
+    DropdownSearchComponent,
+    FormFieldComponent,
+    FormUploadFileComponent,
+    FormUploadFilesComponent
+} from './form-wrappers/form-wrappers.component';
+import { ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
     imports: [
         CommonModule,
+        ReactiveFormsModule
     ],
     declarations: [
         HelpContentComponent,
@@ -19,7 +26,8 @@ import { FormFieldComponent, FormUploadFileComponent, FormUploadFilesComponent }
         FilterByTerm,
         FormFieldComponent,
         FormUploadFileComponent,
-        FormUploadFilesComponent
+        FormUploadFilesComponent,
+        DropdownSearchComponent
     ],
     exports: [
         HelpContentComponent,
@@ -29,7 +37,8 @@ import { FormFieldComponent, FormUploadFileComponent, FormUploadFilesComponent }
         FilterByTerm,
         FormFieldComponent,
         FormUploadFileComponent,
-        FormUploadFilesComponent
+        FormUploadFilesComponent,
+        DropdownSearchComponent
     ]
 })
 export class SharedComponentsModule {}

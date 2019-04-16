@@ -102,6 +102,7 @@ export class NewRequestComponent implements OnInit {
                 console.log(error);
                 this.showSpinner = false;
                 this.errorMessage = 'Παρουσιάστηκε πρόβλημα με την ανάκτηση των απαραίτητων πληροφοριών.';
+                window.scrollTo(1, 1);
             },
             () => {
                 this.showSpinner = false;
@@ -110,6 +111,7 @@ export class NewRequestComponent implements OnInit {
                      (this.projects.length === 0)) {
                     this.errorMessage = 'Παρουσιάστηκε πρόβλημα με την ανάκτηση των απαραίτητων πληροφοριών.';
                 }
+                window.scrollTo(1, 1);
             }
         );
     }
@@ -261,6 +263,7 @@ export class NewRequestComponent implements OnInit {
                     this.errorMessage = 'Παρουσιάστηκε πρόβλημα με την ανάκτηση των πληροφοριών για το έργο.';
                     this.showSpinner = false;
                     this.searchTerm = '';
+                    window.scrollTo(1, 1);
                 },
                 () => {
                     this.errorMessage = '';
@@ -278,6 +281,7 @@ export class NewRequestComponent implements OnInit {
                     }
                     this.searchTerm = '';
                     this.showSpinner = false;
+                    window.scrollTo(1, 1);
                 }
             );
         }

@@ -89,6 +89,7 @@ export class RequestStageComponent implements OnInit {
                         this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την ανάκτηση του αιτήματος.';
                     }
                 }
+                window.scrollTo(1, 1);
             },
             () => {
                 this.showSpinner = false;
@@ -102,7 +103,7 @@ export class RequestStageComponent implements OnInit {
                 } else {
                     this.updateShowStageFields();
                 }
-
+                window.scrollTo(1, 1);
             }
         );
     }
@@ -162,10 +163,12 @@ export class RequestStageComponent implements OnInit {
                 console.log(error);
                 this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την ανάκτηση του αιτήματος.';
                 this.showSpinner = false;
+                window.scrollTo(1, 1);
             },
             () => {
                 this.showSpinner = false;
                 this.updateShowStageFields();
+                window.scrollTo(1, 1);
             }
         );
     }
@@ -213,6 +216,7 @@ export class RequestStageComponent implements OnInit {
                     console.log(error);
                     this.showSpinner = false;
                     this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
+                    window.scrollTo(1, 1);
                 },
                 () => {
                     this.successMessage = 'Οι αλλαγές αποθηκεύτηκαν.';
@@ -422,6 +426,7 @@ export class RequestStageComponent implements OnInit {
                 this.showSpinner = false;
                 this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
                 UIkit.modal('#cancellationModal').hide();
+                window.scrollTo(1, 1);
             },
             () => {
                 this.successMessage = 'Το αίτημα ακυρώθηκε.';
@@ -444,6 +449,7 @@ export class RequestStageComponent implements OnInit {
                 this.showSpinner = false;
                 this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
                 UIkit.modal('#finalizingModal').hide();
+                window.scrollTo(1, 1);
             },
             () => {
                 this.errorMessage = '';
