@@ -126,13 +126,9 @@ export class RequestStageComponent implements OnInit {
                         }
                     }
                 }
-                // TODO:: CHECK INSTEAD, IF canEditPrevious is true WHEN IT BECOMES AVAILABLE
-                // MAKE SURE THE canEditPrevious value is the correct one when prevStage == 6
-                if ((prevStage != null) &&
-                    (((prevStage === '1') && (this.authService.getUserProp('email') === this.currentRequestApproval.requesterEmail)) ||
-                     ((prevStage !== '1') &&
-                      (this.authService.getUserProp('email') === this.currentRequestApproval.stages[prevStage].user.email)) ||
-                     (this.userIsAdmin()))) {
+
+                // TODO:: MAKE SURE THE canEditPrevious value is the correct one when prevStage == 6
+                if ((prevStage != null) && ((this.currentRequestApproval.canEditPrevious === true) || (this.userIsAdmin()))) {
 
                     this.currentRequestInfo.previousStage = prevStage;
                 }

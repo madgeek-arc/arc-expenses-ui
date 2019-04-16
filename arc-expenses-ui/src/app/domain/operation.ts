@@ -20,6 +20,7 @@ export class RequestResponse {
     onBehalfEmail: string;
     tripDestination: string;
     canEdit: boolean;
+    canEditPrevious: boolean;
 }
 
 export class RequestSummary {

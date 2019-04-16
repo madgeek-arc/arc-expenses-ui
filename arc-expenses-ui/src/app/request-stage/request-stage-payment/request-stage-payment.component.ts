@@ -125,11 +125,7 @@ export class RequestStagePaymentComponent implements OnInit {
                     }
                 }
 
-                // TODO:: CHECK INSTEAD, IF canEditPrevious is true WHEN IT BECOMES AVAILABLE
-                // MAKE SURE THE canEditPrevious value is the correct one when prevStage == 6
-                if ((prevStage != null) &&
-                    ((this.authService.getUserProp('email') === this.currentRequestPayment.stages[prevStage].user.email) ||
-                     (this.userIsAdmin()))) {
+                if ((prevStage != null) && ((this.currentRequestPayment.canEditPrevious === true) || (this.userIsAdmin()))) {
 
                     this.currentRequestInfo.previousStage = prevStage;
                 }
