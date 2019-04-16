@@ -199,7 +199,8 @@ export class RequestStageComponent implements OnInit {
         this.showSpinner = true;
         this.errorMessage = '';
         this.successMessage = '';
-        if (this.currentRequestApproval.baseInfo.stage === '5b') {
+        if ((this.currentRequestApproval.baseInfo.stage === '5b') ||
+             ((mode === 'edit') && (this.currentRequestInfo.previousStage != null) && (this.currentRequestInfo.previousStage === '5b'))) {
             submitted.append('supplier', this.currentRequestApproval.stages['1']['supplier']);
             submitted.append('amountInEuros', this.currentRequestApproval.stages['1']['amountInEuros'].toString());
         }

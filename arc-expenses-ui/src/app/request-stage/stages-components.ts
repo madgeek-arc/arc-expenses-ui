@@ -383,14 +383,22 @@ export class Stage5bComponent extends StageComponent implements OnInit {
                 newValArray.push(this.currentRequestInfo.supplier);
                 newValArray.push(this.currentRequestInfo.requestedAmount);
                 this.newValues.emit(newValArray);
-                this.approveRequest(approved);
+                if (this.canEditStage) {
+                    this.resubmitPreviousStage();
+                } else {
+                    this.approveRequest(approved);
+                }
 
             } else {
                 this.stageFormError = 'Τα πεδία που σημειώνονται με (*) είναι υποχρεωτικά.';
             }
 
         } else {
-            this.approveRequest(approved);
+            if (this.canEditStage) {
+                this.resubmitPreviousStage();
+            } else {
+                this.approveRequest(approved);
+            }
         }
     }
 
@@ -455,7 +463,7 @@ export class Stage7Component extends StageComponent implements OnInit {
 
         super.ngOnInit();
 
-        if ( this.currentRequestInfo.finalAmount ) {
+        if ( this.currentRequestInfo.finalAmount != null ) {
             this.showExtraFields = true;
             console.log('oldFinalAmount is', this.currentRequestInfo.finalAmount);
         }
@@ -485,14 +493,22 @@ export class Stage7Component extends StageComponent implements OnInit {
                 const newValArray = [];
                 newValArray.push(this.currentRequestInfo.finalAmount);
                 this.newValues.emit(newValArray);
-                this.approveRequest(true);
+                if (this.canEditStage) {
+                    this.resubmitPreviousStage();
+                } else {
+                    this.approveRequest(true);
+                }
 
             } else {
                 this.stageFormError = 'Παρακαλώ συμπληρώστε ένα τελικό ποσό.';
             }
 
         } else {
-            this.approveRequest(true);
+            if (this.canEditStage) {
+                this.resubmitPreviousStage();
+            } else {
+                this.approveRequest(true);
+            }
         }
     }
 

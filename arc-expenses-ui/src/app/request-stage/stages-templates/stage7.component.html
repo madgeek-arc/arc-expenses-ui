@@ -75,7 +75,7 @@
             <button class="uk-button uk-button-primary" (click)="emitNewValuesAndForward()">Υποβολή</button>
         </div>
         <div *ngIf="canEditStage">
-            <button class="uk-button uk-button-primary" (click)="resubmitPreviousStage()">Αποθήκευση αλλαγών</button>
+            <button class="uk-button uk-button-primary" (click)="emitNewValuesAndForward()">Αποθήκευση αλλαγών</button>
             <button class="uk-button uk-button-default" (click)="editStage(false)">Κλείσιμο</button>
         </div>
 

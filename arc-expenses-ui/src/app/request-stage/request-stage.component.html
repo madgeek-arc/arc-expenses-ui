@@ -101,6 +101,13 @@
                                (emitRequest)="getUpdatedRequest($event)"></stage1-form>
                 </div>
 
+                <!-- Link to Payment -->
+                <div *ngIf="((currentRequestApproval.type !== 'SERVICES_CONTRACT') &&
+                             (currentRequestPayments != null) &&
+                             (currentRequestPayments.length > 0))" class="" data-html2canvas-ignore>
+                  <a [routerLink]="['/requests/request-stage-payment', currentRequestPayments[0].id]">
+                    Μετάβαση στη σελίδα εξόφλησης δαπάνης</a>
+                </div>
 
                 <!--end of 1st stage-->
                 <div class="uk-text-right" data-html2canvas-ignore>
@@ -222,10 +229,10 @@
 
                     <div *ngIf="(currentRequestPayments && (currentRequestPayments.length > 0))">
 
-                      <!-- Link to Payment -->
-                      <div *ngIf="(currentRequestApproval.type !== 'SERVICES_CONTRACT')" class="" data-html2canvas-ignore>
-                          <a [routerLink]="['/requests/request-stage-payment', currentRequestPayments[0].id]">Προβολή Περαίωσης</a>
-                      </div>
+                      <!--&lt;!&ndash; Link to Payment &ndash;&gt;-->
+                      <!--<div *ngIf="(currentRequestApproval.type !== 'SERVICES_CONTRACT')" class="" data-html2canvas-ignore>-->
+                          <!--<a [routerLink]="['/requests/request-stage-payment', currentRequestPayments[0].id]">Προβολή Περαίωσης</a>-->
+                      <!--</div>-->
 
                       <!-- Payments list -->
                       <div *ngIf="(currentRequestApproval.type === 'SERVICES_CONTRACT')" class="" data-html2canvas-ignore>

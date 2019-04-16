@@ -113,6 +113,7 @@ export class RequestStagePaymentComponent implements OnInit {
         if (((this.currentRequestPayment.baseInfo.status === 'PENDING') ||
              (this.currentRequestPayment.baseInfo.status === 'UNDER_REVIEW')) &&
             (this.currentRequestPayment.baseInfo.stage !== '7')) {
+
             const i = this.stages.indexOf(this.currentRequestPayment.baseInfo.stage);
             if (i > -1) {
                 let prevStage: string;
@@ -162,7 +163,8 @@ export class RequestStagePaymentComponent implements OnInit {
         this.showSpinner = true;
         this.errorMessage = '';
         this.successMessage = '';
-        if (this.currentRequestPayment.baseInfo.stage === '7') {
+        if ((this.currentRequestPayment.baseInfo.stage === '7') ||
+            ((mode === 'edit') && (this.currentRequestInfo.previousStage != null) && (this.currentRequestInfo.previousStage === '7'))) {
             submitted.append('finalAmount', this.currentRequestPayment.stages['1']['finalAmount'].toString());
         }
         this.requestService.submitUpdate<any>('payment', mode, this.currentRequestPayment.baseInfo.id, submitted).subscribe(
