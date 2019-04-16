@@ -1,4 +1,16 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import {
+    AfterViewInit,
+    Component,
+    ElementRef,
+    EventEmitter,
+    Inject,
+    Input,
+    OnChanges,
+    OnDestroy,
+    OnInit,
+    Output,
+    SimpleChanges
+} from '@angular/core';
 import { FieldDescription } from '../../domain/stageDescriptions';
 import * as uikit from 'uikit';
 import { FormBuilder, FormGroup } from '@angular/forms';
@@ -201,9 +213,9 @@ export class FormUploadFilesComponent implements OnInit {
                     </div>
                 </div>
                 <div class="uk-width-auto">
-                    <button type="submit" class="uk-icon" uk-icon="search"
+                    <button id="{{id + '_submit'}}" type="submit" class="uk-icon" uk-icon="search"
                             (click)="submitSearch()" hidden></button>
-                    <button class="uk-icon" id="{{id + '_btn'}}" uk-icon="close"></button>
+                    <button id="{{id + '_btn'}}" type="reset" class="uk-icon" uk-icon="close"></button>
                 </div>
             </div>
 
@@ -231,12 +243,18 @@ export class DropdownSearchComponent implements OnInit, AfterViewInit {
     // closes popup search form on submit
     addToggle() {
         const btn = document.getElementById(this.id + '_btn');
+        const sbm = document.getElementById(this.id + '_submit');
         btn.setAttribute('uk-toggle', 'target: #' + this.id);
+        sbm.setAttribute('uk-toggle', 'target: #' + this.id);
     }
 
     submitSearch() {
         console.log(`searchTerm is ${this.formgroup.get('searchField').value}`);
         this.emitSearchTerm.emit([this.id, this.formgroup.get('searchField').value]);
+        this.formgroup.reset();
+    }
+
+    clearForm() {
         this.formgroup.reset();
     }
 

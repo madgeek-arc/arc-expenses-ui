@@ -1,9 +1,11 @@
 import { analiftheiYpoxrewsiDesc, checkFeasibilityDesc, checkLegalityDesc, checkNecessityDesc, checkRegularityDesc,
          commentDesc, fundsAvailableDesc, loanDesc, loanSourceDesc, FieldDescription, stageTitles } from './stageDescriptions';
 import { Type } from '@angular/core';
-import { Stage10Component, Stage11Component, Stage12Component, Stage13Component, Stage2Component,
-         Stage3Component, Stage4Component, Stage5aComponent, Stage5bComponent, Stage6Component,
-         Stage7Component, Stage8Component, Stage9Component } from '../request-stage/stages-components';
+import {
+    Stage10Component, Stage11Component, Stage12Component, Stage13Component, Stage2Component,
+    Stage3Component, Stage4Component, Stage5aComponent, Stage5bComponent, Stage6Component, Stage7aComponent,
+    Stage7Component, Stage8Component, Stage9Component
+} from '../request-stage/stages-components';
 import { Stage10, Stage11, Stage12, Stage13, Stage2, Stage3, Stage4, Stage5a,
          Stage5b, Stage6, Stage7, Stage7a, Stage8, Stage9 } from './operation';
 
@@ -178,7 +180,7 @@ export class RequestInfo {
             stageTitles['7a'],
             ['7'],
             ['8'],
-            Stage5bComponent,
+            Stage7aComponent,
             [commentDesc],
             new SubmittedStageResultMap(
                 'Εγκρίθηκε από το Διοικητικό Συμβούλιο',
