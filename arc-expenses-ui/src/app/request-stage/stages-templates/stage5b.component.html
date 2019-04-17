@@ -4,7 +4,7 @@
     <!-- STAGE RESULT DISPLAY -->
     <div *ngIf="showStage > 1" class="uk-form-controls">
         <!--<h5>{{ stageTitle }}</h5>-->
-        <div *ngIf="canEditStage">
+        <div *ngIf="canEditStage" data-html2canvas-ignore>
             <a class="uk-link" (click)="editStage(true)"><i class="uk-icon" uk-icon="pencil"></i> Επεξεργασία</a>
         </div>
         <div>

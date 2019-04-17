@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Attachment, Request, RequestResponse, Stage5b } from '../../domain/operation';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { requesterPositions, supplierSelectionMethodsMap } from '../../domain/stageDescriptions';
+import { ManageRequestsService } from '../../services/manage-requests.service';
 
 @Component({
     selector: 'stage1-form',
@@ -29,7 +30,8 @@ export class Stage1FormComponent implements OnInit {
     selMethods = supplierSelectionMethodsMap;
     isSupplierRequired: boolean;
 
-    constructor(private fb: FormBuilder) {}
+    constructor(private fb: FormBuilder,
+                private requestService: ManageRequestsService) {}
 
     ngOnInit() {
         this.createForm();
@@ -72,17 +74,39 @@ export class Stage1FormComponent implements OnInit {
     }
 
     removeUploadedFile(filename: string) {
-        const z = this.stage1AttachmentNames.indexOf(filename);
-        this.stage1AttachmentNames.splice(z, 1);
+        // if it was a new file
         if (this.uploadedFiles && this.uploadedFiles.some(x => x.name === filename)) {
             const i = this.uploadedFiles.findIndex(x => x.name === filename);
             this.uploadedFiles.splice(i, 1);
-        }
-        if (this.currentRequest.stages['1'].attachments &&
-            this.currentRequest.stages['1'].attachments.some(x => x.filename === filename)) {
+
+            const z = this.stage1AttachmentNames.indexOf(filename);
+            this.stage1AttachmentNames.splice(z, 1);
+
+        // if it was an already uploaded file
+        } else if (this.currentRequest.stages['1'].attachments &&
+                   this.currentRequest.stages['1'].attachments.some(x => x.filename === filename)) {
 
             const i = this.currentRequest.stages['1'].attachments.findIndex(x => x.filename === filename);
-            this.currentRequest.stages['1'].attachments.splice(i, 1);
+
+            this.errorMessage = '';
+            this.requestService.deleteUploadedFile(this.currentRequest.baseInfo.id,
+                                                   this.currentRequest.stages['1'].attachments[i].url,
+                                                   'approval',
+                                                   this.currentRequest.stages['1'].attachments[i].filename)
+                .subscribe(
+                    res => {
+                        console.log(`delete uploaded file responded: ${JSON.stringify(res)}`);
+                        this.currentRequest.stages['1'].attachments.splice(i, 1);
+
+                        const z = this.stage1AttachmentNames.indexOf(filename);
+                        this.stage1AttachmentNames.splice(z, 1);
+                        this.errorMessage = '';
+                    },
+                    er => {
+                        console.log(er);
+                        this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την διαγραφή του αρχείου. Παρακαλώ, προσπαθήστε ξανά.';
+                    }
+                );
         }
     }
 

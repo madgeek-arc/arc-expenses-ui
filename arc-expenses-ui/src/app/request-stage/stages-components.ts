@@ -4,6 +4,7 @@ import { Stage } from '../domain/operation';
 import { commentDesc, FieldDescription } from '../domain/stageDescriptions';
 import { DatePipe } from '@angular/common';
 import { RequestInfo, StageInfo } from '../domain/requestInfoClasses';
+import { ManageRequestsService } from '../services/manage-requests.service';
 
 @Component ({
     selector: 'stage-component',
@@ -54,7 +55,8 @@ export class StageComponent implements OnInit {
 
     datePipe = new DatePipe('el');
 
-    constructor(private fb: FormBuilder) {}
+    constructor(private fb: FormBuilder,
+                private requestService: ManageRequestsService) {}
 
     ngOnInit() {
 
@@ -130,17 +132,40 @@ export class StageComponent implements OnInit {
     }
 
     removeUploadedFile(filename: string) {
-        const z = this.uploadedFilenames.indexOf(filename);
-        this.uploadedFilenames.splice(z, 1);
+        // if it was a new file
         if (this.uploadedFiles && this.uploadedFiles.some(x => x.name === filename)) {
             const i = this.uploadedFiles.findIndex(x => x.name === filename);
             this.uploadedFiles.splice(i, 1);
-        }
-        if (this.currentStage.attachments &&
-            this.currentStage.attachments.some(x => x.filename === filename)) {
+
+            const z = this.uploadedFilenames.indexOf(filename);
+            this.uploadedFilenames.splice(z, 1);
+
+        // if it was an already uploaded file
+        } else  if (this.currentStage.attachments &&
+                    this.currentStage.attachments.some(x => x.filename === filename)) {
 
             const i = this.currentStage.attachments.findIndex(x => x.filename === filename);
-            this.currentStage.attachments.splice(i, 1);
+            const mode: string = (this.currentRequestInfo.phaseId.includes('a') ? 'approval' : 'payment');
+
+            this.stageFormError = '';
+            this.requestService.deleteUploadedFile(this.currentRequestInfo.phaseId,
+                                                   this.currentStage.attachments[i].url,
+                                                   mode,
+                                                   this.currentStage.attachments[i].filename)
+                .subscribe(
+                    res => {
+                        console.log(`delete uploaded file responded: ${JSON.stringify(res)}`);
+                        this.currentStage.attachments.splice(i, 1);
+
+                        const z = this.uploadedFilenames.indexOf(filename);
+                        this.uploadedFilenames.splice(z, 1);
+                        this.stageFormError = '';
+                    },
+                er => {
+                        console.log(er);
+                        this.stageFormError = 'Παρουσιάστηκε πρόβλημα κατά την διαγραφή του αρχείου. Παρακαλώ, προσπαθήστε ξανά.';
+                    }
+                );
         }
     }
 

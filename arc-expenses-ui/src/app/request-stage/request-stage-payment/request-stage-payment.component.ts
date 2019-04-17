@@ -214,6 +214,11 @@ export class RequestStagePaymentComponent implements OnInit {
     }
 
     willShowStage(stage: string) {
+        /* return values:  0 -> don't show
+                           1 -> show form
+                           2 -> was approved
+                           3 -> was rejected
+                           4 -> was returned to previous*/
         if ( (stage === this.currentRequestPayment.baseInfo.stage) &&
             (this.currentRequestPayment.baseInfo.status !== 'REJECTED') &&
             (this.currentRequestPayment.baseInfo.status !== 'ACCEPTED') &&
@@ -313,7 +318,8 @@ export class RequestStagePaymentComponent implements OnInit {
                 } else if (this.totalPaymentsOfRequest > 1) {
                     this.router.navigate(['/requests/request-stage', this.currentRequestPayment.baseInfo.requestId + '-a1']);
                 } else {
-                    this.router.navigate(['/requests/request-stage-payment', res['id']]);
+                    // this.router.navigate(['/requests/request-stage-payment', res['id']]);
+                    this.getCurrentRequest();
                 }
             },
             error => {

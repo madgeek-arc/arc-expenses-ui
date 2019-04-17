@@ -54,6 +54,19 @@ export class ManageRequestsService {
         return this.http.request(req).pipe(catchError(this.handleError));
     }
 
+    deleteUploadedFile(id: string, archiveId: string, mode: string, filename: string): Observable<any> {
+        /* ACCEPTED MODE VALUES: request, approval, payment */
+        let url = `${environment.API_ENDPOINT}/request/store/delete?`;
+        url = `${url}archiveId=${encodeURIComponent(archiveId)}`;
+        url = `${url}&id=${id}`;
+        url = `${url}&mode=${mode}`;
+        url = `${url}&filename=${encodeURIComponent(filename)}`;
+
+        console.log(`calling ${url}`);
+
+        return this.http.delete<any>(url, headerOptions).pipe(catchError(this.handleError));
+    }
+
     cancelRequestPayment(paymentId: string, cancelRequest: boolean): Observable<any> {
         const url = `${environment.API_ENDPOINT}/payment/cancel/${paymentId}`;
         console.log(`calling ${url}`);
