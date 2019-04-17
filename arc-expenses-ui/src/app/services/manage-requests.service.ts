@@ -62,7 +62,8 @@ export class ManageRequestsService {
         formData.append('cancel_request', cancelRequest ? 'true' : 'false');
 
         // returns json of the form {id: paymentID}
-        return this.http.post<any>(url, formData, headerOptions).pipe(catchError(this.handleError));
+        const req = new HttpRequest('POST', url, formData, { withCredentials: true });
+        return this.http.request<any>(req).pipe(catchError(this.handleError));
     }
 
     finalizeRequest(requestId: string): Observable<any> {

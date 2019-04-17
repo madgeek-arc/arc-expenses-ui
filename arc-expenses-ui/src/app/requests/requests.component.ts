@@ -93,7 +93,7 @@ export class RequestsComponent implements OnInit {
         this.orderField = 'creation_date';
         this.totalPages = 0;
 
-        this.editableSelected = true;
+        this.editableSelected = false;
         this.myRequestsSelected = false;
 
         this.createSearchUrl();
@@ -120,7 +120,7 @@ export class RequestsComponent implements OnInit {
                 this.orderField = 'creation_date';
                 this.totalPages = 0;
 
-                this.editableSelected = true;
+                this.editableSelected = false;
                 this.myRequestsSelected = false;
 
                 if ( params.has('status') ) { this.statusesChoice = params.getAll('status'); }

@@ -186,6 +186,7 @@ export class RequestStagePaymentComponent implements OnInit {
 
 
     editPreviousStage(showForm: boolean) {
+        // if the previous stage cannot be editted this.currentRequestInfo.previousStage will be undefined -- see findPreviousStage()
         if (this.currentRequestInfo.previousStage != null) {
             const prevStage = this.currentRequestInfo.previousStage;
             if (showForm === true) {

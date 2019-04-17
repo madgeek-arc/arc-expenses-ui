@@ -118,7 +118,7 @@
                                 <!-- PHASE 2  -->
 
                                 <div class="uk-child-width-expand uk-grid" uk-grid
-                                     *ngIf="currentRequestInfo['7'].showStage > 1">
+                                     *ngIf="(currentRequestInfo['7'].showStage > 1) || (currentRequestInfo['7a'].showStage > 1)">
 
                                   <stage7-component class="uk-card uk-card-body uk-card-basic-info uk-margin-left"
                                                     *ngIf="currentRequestInfo['7'].showStage > 1"
@@ -137,7 +137,7 @@
                                 </div>
 
                                 <div class="uk-child-width-expand uk-grid" uk-grid
-                                     *ngIf="currentRequestInfo['9'].showStage > 1">
+                                     *ngIf="(currentRequestInfo['9'].showStage > 1) || (currentRequestInfo['10'].showStage > 1)">
 
                                   <stage9-component class="uk-card uk-card-body uk-card-basic-info uk-margin-left"
                                                     *ngIf="currentRequestInfo['9'].showStage > 1"
@@ -157,7 +157,7 @@
 
 
                                 <div class="uk-child-width-expand uk-grid" uk-grid
-                                     *ngIf="currentRequestInfo['12'].showStage > 1">
+                                     *ngIf="(currentRequestInfo['12'].showStage > 1) || (currentRequestInfo['13'].showStage > 1)">
                                   <stage12-component class="uk-card uk-card-body uk-card-basic-info uk-margin-left"
                                                      *ngIf="currentRequestInfo['12'].showStage > 1"
                                                      [data]="{currentStage: currentRequestPayment.stages['12'], currentRequestInfo: currentRequestInfo}"

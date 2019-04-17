@@ -97,12 +97,7 @@ export class RequestStageComponent implements OnInit {
                                                           this.currentRequestApproval.baseInfo.requestId);
                 this.findPreviousStage();
                 this.checkIfStageIs5b(this.currentRequestApproval.baseInfo.stage);
-                if ((this.currentRequestApproval.type !== 'CONTRACT') &&
-                    (this.currentRequestApproval.baseInfo.status === 'ACCEPTED')) {
-                    this.getRequestPayments();
-                } else {
-                    this.updateShowStageFields();
-                }
+                this.getRequestPayments();
                 window.scrollTo(1, 1);
             }
         );

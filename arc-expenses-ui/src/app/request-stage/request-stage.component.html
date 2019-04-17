@@ -135,7 +135,7 @@
 
                 <!-- PHASE 1  -->
                 <div class="uk-child-width-expand uk-grid" uk-grid
-                     *ngIf="currentRequestInfo['2'].showStage > 1">
+                     *ngIf="(currentRequestInfo['2'].showStage > 1) || (currentRequestInfo['3'].showStage > 1)">
 
                   <stage2-component class="uk-card uk-card-body uk-card-basic-info uk-margin-left"
                                     *ngIf="currentRequestInfo['2'].showStage > 1"
@@ -157,7 +157,7 @@
 
 
                 <div class="uk-child-width-expand uk-grid" uk-grid
-                     *ngIf="currentRequestInfo['5a'].showStage > 1">
+                     *ngIf="(currentRequestInfo['5a'].showStage > 1) || (currentRequestInfo['5b'].showStage > 1) || (currentRequestInfo['6'].showStage > 1)">
 
                   <stage5a-component class="uk-card uk-card-body uk-card-basic-info uk-margin-left"
                                      *ngIf="currentRequestInfo['5a'].showStage > 1"
@@ -228,11 +228,6 @@
                     </div>
 
                     <div *ngIf="(currentRequestPayments && (currentRequestPayments.length > 0))">
-
-                      <!--&lt;!&ndash; Link to Payment &ndash;&gt;-->
-                      <!--<div *ngIf="(currentRequestApproval.type !== 'SERVICES_CONTRACT')" class="" data-html2canvas-ignore>-->
-                          <!--<a [routerLink]="['/requests/request-stage-payment', currentRequestPayments[0].id]">Προβολή Περαίωσης</a>-->
-                      <!--</div>-->
 
                       <!-- Payments list -->
                       <div *ngIf="(currentRequestApproval.type === 'SERVICES_CONTRACT')" class="" data-html2canvas-ignore>
