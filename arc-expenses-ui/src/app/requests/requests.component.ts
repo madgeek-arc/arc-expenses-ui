@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { RequestSummary, Vocabulary } from '../domain/operation';
+import { RequestSummary } from '../domain/operation';
 import { ManageRequestsService } from '../services/manage-requests.service';
 import { AuthenticationService } from '../services/authentication.service';
 import { Paging } from '../domain/extraClasses';
@@ -30,6 +30,7 @@ export class RequestsComponent implements OnInit {
     stagesMap = stageTitles;
     reqTypes = requestTypes;
     requestTypeIds = ['regular', 'contract', 'services_contract', 'trip'];
+    extraFiltersTranslation = {projectAcronym: 'έργο', institute: 'ινστιτούτο/μονάδα', requester: 'αιτών'};
 
     /* flags */
     isSimpleUser: boolean;
@@ -48,6 +49,7 @@ export class RequestsComponent implements OnInit {
     typesChoice: string[] = [];
     order: string;
     orderField: string;
+    extraFilters: Map<string, string>;
     itemsPerPage: number;
     currentPage: number;
     totalPages: number;
@@ -79,6 +81,7 @@ export class RequestsComponent implements OnInit {
         this.statusesChoice = [ 'pending', 'under_review' ];
         this.stagesChoice = [ 'all' ];
         this.typesChoice = [ 'all' ];
+        this.extraFilters = new Map<string, string>();
 
         this.searchTerm = '';
         this.keywordField = this.fb.group({keyword: [ '' ]});
@@ -106,6 +109,7 @@ export class RequestsComponent implements OnInit {
                 this.statusesChoice = [ 'pending', 'under_review' ];
                 this.stagesChoice = [ 'all' ];
                 this.typesChoice = [ 'all' ];
+                this.extraFilters = new Map<string, string>();
 
                 this.searchTerm = '';
                 this.keywordField = this.fb.group({keyword: [ '' ]});
@@ -142,6 +146,9 @@ export class RequestsComponent implements OnInit {
                     }
                 }
                 if ( params.has('type') ) { this.typesChoice = params.getAll('type'); }
+                if ( params.has('projectAcronym') ) { this.extraFilters.set('projectAcronym', params.get('projectAcronym')); }
+                if ( params.has('institute') ) { this.extraFilters.set('institute', params.get('institute')); }
+                if ( params.has('requester') ) { this.extraFilters.set('requester', params.get('requester')); }
                 if ( params.has('searchTerm') ) {
                     this.searchTerm = params.get('searchTerm');
                     this.keywordField.get('keyword').setValue(this.searchTerm);
@@ -291,7 +298,8 @@ export class RequestsComponent implements OnInit {
                                                       this.order,
                                                       this.orderField,
                                                       editable,
-                                                      isMine).subscribe(
+                                                      isMine,
+                                                      this.extraFilters).subscribe(
             res => {
                 if (res) {
                     this.searchResults = res;
@@ -324,6 +332,13 @@ export class RequestsComponent implements OnInit {
                 window.scrollTo(1, 1);
             }
         );
+    }
+
+    getExtraFiltersKeys() {
+        if (this.extraFilters) {
+            return Array.from(this.extraFilters.keys());
+        }
+        return [];
     }
 
     sortBy (category: string) {
@@ -424,26 +439,25 @@ export class RequestsComponent implements OnInit {
         this.createSearchUrl();
     }
 
+    addExtraFilter(searchParams: string[]) {
+        if (searchParams.length === 2) {
+            const key = searchParams[ 0 ];
+            const value = searchParams[ 1 ];
+            this.extraFilters.set(key, value);
+            this.createSearchUrl();
+        }
+    }
+
+    removeExtraFilter(key: string) {
+        this.extraFilters.delete(key);
+        this.createSearchUrl();
+    }
+
     getSearchByKeywordResults() {
         this.searchTerm = this.keywordField.get('keyword').value;
         console.log('this.searchTerm is', this.searchTerm);
         this.currentPage = 0;
         this.createSearchUrl();
-    }
-
-    getSearchByField(searchParams: string[]) {
-        // TODO:: implement search by field
-        if (searchParams.length === 2) {
-            const searchField = searchParams[0];
-            const searchTerm = searchParams[1];
-            if (searchField === 'project') {
-                console.log(`requested project is  ${searchTerm}`);
-            } else if (searchField === 'institute') {
-                console.log(`requested institute is  ${searchTerm}`);
-            } else if (searchField === 'requester') {
-                console.log(`requested requester is  ${searchTerm}`);
-            }
-        }
     }
 
     toggleEditable(event: any) {
@@ -625,21 +639,22 @@ export class RequestsComponent implements OnInit {
         this.stagesChoice.forEach( st => url.append('stage', st) );
         url.set('phase', this.phaseId.toString());
         this.typesChoice.forEach( t => url.append('type', t) );
+        if (this.extraFilters) {
+            this.extraFilters.forEach(
+                (val: string, k: string) => url.set(k, val)
+            );
+        }
         url.set('searchTerm', this.searchTerm);
         url.set('page', this.currentPage.toString());
         url.set('itemsPerPage', this.itemsPerPage.toString());
         url.set('orderField', this.orderField);
         url.set('order', this.order);
-        if (this.editableSelected) {
-            url.set('editable', 'true');
-        } else {
-            url.set('editable', 'false');
-        }
-        if (this.myRequestsSelected) {
-            url.set('isMine', 'true');
-        } else {
-            url.set('isMine', 'false');
-        }
+
+        const editableValue = (this.editableSelected ? 'true' : 'false');
+        url.set('editable', editableValue);
+
+        const isMineValue = (this.myRequestsSelected ? 'true' : 'false');
+        url.set('isMine', isMineValue);
 
         this.router.navigateByUrl(`/requests?${url.toString()}`);
     }

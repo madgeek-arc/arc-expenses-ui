@@ -12,7 +12,7 @@
               <div class="search_box_bg" style="text-align:center">
                 <form [formGroup]="keywordField" class="uk-align-center uk-margin-top">
                   <input class="uk-input uk-width-2-3 uk-search-field"
-                         placeholder="αρ.πρωτοκόλλου, αιτών, χειριστής, υπεύθυνος, έργο, ινστιτούτο" formControlName="keyword">
+                         placeholder="αρ.πρωτοκόλλου, χειριστής, επιστημονικός υπεύθυνος" formControlName="keyword">
                   <button class="uk-button uk-button-secondary" type="submit" (click)="getSearchByKeywordResults()"><i class="fa fa-search"></i> Αναζήτηση</button>
                   <button class="uk-button uk-button-default" (click)="initializeParams()">Καθάρισμα επιλογών</button>
                 </form>
@@ -170,7 +170,18 @@
                         <div uk-spinner="ratio: 2" class="uk-overlay uk-dark"></div>
                     </div>
                     <div *ngIf="searchResults && !showSpinner">
-                        <div class="uk-float-left">A=Ανάληψη, Π=Περαίωση</div>
+                        <div class="uk-float-left">
+                            A=Ανάληψη, Π=Περαίωση
+                            <div class="uk-margin-small-top">
+                                <div *ngFor="let filter of getExtraFiltersKeys()" class="uk-label uk-margin-small-right">
+                                    <span class="uk-margin-small-right">
+                                        {{ extraFiltersTranslation[filter] }}: {{ extraFilters.get(filter) }}</span>
+                                    <span>
+                                        <a class="uk-link uk-position-z-index" uk-icon="icon: close" (click)="removeExtraFilter(filter)"></a>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
                         <div class="uk-grid page-controls uk-flex-right">
                             <div class="uk-margin-bottom ">
                                 <div class="uk-inline">
@@ -233,10 +244,10 @@
                                                           [innerHtml]="getOrderSign()"></span>
                                                     </a>
                                                     <a class="uk-link uk-icon-link" uk-icon="icon: search; ratio: 1"
-                                                       uk-toggle="target: #project" title="Αναζήτηση ακρωνύμου"></a>
-                                                    <div class="uk-navbar-dropdown uk-padding-small" style="display: block;" id="project" hidden>
-                                                        <dropdown-search [id]="'project'"
-                                                                         (emitSearchTerm)="getSearchByField($event)"></dropdown-search>
+                                                       uk-toggle="target: #projectAcronym" title="Αναζήτηση ακρωνύμου"></a>
+                                                    <div class="uk-navbar-dropdown uk-padding-small" style="display: block;" id="projectAcronym" hidden>
+                                                        <dropdown-search [id]="'projectAcronym'"
+                                                                         (emitSearchTerm)="addExtraFilter($event)"></dropdown-search>
                                                     </div>
 
                                                 </th>
@@ -251,7 +262,7 @@
                                                        uk-toggle="target: #institute" title="Αναζήτηση ινστιτούτου/μονάδας"></a>
                                                     <div class="uk-navbar-dropdown uk-padding-small" style="display: block;" id="institute" hidden>
                                                         <dropdown-search [id]="'institute'"
-                                                                         (emitSearchTerm)="getSearchByField($event)"></dropdown-search>
+                                                                         (emitSearchTerm)="addExtraFilter($event)"></dropdown-search>
                                                     </div>
 
                                                 </th>
@@ -263,7 +274,7 @@
                                                        uk-toggle="target: #requester" title="Αναζήτηση ινστιτούτου/μονάδας"></a>
                                                     <div class="uk-navbar-dropdown uk-padding-small" style="display: block;" id="requester" hidden>
                                                         <dropdown-search [id]="'requester'"
-                                                                         (emitSearchTerm)="getSearchByField($event)"></dropdown-search>
+                                                                         (emitSearchTerm)="addExtraFilter($event)"></dropdown-search>
                                                     </div>
                                                 </th>
                                                 <th><a title="Ταξινόμηση με βάση την ημερομηνία υποβολής του αιτήματος"

@@ -79,6 +79,7 @@ export class ManageRequestsService {
         return this.http.request<any>(req).pipe(catchError(this.handleError));
     }
 
+    // NOT USED ANYMORE - LEFT HERE IN CASE WE NEED IT - SEE request-stage.component.ts
     finalizeRequest(requestId: string): Observable<any> {
         const url = `${this.apiUrl}finalize/${requestId}`;
         console.log(`calling ${url}`);
@@ -121,7 +122,8 @@ export class ManageRequestsService {
 
     searchAllRequestSummaries(searchField: string, status: string[], type: string[],
                               stage: string[], from: string, quantity: string,
-                              order: string, orderField: string, editable: string, isMine: string): Observable<Paging<RequestSummary>> {
+                              order: string, orderField: string, editable: string,
+                              isMine: string, extraFilters?: Map<string, string>): Observable<Paging<RequestSummary>> {
         let statusList = '';
         status.forEach( x => statusList = statusList + '&status=' + x.toUpperCase() );
         let typesList = '';
@@ -131,6 +133,11 @@ export class ManageRequestsService {
         let url = `${this.apiUrl}getAll?from=${from}&quantity=${quantity}${statusList}${typesList}${stagesList}`;
         url = url + `&order=${order}&orderField=${orderField.toUpperCase()}`;
         url = url + `&editable=${editable}&isMine=${isMine}&searchField=${searchField}`;
+        if (extraFilters) {
+            extraFilters.forEach(
+                (val: string, k: string) => url = url + '&' + k + '=' + val
+            );
+        }
 
         console.log(`calling ${url}`);
         return this.http.get<Paging<RequestSummary>>(url, headerOptions).pipe(

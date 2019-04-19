@@ -429,6 +429,7 @@ export class RequestStageComponent implements OnInit {
         );
     }
 
+    // NOT USED ANYMORE - LEFT HERE IN CASE WE NEED IT - JUST UNCOMMENT THE BUTTON AND THE MODAL IN HTML
     confirmedFinalize() {
         window.scrollTo(0, 0);
         this.showSpinner = true;

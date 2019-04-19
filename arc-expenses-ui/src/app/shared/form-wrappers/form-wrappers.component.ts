@@ -213,8 +213,8 @@ export class FormUploadFilesComponent implements OnInit {
                     </div>
                 </div>
                 <div class="uk-width-auto">
-                    <button id="{{id + '_submit'}}" type="submit" class="uk-icon" uk-icon="search"
-                            (click)="submitSearch()" hidden></button>
+                    <button id="{{id + '_submit'}}" type="submit" class="uk-icon" uk-icon="check"
+                            (click)="submitSearch()"></button>
                     <button id="{{id + '_btn'}}" type="reset" class="uk-icon" uk-icon="close"></button>
                 </div>
             </div>
