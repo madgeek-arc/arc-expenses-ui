@@ -330,7 +330,7 @@ export class RequestStageComponent implements OnInit {
             this.currentRequestApproval.stages['1'].attachments[fileIndex] &&
             this.currentRequestApproval.stages['1'].attachments[fileIndex].url) {
 
-            let url = `${window.location.origin}/arc-expenses-service/request/store/download?`;
+            let url = `${window.location.origin}/arc-expenses-service/request/store?`;
             url = `${url}archiveId=${encodeURIComponent(this.currentRequestApproval.stages['1'].attachments[fileIndex].url)}`;
             url = `${url}&id=${this.currentRequestApproval.baseInfo.id}`;
             url = `${url}&mode=approval`;

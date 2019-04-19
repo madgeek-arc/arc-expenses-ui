@@ -338,7 +338,7 @@ export class RequestStagePaymentComponent implements OnInit {
             this.currentRequestPayment.stages['1'].attachments[fileIndex] &&
             this.currentRequestPayment.stages['1'].attachments[fileIndex].url) {
 
-            let url = `${window.location.origin}/arc-expenses-service/request/store/download?`;
+            let url = `${window.location.origin}/arc-expenses-service/request/store?`;
             url = `${url}archiveId=${encodeURIComponent(this.currentRequestPayment.stages['1'].attachments[fileIndex].url)}`;
             url = `${url}&id=${this.currentRequestPayment.baseInfo.requestId}-a1`;
             url = `${url}&mode=approval`;

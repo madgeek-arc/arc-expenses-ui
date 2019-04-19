@@ -56,7 +56,7 @@ export class ManageRequestsService {
 
     deleteUploadedFile(id: string, archiveId: string, mode: string, filename: string): Observable<any> {
         /* ACCEPTED MODE VALUES: request, approval, payment */
-        let url = `${environment.API_ENDPOINT}/request/store/delete?`;
+        let url = `${environment.API_ENDPOINT}/request/store?`;
         url = `${url}archiveId=${encodeURIComponent(archiveId)}`;
         url = `${url}&id=${id}`;
         url = `${url}&mode=${mode}`;
@@ -83,6 +83,10 @@ export class ManageRequestsService {
         const url = `${this.apiUrl}finalize/${requestId}`;
         console.log(`calling ${url}`);
 
+        // const formData = new FormData();
+
+        // const req = new HttpRequest('POST', url, formData, { withCredentials: true });
+        // return this.http.request<any>(req).pipe(catchError(this.handleError));
         return this.http.post<any>(url, {}, headerOptions).pipe(catchError(this.handleError));
     }
 

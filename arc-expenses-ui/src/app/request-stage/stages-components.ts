@@ -114,7 +114,7 @@ export class StageComponent implements OnInit {
 
             const mode: string = (this.currentRequestInfo.phaseId.includes('a') ? 'approval' : 'payment');
 
-            let url = `${window.location.origin}/arc-expenses-service/request/store/download?`;
+            let url = `${window.location.origin}/arc-expenses-service/request/store?`;
             url = `${url}archiveId=${encodeURIComponent(this.currentStage.attachments[i].url)}`;
             url = `${url}&id=${this.currentRequestInfo.phaseId}`;
             url = `${url}&mode=${mode}`;
