@@ -39,6 +39,7 @@ export class RequestStageComponent implements OnInit {
     stageLoaderAnchorItem: AnchorItem;
     prevStageLoaderAnchorItem: AnchorItem;
     showStage1: boolean;
+    canBeCancelled: boolean;
 
     constructor(private route: ActivatedRoute,
                 private router: Router,
@@ -158,7 +159,9 @@ export class RequestStageComponent implements OnInit {
             },
             () => {
                 this.showSpinner = false;
+                console.log(this.currentRequestPayments.length);
                 this.updateShowStageFields();
+                this.setCanBeCancelled();
                 window.scrollTo(1, 1);
             }
         );
@@ -379,13 +382,14 @@ export class RequestStageComponent implements OnInit {
         }
     }
 
-    canBeCancelled() {
+    setCanBeCancelled() {
         if (this.userIsAdmin() || this.userIsRequester() || this.userIsOnBehalfUser()) {
             if (this.currentRequestApproval.type === 'CONTRACT') {
-                return (this.currentRequestApproval.baseInfo.status === 'PENDING');
+                this.canBeCancelled = (this.currentRequestApproval.baseInfo.status === 'PENDING');
             } else {
-                return ((this.currentRequestApproval.baseInfo.status !== 'REJECTED') &&
-                        (this.currentRequestApproval.baseInfo.status !== 'CANCELLED'));
+                this.canBeCancelled = ((this.currentRequestApproval.baseInfo.status !== 'REJECTED') &&
+                                       (this.currentRequestApproval.baseInfo.status !== 'CANCELLED') &&
+                                       (this.currentRequestPayments.length === 0));
             }
         }
         return false;

@@ -271,13 +271,13 @@
                                                     Αιτων
                                                     <a class="uk-link uk-icon-link uk-margin-small-left"
                                                        uk-icon="icon: search; ratio: 1"
-                                                       uk-toggle="target: #requester" title="Αναζήτηση ινστιτούτου/μονάδας"></a>
+                                                       uk-toggle="target: #requester" title="Αναζήτηση με το email του αιτούντα"></a>
                                                     <div class="uk-navbar-dropdown uk-padding-small" style="display: block;" id="requester" hidden>
                                                         <dropdown-search [id]="'requester'"
                                                                          (emitSearchTerm)="addExtraFilter($event)"></dropdown-search>
                                                     </div>
                                                 </th>
-                                                <th><a title="Ταξινόμηση με βάση την ημερομηνία υποβολής του αιτήματος"
+                                                <th><a title="Ταξινόμηση με βάση την ημερομηνία έναρξης της ανάληψης ή της περαίωσης του αιτήματος"
                                                        (click)="sortBy('creation_date')">
                                                     Ημ/νια&nbsp;
                                                     <span *ngIf="orderField && (orderField === 'creation_date')"
