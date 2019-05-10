@@ -182,12 +182,6 @@ export class FormUploadFilesComponent implements OnInit {
 
     deleteItem(i: number) {
         console.log(`deleting ${this.uploadedFilenames[i]}`);
-        if (this.uploadedFiles && this.uploadedFiles.some(x => x.name === this.uploadedFilenames[i])) {
-            const z = this.uploadedFiles.findIndex(x => x.name === this.uploadedFilenames[i]);
-            this.uploadedFiles.splice(z, 1);
-            console.log(`number of uploaded files is ${this.uploadedFiles.length}`);
-            this.emitFiles.emit(this.uploadedFiles);
-        }
         this.emitDelete.emit(this.uploadedFilenames[i]);
     }
 
@@ -213,8 +207,7 @@ export class FormUploadFilesComponent implements OnInit {
                     </div>
                 </div>
                 <div class="uk-width-auto">
-                    <button id="{{id + '_submit'}}" type="submit" class="uk-icon" uk-icon="check"
-                            (click)="submitSearch()"></button>
+                    <button id="{{id + '_submit'}}" type="submit" class="uk-icon" uk-icon="check" (click)="submitSearch()"></button>
                     <button id="{{id + '_btn'}}" type="reset" class="uk-icon" uk-icon="close"></button>
                 </div>
             </div>

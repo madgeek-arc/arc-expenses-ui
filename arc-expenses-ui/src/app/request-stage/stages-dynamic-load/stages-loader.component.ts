@@ -18,7 +18,9 @@ export class StagesLoaderComponent implements OnInit {
     constructor(private componentFactoryResolver: ComponentFactoryResolver) { }
 
     ngOnInit() {
-        this.loadComponent();
+        if (this.stage) {
+            this.loadComponent();
+        }
     }
 
     loadComponent() {
