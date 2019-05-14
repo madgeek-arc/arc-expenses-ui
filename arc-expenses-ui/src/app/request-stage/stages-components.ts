@@ -46,12 +46,11 @@ export class StageComponent implements OnInit {
 
     uploadedFiles: File[] = [];
     uploadedFilenames: string[] = [];
-    filesToBeDeleted: any[] = [];
+    filesToBeDeleted: string[] = [];
 
     currentStage: Stage;
     currentRequestInfo: RequestInfo;
     currentStageInfo: StageInfo;
-    currentArchiveId: string;
 
     canEditStage: boolean; // true when this stage was the last to be submitted amd it can be edited by the current user
 
@@ -119,7 +118,6 @@ export class StageComponent implements OnInit {
             url = `${url}archiveId=${encodeURIComponent(this.currentStage.attachments[i].url)}`;
             url = `${url}&id=${this.currentRequestInfo.phaseId}`;
             url = `${url}&mode=${mode}`;
-            url = `${url}&filename=${encodeURIComponent(this.currentStage.attachments[i].filename)}`;
 
             /* link to download method */
             window.open(url, '_blank');
@@ -146,8 +144,7 @@ export class StageComponent implements OnInit {
                     this.currentStage.attachments.some(x => x.filename === filename)) {
 
             const i = this.currentStage.attachments.findIndex(x => x.filename === filename);
-            this.currentArchiveId = this.currentStage.attachments[i].url;
-            this.filesToBeDeleted.push({ url: this.currentStage.attachments[i].url, fn: filename});
+            this.filesToBeDeleted.push(this.currentStage.attachments[i].url);
             this.currentStage.attachments.splice(i, 1);
         }
     }
@@ -223,9 +220,8 @@ export class StageComponent implements OnInit {
                 }
 
                 if (this.filesToBeDeleted.length > 0) {
-                    newStage.append('archiveId', this.currentArchiveId);
                     for (const f of this.filesToBeDeleted) {
-                        newStage.append('removed', f.fn);
+                        newStage.append('removed', f);
                     }
                 }
 

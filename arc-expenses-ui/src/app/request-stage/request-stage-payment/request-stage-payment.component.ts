@@ -342,7 +342,6 @@ export class RequestStagePaymentComponent implements OnInit {
             url = `${url}archiveId=${encodeURIComponent(this.currentRequestPayment.stages['1'].attachments[fileIndex].url)}`;
             url = `${url}&id=${this.currentRequestPayment.baseInfo.requestId}-a1`;
             url = `${url}&mode=approval`;
-            url = `${url}&filename=${encodeURIComponent(this.currentRequestPayment.stages['1'].attachments[fileIndex].filename)}`;
 
             window.open(url, '_blank');
         }

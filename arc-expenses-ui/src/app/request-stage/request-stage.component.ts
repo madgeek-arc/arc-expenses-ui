@@ -337,7 +337,6 @@ export class RequestStageComponent implements OnInit {
             url = `${url}archiveId=${encodeURIComponent(this.currentRequestApproval.stages['1'].attachments[fileIndex].url)}`;
             url = `${url}&id=${this.currentRequestApproval.baseInfo.id}`;
             url = `${url}&mode=approval`;
-            url = `${url}&filename=${encodeURIComponent(this.currentRequestApproval.stages['1'].attachments[fileIndex].filename)}`;
 
             window.open(url, '_blank');
         }

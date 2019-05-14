@@ -22,8 +22,7 @@ export class Stage1FormComponent implements OnInit {
     updateStage1Form: FormGroup;
     stage1AttachmentNames: string[] = [];
     uploadedFiles: File[];
-    filesToBeDeleted: any[] = [];
-    currentArchiveId: string;
+    filesToBeDeleted: string[] = [];
     requestedAmount: string;
     readonly amountLimit = 20000;
     readonly lowAmountLimit = 2500;
@@ -32,8 +31,7 @@ export class Stage1FormComponent implements OnInit {
     selMethods = supplierSelectionMethodsMap;
     isSupplierRequired: boolean;
 
-    constructor(private fb: FormBuilder,
-                private requestService: ManageRequestsService) {}
+    constructor(private fb: FormBuilder) {}
 
     ngOnInit() {
         this.createForm();
@@ -90,8 +88,7 @@ export class Stage1FormComponent implements OnInit {
                    this.currentRequest.stages['1'].attachments.some(x => x.filename === filename)) {
 
             const i = this.currentRequest.stages['1'].attachments.findIndex(x => x.filename === filename);
-            this.currentArchiveId = this.currentRequest.stages['1'].attachments[i].url;
-            this.filesToBeDeleted.push({ url: this.currentRequest.stages['1'].attachments[i].url, fn: filename});
+            this.filesToBeDeleted.push(this.currentRequest.stages['1'].attachments[i].url);
             this.currentRequest.stages['1'].attachments.splice(i, 1);
         }
     }
@@ -144,9 +141,8 @@ export class Stage1FormComponent implements OnInit {
                 }
 
                 if (this.filesToBeDeleted.length > 0) {
-                    updatedRequest.append('archiveId', this.currentArchiveId);
                     for (const f of this.filesToBeDeleted) {
-                        updatedRequest.append('removed', f.fn);
+                        updatedRequest.append('removed', f);
                     }
                 }
 
