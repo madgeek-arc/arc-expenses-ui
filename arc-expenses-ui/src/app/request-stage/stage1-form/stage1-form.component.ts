@@ -22,6 +22,8 @@ export class Stage1FormComponent implements OnInit {
     updateStage1Form: FormGroup;
     stage1AttachmentNames: string[] = [];
     uploadedFiles: File[];
+    filesToBeDeleted: any[] = [];
+    currentArchiveId: string;
     requestedAmount: string;
     readonly amountLimit = 20000;
     readonly lowAmountLimit = 2500;
@@ -75,38 +77,22 @@ export class Stage1FormComponent implements OnInit {
 
     removeUploadedFile(filename: string) {
         // if it was a new file
+
+        const z = this.stage1AttachmentNames.indexOf(filename);
+        this.stage1AttachmentNames.splice(z, 1);
+
         if (this.uploadedFiles && this.uploadedFiles.some(x => x.name === filename)) {
             const i = this.uploadedFiles.findIndex(x => x.name === filename);
             this.uploadedFiles.splice(i, 1);
-
-            const z = this.stage1AttachmentNames.indexOf(filename);
-            this.stage1AttachmentNames.splice(z, 1);
 
         // if it was an already uploaded file
         } else if (this.currentRequest.stages['1'].attachments &&
                    this.currentRequest.stages['1'].attachments.some(x => x.filename === filename)) {
 
             const i = this.currentRequest.stages['1'].attachments.findIndex(x => x.filename === filename);
-
-            this.errorMessage = '';
-            this.requestService.deleteUploadedFile(this.currentRequest.baseInfo.id,
-                                                   this.currentRequest.stages['1'].attachments[i].url,
-                                                   'approval',
-                                                   this.currentRequest.stages['1'].attachments[i].filename)
-                .subscribe(
-                    res => {
-                        console.log(`delete uploaded file responded: ${JSON.stringify(res)}`);
-                        this.currentRequest.stages['1'].attachments.splice(i, 1);
-
-                        const z = this.stage1AttachmentNames.indexOf(filename);
-                        this.stage1AttachmentNames.splice(z, 1);
-                        this.errorMessage = '';
-                    },
-                    er => {
-                        console.log(er);
-                        this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την διαγραφή του αρχείου. Παρακαλώ, προσπαθήστε ξανά.';
-                    }
-                );
+            this.currentArchiveId = this.currentRequest.stages['1'].attachments[i].url;
+            this.filesToBeDeleted.push({ url: this.currentRequest.stages['1'].attachments[i].url, fn: filename});
+            this.currentRequest.stages['1'].attachments.splice(i, 1);
         }
     }
 
@@ -154,6 +140,13 @@ export class Stage1FormComponent implements OnInit {
                 if ( this.uploadedFiles && (this.uploadedFiles.length > 0) ) {
                     for (const file of this.uploadedFiles) {
                         updatedRequest.append('attachments', file, file.name);
+                    }
+                }
+
+                if (this.filesToBeDeleted.length > 0) {
+                    updatedRequest.append('archiveId', this.currentArchiveId);
+                    for (const f of this.filesToBeDeleted) {
+                        updatedRequest.append('removed', f.fn);
                     }
                 }
 

@@ -46,17 +46,18 @@ export class StageComponent implements OnInit {
 
     uploadedFiles: File[] = [];
     uploadedFilenames: string[] = [];
+    filesToBeDeleted: any[] = [];
 
     currentStage: Stage;
     currentRequestInfo: RequestInfo;
     currentStageInfo: StageInfo;
+    currentArchiveId: string;
 
     canEditStage: boolean; // true when this stage was the last to be submitted amd it can be edited by the current user
 
     datePipe = new DatePipe('el');
 
-    constructor(private fb: FormBuilder,
-                private requestService: ManageRequestsService) {}
+    constructor(private fb: FormBuilder) {}
 
     ngOnInit() {
 
@@ -132,40 +133,22 @@ export class StageComponent implements OnInit {
     }
 
     removeUploadedFile(filename: string) {
+        const z = this.uploadedFilenames.indexOf(filename);
+        this.uploadedFilenames.splice(z, 1);
+
         // if it was a new file
         if (this.uploadedFiles && this.uploadedFiles.some(x => x.name === filename)) {
             const i = this.uploadedFiles.findIndex(x => x.name === filename);
             this.uploadedFiles.splice(i, 1);
-
-            const z = this.uploadedFilenames.indexOf(filename);
-            this.uploadedFilenames.splice(z, 1);
 
         // if it was an already uploaded file
         } else  if (this.currentStage.attachments &&
                     this.currentStage.attachments.some(x => x.filename === filename)) {
 
             const i = this.currentStage.attachments.findIndex(x => x.filename === filename);
-            const mode: string = (this.currentRequestInfo.phaseId.includes('a') ? 'approval' : 'payment');
-
-            this.stageFormError = '';
-            this.requestService.deleteUploadedFile(this.currentRequestInfo.phaseId,
-                                                   this.currentStage.attachments[i].url,
-                                                   mode,
-                                                   this.currentStage.attachments[i].filename)
-                .subscribe(
-                    res => {
-                        console.log(`delete uploaded file responded: ${JSON.stringify(res)}`);
-                        this.currentStage.attachments.splice(i, 1);
-
-                        const z = this.uploadedFilenames.indexOf(filename);
-                        this.uploadedFilenames.splice(z, 1);
-                        this.stageFormError = '';
-                    },
-                er => {
-                        console.log(er);
-                        this.stageFormError = 'Παρουσιάστηκε πρόβλημα κατά την διαγραφή του αρχείου. Παρακαλώ, προσπαθήστε ξανά.';
-                    }
-                );
+            this.currentArchiveId = this.currentStage.attachments[i].url;
+            this.filesToBeDeleted.push({ url: this.currentStage.attachments[i].url, fn: filename});
+            this.currentStage.attachments.splice(i, 1);
         }
     }
 
@@ -190,6 +173,7 @@ export class StageComponent implements OnInit {
         }
 
         this.submitForm();
+
     }
 
     goBackOneStage() {
@@ -202,13 +186,17 @@ export class StageComponent implements OnInit {
                 this.stageForm.get(key).updateValueAndValidity();
             });
             this.updateMode = 'downgrade';
+
             this.submitForm();
+
         }
     }
 
     resubmitPreviousStage() {
         this.updateMode = 'edit';
+
         this.submitForm();
+
     }
 
     submitForm() {
@@ -233,6 +221,14 @@ export class StageComponent implements OnInit {
                         newStage.append('attachments', f, f.name);
                     }
                 }
+
+                if (this.filesToBeDeleted.length > 0) {
+                    newStage.append('archiveId', this.currentArchiveId);
+                    for (const f of this.filesToBeDeleted) {
+                        newStage.append('removed', f.fn);
+                    }
+                }
+
                 this.emitStage.emit([this.updateMode, newStage]);
 
             }
