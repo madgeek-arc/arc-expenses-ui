@@ -427,7 +427,8 @@ export class RequestStageComponent implements OnInit {
                 this.successMessage = 'Το αίτημα ακυρώθηκε.';
                 this.showSpinner = false;
                 UIkit.modal('#cancellationModal').hide();
-                this.router.navigate(['/requests/request-stage', this.currentRequestApproval.baseInfo.id]);
+                // this.router.navigate(['/requests/request-stage', this.currentRequestApproval.baseInfo.id]);
+                this.getCurrentRequest();
             }
         );
     }
