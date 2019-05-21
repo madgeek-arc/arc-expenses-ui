@@ -3,16 +3,14 @@
 * */
 
 import { Injectable } from '@angular/core';
-import { Request, RequestApproval, RequestPayment, RequestResponse, RequestSummary } from '../domain/operation';
+import { RequestPayment, RequestResponse, RequestSummary } from '../domain/operation';
 import { Observable } from 'rxjs/Observable';
 import { HttpClient, HttpErrorResponse, HttpEvent, HttpHeaders, HttpRequest } from '@angular/common/http';
-import { catchError } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { Paging } from '../domain/extraClasses';
 import { ContactUsMail } from '../domain/operation';
 import {environment} from '../../environments/environment';
-import index from '@angular/cli/lib/cli';
-import { c } from '@angular/core/src/render3';
 
 const headerOptions = {
     headers : new HttpHeaders().set('Content-Type', 'application/json').set('Accept', 'application/json'),
@@ -54,19 +52,6 @@ export class ManageRequestsService {
         return this.http.request(req).pipe(catchError(this.handleError));
     }
 
-    deleteUploadedFile(id: string, archiveId: string, mode: string, filename: string): Observable<any> {
-        /* ACCEPTED MODE VALUES: request, approval, payment */
-        let url = `${environment.API_ENDPOINT}/request/store?`;
-        url = `${url}archiveId=${encodeURIComponent(archiveId)}`;
-        url = `${url}&id=${id}`;
-        url = `${url}&mode=${mode}`;
-        url = `${url}&filename=${encodeURIComponent(filename)}`;
-
-        console.log(`calling ${url}`);
-
-        return this.http.delete<any>(url, headerOptions).pipe(catchError(this.handleError));
-    }
-
     cancelRequestPayment(paymentId: string, cancelRequest: boolean): Observable<any> {
         const url = `${environment.API_ENDPOINT}/payment/cancel/${paymentId}`;
         console.log(`calling ${url}`);
@@ -76,19 +61,9 @@ export class ManageRequestsService {
 
         // returns json of the form {id: paymentID}
         const req = new HttpRequest('POST', url, formData, { withCredentials: true });
-        return this.http.request<any>(req).pipe(catchError(this.handleError));
-    }
-
-    // NOT USED ANYMORE - LEFT HERE IN CASE WE NEED IT - SEE request-stage.component.ts
-    finalizeRequest(requestId: string): Observable<any> {
-        const url = `${this.apiUrl}finalize/${requestId}`;
-        console.log(`calling ${url}`);
-
-        // const formData = new FormData();
-
-        // const req = new HttpRequest('POST', url, formData, { withCredentials: true });
-        // return this.http.request<any>(req).pipe(catchError(this.handleError));
-        return this.http.post<any>(url, {}, headerOptions).pipe(catchError(this.handleError));
+        return this.http.request<any>(req).pipe(
+            catchError(this.handleError)
+        );
     }
 
     addRequestPayment(requestId: string): Observable<any> {

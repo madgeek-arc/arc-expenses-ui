@@ -299,7 +299,8 @@ export class RequestStagePaymentComponent implements OnInit {
     }
 
     userIsOnBehalfUser() {
-        return (this.authService.getUserProp('email').toLowerCase() === this.currentRequestPayment.onBehalfEmail.toLowerCase());
+        return (this.currentRequestPayment.onBehalfEmail &&
+                (this.authService.getUserProp('email').toLowerCase() === this.currentRequestPayment.onBehalfEmail.toLowerCase()));
     }
 
     confirmedCancel(cancelWholeRequest: boolean) {
@@ -314,12 +315,9 @@ export class RequestStagePaymentComponent implements OnInit {
                 this.showSpinner = false;
                 UIkit.modal('#cancellationModal').hide();
                 if (cancelWholeRequest) {
-                    this.router.navigate(['/requests']);
-                } else if (this.totalPaymentsOfRequest > 1) {
-                    this.router.navigate(['/requests/request-stage', this.currentRequestPayment.baseInfo.requestId + '-a1']);
+                    this.router.navigate([ '/requests' ]);
                 } else {
-                    // this.router.navigate(['/requests/request-stage-payment', res['id']]);
-                    this.getCurrentRequest();
+                    window.location.href = '/requests/request-stage/' + this.currentRequestPayment.baseInfo.requestId + '-a1';
                 }
             },
             error => {

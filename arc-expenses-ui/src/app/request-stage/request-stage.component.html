@@ -258,9 +258,6 @@
                         </div>
 
                         <div *ngIf="( userIsRequester() || userIsAdmin() || userIsOnBehalfUser() ) && (currentRequestApproval.requestStatus === 'PENDING')">
-                            <!--<button class="uk-button uk-button-primary uk-margin-small-right" style="min-width: 200px;" type="button"-->
-                                    <!--uk-toggle="target: #finalizingModal">-->
-                              <!--Ολοκλήρωση Αιτήματος</button>-->
                             <button class="uk-button uk-button-primary" style="min-width: 200px;" type="button"
                                     (click)="createRequestPayment()">
                               Προσθήκη Νέας Περαίωσης</button>
@@ -293,29 +290,15 @@
     </div>
   </div>
 </div>
+</div>
 
 <div *ngIf="currentRequestApproval" id="cancellationModal" uk-modal>
   <div class="uk-modal-dialog uk-modal-body">
     <h4 class="uk-modal-title uk-h4">Επιβεβαίωση ακύρωσης</h4>
     <div class="uk-modal-body">
-      Είστε βέβαιοι ότι επιθυμείτε να ακυρώσετε το αίτημα<br>με αρ.Πρωτ.{{ currentRequestApproval.baseInfo.requestId }};
+      Είστε βέβαιοι ότι επιθυμείτε να ακυρώσετε το αίτημα<br>με αρ.πρωτ.{{ currentRequestApproval.baseInfo.requestId }};
     </div>
     <button class="uk-button uk-button-danger uk-margin-small-right" (click)="confirmedCancel()">Ακύρωση αιτήματος</button>
     <button class="uk-button uk-button-default uk-modal-close">Κλείσιμο</button>
   </div>
 </div>
-
-<!--<div *ngIf="currentRequestApproval" id="finalizingModal" uk-modal>-->
-  <!--<div class="uk-modal-dialog uk-modal-body">-->
-    <!--<h4 class="uk-modal-title uk-h4">Επιβεβαίωση ολοκλήρωσης</h4>-->
-    <!--<div class="uk-modal-body">-->
-        <!--Είστε βέβαιοι ότι επιθυμείτε να ολοκληρώσετε το αίτημα<br>με αρ.Πρωτ.{{ currentRequestApproval.baseInfo.requestId }};-->
-        <!--<br>-->
-        <!--Μετά από αυτή την ενέργεια δεν θα είναι δυνατή η προσθήκη νέων περαιώσεων.-->
-    <!--</div>-->
-    <!--<button class="uk-button uk-button-primary uk-margin-small-right" (click)="confirmedFinalize()">Ολοκλήρωση αιτήματος</button>-->
-    <!--<button class="uk-button uk-button-default uk-modal-close">Κλείσιμο</button>-->
-  <!--</div>-->
-<!--</div>-->
-
-

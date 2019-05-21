@@ -387,8 +387,7 @@ export class RequestStageComponent implements OnInit {
                 this.canBeCancelled = (this.currentRequestApproval.baseInfo.status === 'PENDING');
             } else {
                 this.canBeCancelled = ((this.currentRequestApproval.baseInfo.status !== 'REJECTED') &&
-                                       (this.currentRequestApproval.baseInfo.status !== 'CANCELLED') &&
-                                       (this.currentRequestPayments.length === 0));
+                                       (this.currentRequestApproval.baseInfo.status !== 'CANCELLED'));
             }
         }
         return false;
@@ -403,7 +402,8 @@ export class RequestStageComponent implements OnInit {
     }
 
     userIsOnBehalfUser() {
-        return (this.authService.getUserProp('email').toLowerCase() === this.currentRequestApproval.onBehalfEmail.toLowerCase());
+        return (this.currentRequestApproval.onBehalfEmail &&
+                (this.authService.getUserProp('email').toLowerCase() === this.currentRequestApproval.onBehalfEmail.toLowerCase()));
     }
 
     confirmedCancel() {
@@ -429,31 +429,6 @@ export class RequestStageComponent implements OnInit {
                 UIkit.modal('#cancellationModal').hide();
                 // this.router.navigate(['/requests/request-stage', this.currentRequestApproval.baseInfo.id]);
                 this.getCurrentRequest();
-            }
-        );
-    }
-
-    // NOT USED ANYMORE - LEFT HERE IN CASE WE NEED IT - JUST UNCOMMENT THE BUTTON AND THE MODAL IN HTML
-    confirmedFinalize() {
-        window.scrollTo(0, 0);
-        this.showSpinner = true;
-        this.errorMessage = '';
-        this.successMessage = '';
-        this.requestService.finalizeRequest(this.currentRequestApproval.baseInfo.requestId).subscribe(
-            res => console.log('finalize request responded: ', JSON.stringify(res)),
-            error => {
-                console.log(error);
-                this.showSpinner = false;
-                this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
-                UIkit.modal('#finalizingModal').hide();
-                window.scrollTo(1, 1);
-            },
-            () => {
-                this.errorMessage = '';
-                this.showSpinner = false;
-                this.successMessage = 'Το αίτημα ολοκληρώθηκε.';
-                UIkit.modal('#finalizingModal').hide();
-                this.router.navigate(['/requests/request-stage', this.currentRequestApproval.baseInfo.id]);
             }
         );
     }
