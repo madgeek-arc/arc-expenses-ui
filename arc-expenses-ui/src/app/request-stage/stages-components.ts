@@ -4,7 +4,8 @@ import { Stage } from '../domain/operation';
 import { commentDesc, FieldDescription } from '../domain/stageDescriptions';
 import { DatePipe } from '@angular/common';
 import { RequestInfo, StageInfo } from '../domain/requestInfoClasses';
-import { ManageRequestsService } from '../services/manage-requests.service';
+
+declare var UIkit: any;
 
 @Component ({
     selector: 'stage-component',
@@ -161,6 +162,7 @@ export class StageComponent implements OnInit {
                 this.stageForm.get(key).updateValueAndValidity();
             });
             this.updateMode = 'reject';
+            // UIkit.modal('#rejectionModal' + this.stageId).hide();
         } else {
             this.updateMode = 'approve';
         }
@@ -241,6 +243,10 @@ export class StageComponent implements OnInit {
 
     getCurrentDateString() {
         return this.datePipe.transform(Date.now(), 'dd/MM/yyyy');
+    }
+
+    showRejectionModal() {
+        UIkit.modal('#rejectionModal' + this.stageId).show();
     }
 
 }

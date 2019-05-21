@@ -200,9 +200,10 @@
                                 </div>
 
                                 <!-- Message to user -->
-                                <div *ngIf=" (currentRequestPayment.requestStatus === 'ACCEPTED') ||
-                                             (currentRequestPayment.requestStatus === 'REJECTED') ||
-                                             (currentRequestPayment.requestStatus === 'CANCELLED')"
+                                <div *ngIf=" !isSimpleUser &&
+                                             ((currentRequestPayment.requestStatus === 'ACCEPTED') ||
+                                              (currentRequestPayment.requestStatus === 'REJECTED') ||
+                                              (currentRequestPayment.requestStatus === 'CANCELLED'))"
                                      class="uk-alert uk-alert-primary uk-text-center uk-margin-top">
                                     Το αίτημα {{ stateNames[currentRequestPayment.requestStatus] }}.
                                 </div>

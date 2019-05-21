@@ -295,11 +295,11 @@ export class RequestStagePaymentComponent implements OnInit {
     }
 
     userIsRequester() {
-        return (this.authService.getUserProp('email') === this.currentRequestPayment.requesterEmail);
+        return (this.authService.getUserProp('email').toLowerCase() === this.currentRequestPayment.requesterEmail.toLowerCase());
     }
 
     userIsOnBehalfUser() {
-        return (this.authService.getUserProp('email') === this.currentRequestPayment.onBehalfEmail);
+        return (this.authService.getUserProp('email').toLowerCase() === this.currentRequestPayment.onBehalfEmail.toLowerCase());
     }
 
     confirmedCancel(cancelWholeRequest: boolean) {

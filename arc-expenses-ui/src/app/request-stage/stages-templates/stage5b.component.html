@@ -85,8 +85,8 @@
         <!--BUTTONS-->
         <div *ngIf="!canEditStage">
             <button class="uk-button uk-button-primary" (click)="emitNewValues(true)">Εγκρίνεται</button>
-            <button class="uk-button uk-button-primary" (click)="emitNewValues(false)">Απορρίπτεται</button>
-            <button class="uk-button uk-button-primary" (click)="emitNewValuesAndGoBack()">Επιστροφή στο προηγούμενο στάδιο</button>
+            <button class="uk-button uk-button-danger" uk-toggle="target: #rejectionModal5b">Απορρίπτεται</button>
+            <button class="uk-button uk-button-default" (click)="emitNewValuesAndGoBack()">Επιστροφή στο προηγούμενο στάδιο</button>
         </div>
 
         <div *ngIf="canEditStage">
@@ -102,4 +102,15 @@
     </div>
     <!-- END OF STAGE FORM -->
 
+</div>
+
+<div *ngIf="currentStage" id="rejectionModal5b" uk-modal>
+    <div class="uk-modal-dialog uk-modal-body">
+        <h4 class="uk-modal-title uk-h4">Επιβεβαίωση απόρριψης</h4>
+        <div class="uk-modal-body">
+            Είστε βέβαιοι ότι επιθυμείτε να απορρίψετε το αίτημα;
+        </div>
+        <button class="uk-button uk-button-danger uk-margin-small-right uk-modal-close" (click)="emitNewValues(false)">Απόρριψη αιτήματος</button>
+        <button class="uk-button uk-button-default uk-modal-close">Κλείσιμο</button>
+    </div>
 </div>

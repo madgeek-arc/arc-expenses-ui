@@ -207,9 +207,10 @@
                 </div>
 
                 <!-- Message to user -->
-                <div *ngIf=" (currentRequestApproval.requestStatus === 'ACCEPTED') ||
-                             (currentRequestApproval.requestStatus === 'REJECTED') ||
-                             (currentRequestApproval.requestStatus === 'CANCELLED')"
+                <div *ngIf=" !isSimpleUser &&
+                             ((currentRequestApproval.requestStatus === 'ACCEPTED') ||
+                              (currentRequestApproval.requestStatus === 'REJECTED') ||
+                              (currentRequestApproval.requestStatus === 'CANCELLED'))"
                      class="uk-alert uk-alert-primary uk-text-center uk-margin-top">
                   Το αίτημα {{ stateNames[currentRequestApproval.requestStatus] }}.
                 </div>

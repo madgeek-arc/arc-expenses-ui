@@ -399,11 +399,11 @@ export class RequestStageComponent implements OnInit {
     }
 
     userIsRequester() {
-        return (this.authService.getUserProp('email') === this.currentRequestApproval.requesterEmail);
+        return (this.authService.getUserProp('email').toLowerCase() === this.currentRequestApproval.requesterEmail.toLowerCase());
     }
 
     userIsOnBehalfUser() {
-        return (this.authService.getUserProp('email') === this.currentRequestApproval.onBehalfEmail);
+        return (this.authService.getUserProp('email').toLowerCase() === this.currentRequestApproval.onBehalfEmail.toLowerCase());
     }
 
     confirmedCancel() {
