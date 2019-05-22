@@ -29,26 +29,17 @@
                                 <div class="uk-navbar-dropdown-grid uk-child-width-1-1 uk-grid uk-grid-stack" uk-grid="">
                                     <div class="uk-first-column">
                                         <ul class="uk-nav uk-navbar-dropdown-nav">
-                                            <li><a [routerLink]="['new-request', 'regular']">{{ reqTypes['regular'] }}</a></li>
-                                            <li><a [routerLink]="['new-request', 'trip']">{{ reqTypes['trip'] }}</a></li>
-                                            <li><a [routerLink]="['new-request', 'contract']">{{ reqTypes['contract'] }}</a></li>
-                                            <li><a [routerLink]="['new-request', 'services_contract']">{{ reqTypes['services_contract'] }}</a></li>
+                                            <li><a [routerLink]="['new-request', 'regular']">{{ reqTypes['REGULAR'] }}</a></li>
+                                            <li><a [routerLink]="['new-request', 'trip']">{{ reqTypes['TRIP'] }}</a></li>
+                                            <li><a [routerLink]="['new-request', 'contract']">{{ reqTypes['CONTRACT'] }}</a></li>
+                                            <li><a [routerLink]="['new-request', 'services_contract']">{{ reqTypes['SERVICES_CONTRACT'] }}</a></li>
                                         </ul>
                                     </div>
                                 </div>
                             </div>
                         </li>
                         <li class="uk-parent" [routerLinkActive]="['uk-active']">
-                            <a [routerLink]="['requests']"
-                                [queryParams] = "{ status: ['pending','under_review'],
-                                                   stage: ['all'],
-                                                   phase: 0,
-                                                   type: ['all'],
-                                                   page: 0,
-                                                   itemsPerPage: 10,
-                                                   orderField: 'creation_date',
-                                                   order: 'DESC',
-                                                   searchTerm: '' }" >
+                            <a [routerLink]="['requests']">
                                 Αιτήματα
                             </a>
                         </li>
@@ -152,22 +143,22 @@
                                         <ul class="uk-subnav uk-divider-vertical">
                                             <li>
                                                 <a [routerLink]="['new-request', 'regular']" [routerLinkActive]="['uk-active']">
-                                                    {{ reqTypes['regular'] }}
+                                                    {{ reqTypes['REGULAR'] }}
                                                 </a>
                                             </li>
                                             <li>
                                                 <a [routerLink]="['new-request', 'trip']" [routerLinkActive]="['uk-active']">
-                                                    {{ reqTypes['trip'] }}
+                                                    {{ reqTypes['TRIP'] }}
                                                 </a>
                                             </li>
                                             <li>
                                                 <a [routerLink]="['new-request', 'contract']" [routerLinkActive]="['uk-active']">
-                                                    {{ reqTypes['contract'] }}
+                                                    {{ reqTypes['CONTRACT'] }}
                                                 </a>
                                             </li>
                                             <li>
                                                 <a [routerLink]="['new-request', 'services_contract']" [routerLinkActive]="['uk-active']">
-                                                    {{ reqTypes['services_contract'] }}
+                                                    {{ reqTypes['SERVICES_CONTRACT'] }}
                                                 </a>
                                             </li>
                                         </ul>
@@ -175,16 +166,7 @@
                                 </div>-->
                             </li>
                             <li class="uk-parent" [routerLinkActive]="['uk-active']">
-                                <a [routerLink]="['requests']"
-                                   [queryParams] = "{ status: ['pending','under_review'],
-                                                   stage: ['all'],
-                                                   phase: 0,
-                                                   type: ['all'],
-                                                   page: 0,
-                                                   itemsPerPage: 10,
-                                                   orderField: 'creation_date',
-                                                   order: 'DESC',
-                                                   searchTerm: '' }" >
+                                <a [routerLink]="['requests']">
                                     Αιτήματα
                                 </a>
                             </li>

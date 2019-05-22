@@ -1,16 +1,14 @@
 import { Component, OnInit } from '@angular/core';
-import { BaseInfo, Request, RequestApproval, RequestPayment, RequestSummary,
-    Stage10, Stage11, Stage12, Stage13, Stage5b, Stage7, Stage8, Stage9
-} from '../domain/operation';
+import { RequestPayment, RequestResponse } from '../domain/operation';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ManageRequestsService } from '../services/manage-requests.service';
 import { AuthenticationService } from '../services/authentication.service';
 import { HttpErrorResponse, HttpEventType, HttpResponse } from '@angular/common/http';
-import { approvalStages, requestTypes, stageTitles } from '../domain/stageDescriptions';
+import { approvalStages, requesterPositions, requestTypes, stageTitles,
+         statusNamesMap, supplierSelectionMethodsMap } from '../domain/stageDescriptions';
 import { printRequestPage } from './print-request-function';
 import { AnchorItem } from '../shared/dynamic-loader-anchor-components/anchor-item';
 import { RequestInfo } from '../domain/requestInfoClasses';
-import { concatMap, mergeMap, tap } from 'rxjs/operators';
 
 declare var UIkit: any;
 
@@ -25,33 +23,23 @@ export class RequestStageComponent implements OnInit {
     successMessage: string;
     showSpinner: boolean;
 
-    readonly amountLimit = 20000;
-    readonly lowAmountLimit = 2500;
-
-    uploadedFile: File;
-    uploadedFileURL: string;
-    uploadMode: string;
-
     isSimpleUser: boolean;
     requestId: string;
-    currentRequest: Request;
-    currentRequestApproval: RequestApproval;
+    currentRequestApproval: RequestResponse;
     currentRequestPayments: RequestPayment[] = [];
-    currentStageName: string;
-    canEdit: boolean;
-    wentBackOneStage: boolean;
-    requestNeedsUpdate: boolean;
-    stages: string[];
+    stages: string[] = approvalStages;
     stagesMap = stageTitles;
-    stateNames = {
-        pending: 'βρίσκεται σε εξέλιξη', under_review: 'βρίσκεται σε εξέλιξη',
-        rejected: 'έχει απορριφθεί', accepted: 'έχει ολοκληρωθεί', cancelled: 'έχει ακυρωθεί'
-    };
+    reqPositions = requesterPositions;
+    selMethods = supplierSelectionMethodsMap;
+    stateNames = statusNamesMap;
     reqTypes = requestTypes;
 
     currentRequestInfo: RequestInfo;
 
-    stageLoaderItemList: AnchorItem[];
+    stageLoaderAnchorItem: AnchorItem;
+    prevStageLoaderAnchorItem: AnchorItem;
+    showStage1: boolean;
+    canBeCancelled: boolean;
 
     constructor(private route: ActivatedRoute,
                 private router: Router,
@@ -60,10 +48,26 @@ export class RequestStageComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.getCurrentRequest();
         this.isSimpleUser = (this.authService.getUserRole().some(x => x.authority === 'ROLE_USER') &&
                              (this.authService.getUserRole().length === 1));
-        console.log(`current user role is: ${JSON.stringify(this.authService.getUserRole())}`);
+
+        this.route.paramMap.subscribe(
+            params => {
+                this.initializeVariables();
+                if (params.has('id')) {
+                    this.requestId = params.get('id');
+                    this.getCurrentRequest();
+                }
+            }
+        );
+    }
+
+    initializeVariables() {
+        this.currentRequestApproval = null;
+        this.currentRequestInfo = null;
+        this.currentRequestPayments = [];
+        this.stageLoaderAnchorItem = null;
+        this.prevStageLoaderAnchorItem = null;
     }
 
     getCurrentRequest() {
@@ -72,17 +76,9 @@ export class RequestStageComponent implements OnInit {
         this.errorMessage = '';
         this.notFoundMessage = '';
 
-        /*call api to get request info or throw errorMessage*/
-        const result = this.requestService.getRequestApprovalById(this.requestId).pipe(
-                            tap(res => this.currentRequestApproval = res),
-                            mergeMap( res =>
-                                this.requestService.getRequestById(res.requestId, this.authService.getUserProp('email'))
-                            ));
-        result.subscribe (
-            req => {
-                this.currentRequest = req;
-                console.log(`The archiveid of the currentRequest is ${req.archiveId}`);
-            },
+        /* get request info */
+        this.requestService.getRequestApprovalById(this.requestId).subscribe(
+            res => this.currentRequestApproval = res,
             error => {
                 console.log(error);
                 this.showSpinner = false;
@@ -94,337 +90,196 @@ export class RequestStageComponent implements OnInit {
                         this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την ανάκτηση του αιτήματος.';
                     }
                 }
+                window.scrollTo(1, 1);
             },
             () => {
-                this.stages = approvalStages;
-                if (this.currentRequest.type === 'trip') {
-                    this.currentRequestInfo = new RequestInfo(this.currentRequestApproval.id,
-                                                              this.currentRequest.id,
-                                                              this.currentRequest.user,
-                                                              this.currentRequest.project,
-                                                              this.currentRequest.trip.email);
-                } else {
-                    this.currentRequestInfo = new RequestInfo(this.currentRequestApproval.id,
-                                                              this.currentRequest.id,
-                                                              this.currentRequest.user,
-                                                              this.currentRequest.project);
-                }
-                // console.log('diataktis is', this.currentRequestInfo['5a'].stagePOIs);
-                this.checkIfStageIs5b();
-                this.getIfUserCanEditRequest();
-                if ((this.currentRequest.type !== 'contract') &&
-                    (this.currentRequestApproval.status === 'accepted')) {
-                    this.getRequestPayments();
-                }
-
+                this.showSpinner = false;
+                this.currentRequestInfo = new RequestInfo(this.currentRequestApproval.baseInfo.id,
+                                                          this.currentRequestApproval.baseInfo.requestId);
+                this.findPreviousStage();
+                this.checkIfStageIs5b(this.currentRequestApproval.baseInfo.stage);
+                this.getRequestPayments();
+                window.scrollTo(1, 1);
             }
         );
     }
 
-    checkIfStageIs5b() {
-        if ( (this.currentRequestApproval.stage === '5b') &&
-             (this.currentRequest.stage1.supplierSelectionMethod === 'Διαγωνισμός') ) {
+    // detects previous stage and checks if the current user has permission to edit it
+    findPreviousStage() {
+        if ((this.currentRequestApproval.requestStatus === 'PENDING') &&
+            (this.currentRequestApproval.baseInfo.stage !== '1')) {
+            const i = this.stages.indexOf(this.currentRequestApproval.baseInfo.stage);
+            if (i > -1) {
+                let prevStage: string;
 
-            this.currentRequestInfo.supplier = '';
-            this.currentRequestInfo.requestedAmount = '';
-            if ( this.currentRequest.stage1.supplier ) {
-                this.currentRequestInfo.supplier = this.currentRequest.stage1.supplier;
-            }
-            if ( this.currentRequest.stage1.amountInEuros ) {
-                this.currentRequestInfo.requestedAmount = (this.currentRequest.stage1.amountInEuros).toString();
+                if (this.currentRequestApproval.baseInfo.status === 'ACCEPTED') {
+                    prevStage = '6';
+                } else {
+                    for (const p of this.currentRequestInfo[ this.stages[i] ].prev) {
+                        if (this.currentRequestApproval.stages[p] != null) {
+                            prevStage = p;
+                            break;
+                        }
+                    }
+                }
+
+                // TODO:: MAKE SURE THE canEditPrevious value is the correct one when prevStage == 6
+                if ((prevStage != null) && ((this.currentRequestApproval.canEditPrevious === true) || (this.userIsAdmin()))) {
+
+                    this.currentRequestInfo.previousStage = prevStage;
+                }
             }
         }
     }
 
-    getIfUserCanEditRequest() {
-        this.errorMessage = '';
-        this.canEdit = null;
-        const newBasicInfo = new BaseInfo();
-        newBasicInfo.creationDate = this.currentRequestApproval.creationDate;
-        newBasicInfo.requestId = this.currentRequestApproval.requestId;
-        newBasicInfo.id = this.currentRequestApproval.id;
-        newBasicInfo.stage = this.currentRequestApproval.stage;
-        newBasicInfo.status = this.currentRequestApproval.status;
-        const newSummary = new RequestSummary();
-        newSummary.request = this.currentRequest;
-        newSummary.baseInfo = newBasicInfo;
-        this.requestService.isEditable(newSummary, this.authService.getUserProp('email')).subscribe(
-            res => this.canEdit = res,
-            error => {
-                console.log(error);
-                this.canEdit = false;
-                this.showSpinner = false;
-                this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την ανάκτηση του αιτήματος.';
-            },
-            () => {
-                this.showSpinner = false;
-                console.log('this.canEdit is ', this.canEdit);
-                this.successMessage = '';
-                this.updateShowStageFields();
+    checkIfStageIs5b(stage: string) {
+        if ( (stage === '5b') &&
+             (this.currentRequestApproval.stages['1']['supplierSelectionMethod'] === 'AWARD_PROCEDURE') ) {
+
+            this.currentRequestInfo.supplier = '';
+            this.currentRequestInfo.requestedAmount = '';
+            if ( this.currentRequestApproval.stages['1']['supplier'] ) {
+                this.currentRequestInfo.supplier = this.currentRequestApproval.stages['1']['supplier'];
             }
-        );
+            if ( this.currentRequestApproval.stages['1']['amountInEuros'] ) {
+                this.currentRequestInfo.requestedAmount = (this.currentRequestApproval.stages['1']['amountInEuros']).toString();
+            }
+        }
     }
 
     getRequestPayments() {
         this.errorMessage = '';
-        this.requestService.getPaymentsOfRequest(this.currentRequest.id).subscribe(
+        this.requestService.getPaymentsOfRequest(this.currentRequestApproval.baseInfo.requestId).subscribe(
             res => this.currentRequestPayments = res.results,
             error => {
                 console.log(error);
                 this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την ανάκτηση του αιτήματος.';
                 this.showSpinner = false;
+                window.scrollTo(1, 1);
             },
-            () => this.showSpinner = false
+            () => {
+                this.showSpinner = false;
+                console.log(this.currentRequestPayments.length);
+                this.updateShowStageFields();
+                this.setCanBeCancelled();
+                window.scrollTo(1, 1);
+            }
         );
     }
 
-    getRequestToGoBack(event: any) {
-        console.log('will go back');
-        this.wentBackOneStage = true;
+    getSubmittedStage(submittedData: any[]) {
+        this.updateRequest(submittedData[0], submittedData[1]);
     }
 
-    getNextStage(stage: string) {
-        if ((this.currentRequestApproval['stage' + stage]['approved'] === undefined) ||
-            (this.currentRequestApproval['stage' + stage]['approved'] === true)) {
-            for (const nextStage of this.currentRequestInfo[ stage ][ 'next' ]) {
-                if (this.currentRequestApproval[ 'stage' + nextStage ]) {
-                    return nextStage;
-                }
-            }
-        }
-
-        return this.currentRequestApproval.stage;
-    }
-
-    getPreviousStage(stage: string) {
-        for (const prevStage of this.currentRequestInfo[stage]['prev']) {
-            if (this.currentRequestApproval['stage' + prevStage]) {
-                return prevStage;
-            }
-        }
-
-        return this.currentRequestApproval.stage;
-    }
-
-    getSubmittedStage(newStage: any) {
-        console.log(`got ${JSON.stringify(newStage, null, 1)}`);
-        this.currentStageName = 'stage' + this.currentRequestApproval.stage;
-        console.log(`submitting as ${this.currentStageName}`);
-        this.currentRequestApproval[this.currentStageName] = newStage;
-
-        const submittedStage = this.currentRequestApproval.stage;
-        if (this.wentBackOneStage) {
-            if (submittedStage === '2') {
-                this.currentRequestApproval.stage = '1';
-            } else {
-                this.currentRequestApproval.stage = this.getPreviousStage(this.currentRequestApproval.stage);
-            }
+    getUpdatedRequest(updatedRequest: FormData) {
+        if ((this.currentRequestInfo.previousStage != null) &&
+            (this.currentRequestInfo.previousStage === '1')) {
+            this.updateRequest('edit', updatedRequest);
         } else {
-            this.currentRequestApproval.stage = this.getNextStage(this.currentRequestApproval.stage);
-        }
-
-        // if the pending stage has not changed, the requestApproval has been finalized
-        if (this.currentRequestApproval.stage === submittedStage) {
-            if (this.stages.indexOf(this.currentRequestApproval.stage) === (this.stages.length - 1)) {
-                this.currentRequestApproval.status = 'accepted';
-                if (this.currentRequest.type === 'contract') {
-                    this.currentRequest.requestStatus = 'accepted';
-                    this.requestNeedsUpdate = true;
-                }
-            } else {
-                // console.log('will reject request');
-                this.currentRequestApproval.status = 'rejected';
-                this.currentRequest.requestStatus = 'rejected';
-                this.requestNeedsUpdate = true;
-            }
-        } else {
-            if ( this.wentBackOneStage === true ) {
-                this.currentRequestApproval.status = 'under_review';
-            } else {
-                this.currentRequestApproval.status = 'pending';
-            }
-        }
-
-        this.checkIfStageIs5b();
-        this.wentBackOneStage = false;
-        console.log('submitted status:', this.currentRequestApproval.status);
-        console.log('next stage:', this.currentRequestApproval.stage);
-
-        if ( this.uploadedFile ) {
-            this.uploadMode = 'approval';
-            this.uploadFile();
-        } else {
-            if (this.requestNeedsUpdate) {
-                this.requestNeedsUpdate = false;
-                this.updateRequestAndApproval();
-            } else {
-                this.submitRequestApproval();
-            }
+            this.updateRequest('approve', updatedRequest);
         }
     }
 
-    getUpdatedRequest(updatedRequest: Request) {
-        this.currentRequest = updatedRequest;
-        this.currentRequestApproval.stage = '2';
-        this.currentRequestApproval.status = 'pending';
-        this.currentStageName = 'stage1';
-
-        if ( (this.currentRequest.stage1.amountInEuros > this.amountLimit) &&
-             (!this.currentRequestApproval.stage5b) ) {
-            this.currentRequestApproval.stage5b = new Stage5b();
-        }
-        if ( this.uploadedFile ) {
-            this.uploadMode = 'request';
-            this.uploadFile();
-        } else {
-            this.submitRequest();
+    getNewSupplierAndAmount(newVals: string[]) {
+        if (newVals && newVals.length === 2) {
+            this.currentRequestApproval.stages['1']['supplier'] = newVals[0];
+            this.currentRequestApproval.stages['1']['amountInEuros'] = +newVals[1];
+            this.currentRequestApproval.stages['1']['finalAmount'] = +newVals[1];
         }
     }
 
-    submitRequest() {
+    updateRequest(mode: string, submitted: FormData) {
         window.scrollTo(0, 0);
         this.showSpinner = true;
         this.errorMessage = '';
         this.successMessage = '';
-
-        if ( this.uploadedFile ) {
-
-            this.currentRequest.stage1.attachment.url = this.uploadedFileURL;
-            this.uploadedFileURL = '';
-            this.uploadedFile = null;
+        if ((this.currentRequestApproval.baseInfo.stage === '5b') ||
+             ((mode === 'edit') && (this.currentRequestInfo.previousStage != null) && (this.currentRequestInfo.previousStage === '5b'))) {
+            submitted.append('supplier', this.currentRequestApproval.stages['1']['supplier']);
+            submitted.append('amountInEuros', this.currentRequestApproval.stages['1']['amountInEuros'].toString());
         }
-        console.log(`sending ${JSON.stringify(this.currentRequest.stage1, null, 1)} to updateRequest`);
-        this.updateRequestAndApproval();
-    }
-
-    submitRequestApproval() {
-        console.log('updating approval');
-        window.scrollTo(0, 0);
-        this.showSpinner = true;
-        this.errorMessage = '';
-        this.successMessage = '';
-
-        if ( this.uploadedFile ) {
-
-            this.currentRequestApproval[this.currentStageName]['attachment']['url'] = this.uploadedFileURL;
-            this.uploadedFileURL = '';
-            this.uploadedFile = null;
-        }
-        console.log(`sending ${JSON.stringify(this.currentRequestApproval[this.currentStageName], null, 1)} to updateRequestApproval`);
-
-        /*update this.currentRequestApproval*/
-        this.requestService.updateRequestApproval(this.currentRequestApproval).subscribe (
-            res => console.log(`update RequestApproval responded: ${res.id}, status=${res.status}, stage=${res.stage}`),
-            error => {
-                console.log(error);
-                this.showSpinner = false;
-                this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
-                this.getCurrentRequest();
-            },
-            () => {
-                if ((this.currentRequestApproval.status === 'accepted') && (this.currentRequest.type !== 'contract')) {
-                    this.createRequestPayment();
-                } else {
-                    this.successMessage = 'Οι αλλαγές αποθηκεύτηκαν.';
-                    // this.showSpinner = false;
-                    this.getIfUserCanEditRequest();
-                }
-            }
-        );
-    }
-
-    updateRequestAndApproval() {
-        console.log('updating request and approval');
-        if ( (this.uploadedFile) && (this.currentStageName !== 'stage1') ) {
-
-            this.currentRequestApproval[this.currentStageName]['attachment']['url'] = this.uploadedFileURL;
-            this.uploadedFileURL = '';
-            this.uploadedFile = null;
-        }
-
-        this.requestService.updateRequest(this.currentRequest, this.authService.getUserProp('email')).pipe(
-            tap(res => this.currentRequest = res),
-            concatMap( res =>
-                this.requestService.updateRequestApproval(this.currentRequestApproval)
-            )).subscribe(
-            res => {
-                this.currentRequestApproval = res;
-            },
-            error => {
-                console.log(error);
-                this.showSpinner = false;
-                this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
-                this.getCurrentRequest();
-            },
-            () => {
-                if ((this.currentRequestApproval.status === 'accepted') && (this.currentRequest.type !== 'contract')) {
-                    this.createRequestPayment();
-                } else {
-                    this.successMessage = 'Οι αλλαγές αποθηκεύτηκαν.';
-                    // this.showSpinner = false;
-                    this.getIfUserCanEditRequest();
-                }
-            }
-        );
-    }
-
-    uploadFile() {
-        console.log('uploading file');
-        this.showSpinner = true;
-        this.errorMessage = '';
-        this.requestService.uploadAttachment<string>(this.currentRequest.archiveId,
-                                                     this.currentStageName,
-                                                     this.uploadedFile,
-                                                     this.uploadMode)
+        this.requestService.submitUpdate<any>('request', mode, this.currentRequestApproval.baseInfo.requestId, submitted)
             .subscribe(
                 event => {
-                    // console.log('uploadAttachment responded: ', JSON.stringify(event));
                     if (event.type === HttpEventType.UploadProgress) {
-                        console.log('uploadAttachment responded: ', event);
+                        console.log('update progress says:', event.loaded);
                     } else if ( event instanceof HttpResponse) {
                         console.log('final event:', event.body);
-                        this.uploadedFileURL = event.body;
                     }
                 },
                 error => {
                     console.log(error);
-                    this.uploadedFile = null;
-                    this.uploadMode = null;
                     this.showSpinner = false;
                     this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
+                    window.scrollTo(1, 1);
                 },
                 () => {
-                    if (this.currentStageName === 'stage1') {
-                        this.submitRequest();
-                    } else if (this.requestNeedsUpdate) {
-                        this.requestNeedsUpdate = false;
-                        this.updateRequestAndApproval();
-                    } else {
-                        this.submitRequestApproval();
-                    }
+                    this.successMessage = 'Οι αλλαγές αποθηκεύτηκαν.';
+                    this.getCurrentRequest();
                 }
             );
     }
 
+    updateShowStageFields() {
+        for ( let i = 1; i < this.stages.length; i++ ) {
+            this.currentRequestInfo[this.stages[i]].showStage = this.willShowStage(this.stages[i]);
+            // console.log(`${this.stages[i]} is ${this.currentRequestInfo[this.stages[i]].showStage}`);
+        }
+        this.showStage1 = (this.willShowStage('1') === 2);
+    }
+
+    editStage1() {
+        this.showStage1 = false;
+    }
+
+    editPreviousStage(showForm: boolean) {
+        if (this.currentRequestInfo.previousStage) {
+            const prevStage = this.currentRequestInfo.previousStage;
+
+            if (showForm) {
+                // send data to the form component
+                this.checkIfStageIs5b(prevStage);
+                this.prevStageLoaderAnchorItem = new AnchorItem(
+                    this.currentRequestInfo[prevStage][ 'stageComponent' ],
+                    {
+                        currentStage: this.currentRequestApproval.stages[prevStage],
+                        currentRequestInfo: this.currentRequestInfo
+                    }
+                );
+                this.currentRequestInfo[prevStage].showStage = 1;
+            } else {
+                this.currentRequestInfo[prevStage].showStage = this.willShowStage(prevStage);
+                this.prevStageLoaderAnchorItem = null;
+                this.currentRequestInfo.previousStage = null;
+            }
+        }
+    }
 
     willShowStage(stage: string) {
-        const stageField = 'stage' + stage;
-        if ((stage === this.currentRequestApproval.stage) &&
-            (this.currentRequestApproval.status !== 'rejected') &&
-            (this.currentRequestApproval.status !== 'accepted') &&
-            (this.currentRequestApproval.status !== 'cancelled') &&
-            ( (this.authService.getUserRole().some(x => x.authority === 'ROLE_ADMIN')) || this.canEdit ) ) {
+        /* return values:  0 -> don't show
+                           1 -> show form
+                           2 -> was approved
+                           3 -> was rejected
+                           4 -> was returned to previous*/
 
-            if (this.currentRequestApproval.stage !== '1') {
-                this.stageLoaderItemList = [
-                    new AnchorItem(
+        if ((stage === this.currentRequestApproval.baseInfo.stage) &&
+            (this.currentRequestApproval.baseInfo.status !== 'REJECTED') &&
+            (this.currentRequestApproval.baseInfo.status !== 'ACCEPTED') &&
+            (this.currentRequestApproval.baseInfo.status !== 'CANCELLED') &&
+            ( (this.authService.getUserRole().some(x => x.authority === 'ROLE_ADMIN')) ||
+              (this.currentRequestApproval.canEdit === true) ) ) {
+
+            if (this.currentRequestApproval.baseInfo.stage !== '1') {
+                if (this.currentRequestApproval.stages[stage] == null) {
+                    this.currentRequestApproval.stages[stage] = this.currentRequestInfo.createNewStageObject(stage);
+                }
+                this.stageLoaderAnchorItem =  new AnchorItem(
                         this.currentRequestInfo[stage]['stageComponent'],
                         {
-                            currentStage: this.currentRequestApproval['stage' + stage],
+                            currentStage: this.currentRequestApproval.stages[stage],
                             currentRequestInfo: this.currentRequestInfo
                         }
-                    ),
-                ];
+                    );
             }
 
             return 1;
@@ -433,29 +288,33 @@ export class RequestStageComponent implements OnInit {
             if (stage === '1') {
                 return 2;
             }
-            if ( (this.currentRequestApproval[stageField]) &&
-                 (this.currentRequestApproval[stageField].date)) {
-
+            if ( (this.currentRequestApproval.stages[stage]) && (this.currentRequestApproval.stages[stage].date)) {
                 if (!this.isSimpleUser || (stage === '2') ) {
-
-                    if ( this.stages.indexOf(this.currentRequestApproval.stage) < this.stages.indexOf(stage)) {
+                    if ( this.stages.indexOf(this.currentRequestApproval.baseInfo.stage) < this.stages.indexOf(stage)) {
                         return 4;
                     }
 
-                    if ( (stage === this.currentRequestApproval.stage) && (this.stages.indexOf(stage) > 0)) {
+                    if ( stage === this.currentRequestApproval.baseInfo.stage ) {
 
-                        const prevStageField = 'stage' + this.stages[this.stages.indexOf(stage) - 1];
-                        if ((this.currentRequestApproval[prevStageField]) &&
-                            (this.currentRequestApproval[prevStageField].date) &&
-                            (this.currentRequestApproval[prevStageField].date > this.currentRequestApproval[stageField].date) ) {
+                        // const prevStage = this.stages[this.stages.indexOf(stage) - 1];
+                        let prevStage;
+                        for (const p of this.currentRequestInfo[stage].prev) {
+                            if (this.currentRequestApproval.stages[p] != null) {
+                                prevStage = p;
+                                break;
+                            }
+                        }
+                        if ((this.currentRequestApproval.stages[prevStage]) &&
+                            (this.currentRequestApproval.stages[prevStage].date) &&
+                            (this.currentRequestApproval.stages[prevStage].date > this.currentRequestApproval.stages[stage].date) ) {
 
                             return 4;
                         }
                     }
 
-                if ( (this.currentRequestApproval[stageField]['approved'] &&
-                      this.currentRequestApproval[stageField]['approved'] === true ) ||
-                      (stage === '6') ) {
+                    if ( ((this.currentRequestApproval.stages[stage]['approved'] != null) &&
+                          this.currentRequestApproval.stages[stage]['approved'] === true ) ||
+                         (stage === '6') ) {
 
                         return 2;
 
@@ -469,82 +328,69 @@ export class RequestStageComponent implements OnInit {
         return 0;
     }
 
-    updateShowStageFields() {
-        for ( let i = 1; i < this.stages.length; i++ ) {
-            this.currentRequestInfo[this.stages[i]].showStage = this.willShowStage(this.stages[i]);
-        }
-    }
+    linkToFile(fileIndex: number) {
+        if (this.currentRequestApproval.stages['1'].attachments &&
+            this.currentRequestApproval.stages['1'].attachments[fileIndex] &&
+            this.currentRequestApproval.stages['1'].attachments[fileIndex].url) {
 
-    linkToFile() {
-        if (this.currentRequest.stage1.attachment && this.currentRequest.stage1.attachment.url) {
-            /*window.open(this.currentRequest.stage1.attachment.url , '_blank', 'enabledstatus=0,toolbar=0,menubar=0,location=0');*/
-            let url = `${window.location.origin}/arc-expenses-service/request/store/download?`;
-            url = `${url}requestId=${this.currentRequest.id}&stage=1&mode=request`;
-            console.log(url);
-            window.open(url, '_blank', 'enabledstatus=0,toolbar=0,menubar=0,location=0');
-        }
-    }
+            let url = `${window.location.origin}/arc-expenses-service/request/store?`;
+            url = `${url}archiveId=${encodeURIComponent(this.currentRequestApproval.stages['1'].attachments[fileIndex].url)}`;
+            url = `${url}&id=${this.currentRequestApproval.baseInfo.id}`;
+            url = `${url}&mode=approval`;
 
-    getNewSupplierAndAmount(newVals: string[]) {
-        if (newVals && newVals.length === 2) {
-            this.currentRequest.stage1.supplier = newVals[0];
-            this.currentRequest.stage1.amountInEuros = +newVals[1];
-            this.currentRequest.stage1.finalAmount = +newVals[1];
-            this.requestNeedsUpdate = true;
+            window.open(url, '_blank');
         }
-    }
-
-    getUploadedFile(file: File) {
-        console.log('I got the file!');
-        this.uploadedFile = file;
     }
 
     printRequest() {
-        printRequestPage(this.currentRequest.id, this.reqTypes[this.currentRequest.type]);
+        printRequestPage(this.currentRequestApproval.baseInfo.requestId);
     }
 
     createRequestPayment() {
-        const newRequestPayment = new RequestPayment();
-        newRequestPayment.id = '';
-        newRequestPayment.requestId = this.currentRequest.id;
-        newRequestPayment.creationDate = Date.now().toString();
-        newRequestPayment.stage = '7';
-        newRequestPayment.status = 'pending';
-        newRequestPayment.stage7 = new Stage7();
-        newRequestPayment.stage8 = new Stage8();
-        newRequestPayment.stage9 = new Stage9();
-        newRequestPayment.stage10 = new Stage10();
-        newRequestPayment.stage11 = new Stage11();
-        newRequestPayment.stage12 = new Stage12();
-        newRequestPayment.stage13 = new Stage13();
 
-        this.requestService.addRequestPayment(newRequestPayment).subscribe(
+        this.requestService.addRequestPayment(this.currentRequestApproval.baseInfo.requestId).subscribe(
             res => {
-                    console.log(JSON.stringify(res));
-                    this.router.navigate(['/requests/request-stage-payment', res.id]);
-                },
+                console.log(JSON.stringify(res));
+                this.showSpinner = false;
+                this.router.navigate(['/requests/request-stage-payment/', res['id']]);
+            },
             error => {
+                window.scroll(1, 1);
                 console.log(error);
                 this.showSpinner = false;
                 this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
-                this.getCurrentRequest();
-            },
-            () => {
-                this.successMessage = 'Οι αλλαγές αποθηκεύτηκαν.';
-                this.showSpinner = false;
-                this.getIfUserCanEditRequest();
             }
         );
     }
 
     getStatusAsString( status: string ) {
-        if ( (status === 'pending') || (status === 'under_review') ) {
+        if ( (status === 'PENDING') || (status === 'UNDER_REVIEW') ) {
             return 'σε εξέλιξη';
-        } else if (status === 'accepted') {
+        } else if (status === 'ACCEPTED') {
             return 'ολοκληρωθηκε';
         } else {
             return 'απορρίφθηκε';
         }
+    }
+
+    getTooltipText() {
+        if (this.currentRequestApproval.baseInfo.status === 'ACCEPTED') {
+            return 'Για την ακύρωση του αιτήματος παρακαλώ μεταβείτε στην σελίδα της περαίωσης.';
+        } else {
+            return 'Πατήστε για να<br>ακυρώσετε το αίτημα';
+        }
+    }
+
+    setCanBeCancelled() {
+        if (this.userIsAdmin() || this.userIsRequester() || this.userIsOnBehalfUser()) {
+            if (this.currentRequestApproval.type === 'CONTRACT') {
+                this.canBeCancelled = (this.currentRequestApproval.baseInfo.status === 'PENDING');
+            } else {
+                this.canBeCancelled = ((this.currentRequestApproval.baseInfo.status !== 'REJECTED') &&
+                                       (this.currentRequestApproval.baseInfo.status !== 'CANCELLED'));
+            }
+        }
+        return false;
     }
 
     userIsAdmin() {
@@ -552,38 +398,39 @@ export class RequestStageComponent implements OnInit {
     }
 
     userIsRequester() {
-        return (this.authService.getUserProp('email') === this.currentRequest.user.email);
+        return (this.authService.getUserProp('email').toLowerCase() === this.currentRequestApproval.requesterEmail.toLowerCase());
     }
 
-    cancelRequest() {
-        // UIkit.modal('#cancellationModal').show();
+    userIsOnBehalfUser() {
+        return (this.currentRequestApproval.onBehalfEmail &&
+                (this.authService.getUserProp('email').toLowerCase() === this.currentRequestApproval.onBehalfEmail.toLowerCase()));
     }
 
     confirmedCancel() {
-        this.currentRequestApproval.status = 'cancelled';
-        this.currentRequest.requestStatus = 'cancelled';
-        this.requestService.updateRequest(this.currentRequest, this.authService.getUserProp('email')).pipe(
-            tap(res => this.currentRequest = res),
-            concatMap( res =>
-                this.requestService.updateRequestApproval(this.currentRequestApproval)
-            )).subscribe(
-                res => {
-                        this.currentRequestApproval = res;
-                    },
-                error => {
-                        console.log(error);
-                        this.showSpinner = false;
-                        this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
-                        this.getCurrentRequest();
-                        UIkit.modal('#cancellationModal').hide();
-                    },
-            () => {
-                    this.successMessage = 'Το αίτημα ακυρώθηκε.';
-                    this.showSpinner = false;
-                    this.getIfUserCanEditRequest();
-                    UIkit.modal('#cancellationModal').hide();
+        this.requestService.submitUpdate<any>('request', 'cancel',
+                                               this.currentRequestApproval.baseInfo.requestId).subscribe(
+            event => {
+                if (event.type === HttpEventType.UploadProgress) {
+                    console.log('cancel request responded: ', event.loaded);
+                } else if ( event instanceof HttpResponse) {
+                    console.log('final event:', event.body);
                 }
-            );
+            },
+            error => {
+                console.log(error);
+                this.showSpinner = false;
+                this.errorMessage = 'Παρουσιάστηκε πρόβλημα κατά την αποθήκευση των αλλαγών.';
+                UIkit.modal('#cancellationModal').hide();
+                window.scrollTo(1, 1);
+            },
+            () => {
+                this.successMessage = 'Το αίτημα ακυρώθηκε.';
+                this.showSpinner = false;
+                UIkit.modal('#cancellationModal').hide();
+                // this.router.navigate(['/requests/request-stage', this.currentRequestApproval.baseInfo.id]);
+                this.getCurrentRequest();
+            }
+        );
     }
 
 }

@@ -14,3 +14,8 @@ textarea {
 .uk-form-horizontal .uk-form-controls {
   margin-left: 275px;
 }
+
+.ng-touched.ng-invalid {
+  border-color: #e44e56;
+}
+

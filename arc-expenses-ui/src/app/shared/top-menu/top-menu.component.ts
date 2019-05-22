@@ -48,8 +48,9 @@ export class TopMenuComponent implements OnInit, DoCheck {
     this.authService.logout();
   }
 
-    goToAdmin() {
-      window.location.href = '/admin';
+  goToAdmin() {
+    // window.location.href = '/admin';
+    window.open('/admin', '_blank');
   }
 
   isUserLoggedIn() {

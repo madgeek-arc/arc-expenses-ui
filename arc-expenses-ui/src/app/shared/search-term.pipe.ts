@@ -1,5 +1,4 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { Vocabulary } from '../domain/operation';
 
 @Pipe ({ name: 'filterByTerm' })
 export class FilterByTerm implements PipeTransform {

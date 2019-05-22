@@ -1,10 +1,11 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Attachment, User, PersonOfInterest } from '../domain/operation';
+import { Stage } from '../domain/operation';
 import { commentDesc, FieldDescription } from '../domain/stageDescriptions';
 import { DatePipe } from '@angular/common';
-import { AuthenticationService } from '../services/authentication.service';
 import { RequestInfo, StageInfo } from '../domain/requestInfoClasses';
+
+declare var UIkit: any;
 
 @Component ({
     selector: 'stage-component',
@@ -17,22 +18,19 @@ export class StageComponent implements OnInit {
 
     /* output variable that sends the new Stage back to the parent component
      * in order to call the api and update the request */
-    @Output() emitStage: EventEmitter<any> = new EventEmitter<any>();
-    @Output() emitFile: EventEmitter<File> = new EventEmitter<File>();
+    @Output() emitStage: EventEmitter<any[]> = new EventEmitter<any[]>();
 
-    /* output variable that sends back to the parent an alert that the user
-     * chose to go back to the previous stage */
-    @Output() emitGoBack: EventEmitter<any> = new EventEmitter<any>();
-    choseToGoBack: boolean;
+    updateMode: string; /* approve, reject, downgrade or edit */
 
     /* input variable that defines the status of the current stage */
-    showStage: number; /* values:  0 -> don't show
-                                   1 -> show form
-                                   2 -> was approved
-                                   3 -> was rejected
-                                   4 -> was returned to previous*/
+    @Input() showStage: number; /* values:  0 -> don't show
+                                            1 -> show form
+                                            2 -> was approved
+                                            3 -> was rejected
+                                            4 -> was returned to previous*/
 
     @Output() newValues: EventEmitter<string[]> = new EventEmitter<string[]>();
+    @Output() promptEdit: EventEmitter<boolean> = new EventEmitter<boolean>();
 
 
     /*  phrase mentioning the result of a submitted stage
@@ -47,19 +45,19 @@ export class StageComponent implements OnInit {
     stageId: string;
     stageFields: FieldDescription[];
 
-    uploadedFile: File;
-    uploadedFilename = ''; /*a filename to send to the attachment wrapper*/
+    uploadedFiles: File[] = [];
+    uploadedFilenames: string[] = [];
+    filesToBeDeleted: string[] = [];
 
-    currentStage: any;
+    currentStage: Stage;
     currentRequestInfo: RequestInfo;
     currentStageInfo: StageInfo;
 
-    currentPOI: PersonOfInterest;
+    canEditStage: boolean; // true when this stage was the last to be submitted amd it can be edited by the current user
 
     datePipe = new DatePipe('el');
 
-    constructor(private fb: FormBuilder,
-                private authService: AuthenticationService) {}
+    constructor(private fb: FormBuilder) {}
 
     ngOnInit() {
 
@@ -71,12 +69,13 @@ export class StageComponent implements OnInit {
             this.showStage = this.currentStageInfo.showStage;
             this.stageTitle = this.currentStageInfo.title;
             this.stageFields = this.currentStageInfo.stageFields;
+            this.canEditStage = ((this.currentRequestInfo.previousStage != null) &&
+                                 (this.stageId === this.currentRequestInfo.previousStage));
             if (this.showStage > 1) {
                 this.submittedStageResult = this.currentStageInfo.submittedStageResultMap[this.showStage.toString()];
             }
 
             this.initializeView();
-            this.currentPOI = this.findCurrentPOI();
         }
     }
 
@@ -91,8 +90,10 @@ export class StageComponent implements OnInit {
         if (this.showStage === 1) {
 
             /* set filename if exists */
-            if ( this.currentStage['attachment'] ) {
-                this.uploadedFilename = this.currentStage['attachment']['filename'];
+            if ( this.currentStage.attachments ) {
+                for (const f of this.currentStage.attachments) {
+                    this.uploadedFilenames.push(f.filename);
+                }
             }
 
             /* create form */
@@ -107,45 +108,50 @@ export class StageComponent implements OnInit {
         }
     }
 
-    findCurrentPOI() {
-        if ( (this.authService.getUserRole().some(x => x.authority === 'ROLE_ADMIN')) && (this.showStage === 1) ) {
-            return this.currentStageInfo.stagePOIs[0];
-        } else {
-            let curEmail: string;
-            if ( this.showStage === 1 ) {
-                curEmail = this.authService.getUserProp('email');
-            } else {
-                curEmail = this.currentStage['user']['email'];
-            }
-            for ( const poi of this.currentStageInfo.stagePOIs ) {
-                if ( (poi.email === curEmail) ||
-                     (poi.delegates && poi.delegates.some(x => x.email === curEmail)) ) {
-                    // console.log(`stage ${this.stageId}, stagePoi: ${JSON.stringify(poi)}`);
-                    return poi;
-                }
-            }
-        }
-        // !!! if a poi is not found, currentPOI will remain undefined
-    }
+    linkToFile(i: number) {
+        if (this.currentStage.attachments &&
+            this.currentStage.attachments[i] &&
+            this.currentStage.attachments[i].url) {
 
-    linkToFile() {
-        if (this.currentStage['attachment'] && this.currentStage['attachment']['url'].length > 0 ) {
-            /* direct link to the storeService */
-            /*window.open(this.currentStage['attachment']['url'], '_blank', 'enabledstatus=0,toolbar=0,menubar=0,location=0');*/
             const mode: string = (this.currentRequestInfo.phaseId.includes('a') ? 'approval' : 'payment');
-            let url = `${window.location.origin}/arc-expenses-service/request/store/download?requestId=`;
-            url = `${url}${this.currentRequestInfo.phaseId}&stage=${this.stageId}&mode=${mode}`;
-            console.log(url);
+
+            let url = `${window.location.origin}/arc-expenses-service/request/store?`;
+            url = `${url}archiveId=${encodeURIComponent(this.currentStage.attachments[i].url)}`;
+            url = `${url}&id=${this.currentRequestInfo.phaseId}`;
+            url = `${url}&mode=${mode}`;
+
             /* link to download method */
-            window.open(url,
-                      '_blank', 'enabledstatus=0,toolbar=0,menubar=0,location=0');
+            window.open(url, '_blank');
         }
     }
 
-    getAttachmentInput(newFile: File) {
+    getAttachmentsInput(newFiles: File[]) {
         this.stageFormError = '';
-        this.uploadedFile = newFile;
-        console.log('this.uploadedFile is : ', this.uploadedFile);
+        this.uploadedFiles = newFiles;
+        console.log(`${this.uploadedFiles.length} files were chosen`);
+    }
+
+    removeUploadedFile(filename: string) {
+        const z = this.uploadedFilenames.indexOf(filename);
+        this.uploadedFilenames.splice(z, 1);
+
+        // if it was a new file
+        if (this.uploadedFiles && this.uploadedFiles.some(x => x.name === filename)) {
+            const i = this.uploadedFiles.findIndex(x => x.name === filename);
+            this.uploadedFiles.splice(i, 1);
+
+        // if it was an already uploaded file
+        } else  if (this.currentStage.attachments &&
+                    this.currentStage.attachments.some(x => x.filename === filename)) {
+
+            const i = this.currentStage.attachments.findIndex(x => x.filename === filename);
+            this.filesToBeDeleted.push(this.currentStage.attachments[i].url);
+            this.currentStage.attachments.splice(i, 1);
+        }
+    }
+
+    editStage(showForm: boolean) {
+        this.promptEdit.emit(showForm);
     }
 
     approveRequest( approved: boolean ) {
@@ -155,10 +161,18 @@ export class StageComponent implements OnInit {
                 this.stageForm.get(key).clearValidators();
                 this.stageForm.get(key).updateValueAndValidity();
             });
+            this.updateMode = 'reject';
+            // UIkit.modal('#rejectionModal' + this.stageId).hide();
+        } else {
+            this.updateMode = 'approve';
         }
-        this.currentStage['approved'] = approved;
+
+        if ((this.stageId !== '6') && (this.stageId !== '11')) {
+            this.currentStage['approved'] = approved;
+        }
 
         this.submitForm();
+
     }
 
     goBackOneStage() {
@@ -170,139 +184,69 @@ export class StageComponent implements OnInit {
                 this.stageForm.get(key).clearValidators();
                 this.stageForm.get(key).updateValueAndValidity();
             });
-            this.choseToGoBack = true;
-            this.emitGoBack.emit( this.choseToGoBack );
+            this.updateMode = 'downgrade';
+
             this.submitForm();
+
         }
+    }
+
+    resubmitPreviousStage() {
+        this.updateMode = 'edit';
+
+        this.submitForm();
+
     }
 
     submitForm() {
         this.stageFormError = '';
         if (this.stageForm && this.stageForm.valid ) {
-            if ( ( (this.uploadedFile === undefined) &&
-                   (this.currentStage['attachment'] === undefined) ) &&
-                 !this.choseToGoBack &&
+            if ( ((this.updateMode === 'approve') || (this.updateMode === 'edit')) &&
+                 ( ((this.uploadedFiles == null) || (this.uploadedFiles.length === 0)) &&
+                   ((this.currentStage['attachments'] == null) || (this.currentStage.attachments.length === 0)) ) &&
                  ( (this.stageId === '6') || (this.stageId === '11') ||
-                   ( (this.stageId === '7') && this.currentStage['approved']) ) ) {
+                   (this.stageId === '7') || (this.stageId === '7a')) ) {
 
                 this.stageFormError = 'Η επισύναψη εγγράφων είναι υποχρεωτική.';
 
             } else {
-
-                this.currentStage['user'] = this.createUser();
-
-                this.currentStage['date'] = Date.now().toString();
+                const newStage = new FormData();
                 Object.keys(this.stageForm.controls).forEach(key => {
-                    this.currentStage[key.toString()] = this.stageForm.get(key).value;
+                    newStage.append(key.toString(), this.stageForm.get(key).value);
                 });
 
-                if (this.uploadedFile) {
-                    this.currentStage['attachment'] = this.createAttachment();
-                    this.emitFile.emit(this.uploadedFile);
-
+                if (this.uploadedFiles && (this.uploadedFiles.length > 0)) {
+                    for (const f of this.uploadedFiles) {
+                        newStage.append('attachments', f, f.name);
+                    }
                 }
-                this.emitStage.emit(this.currentStage);
+
+                if (this.filesToBeDeleted.length > 0) {
+                    for (const f of this.filesToBeDeleted) {
+                        newStage.append('removed', f);
+                    }
+                }
+
+                this.emitStage.emit([this.updateMode, newStage]);
 
             }
 
         } else {
-
             this.stageFormError = 'Πρέπει να έχουν γίνει όλοι οι έλεγχοι για να προχωρήσει το αίτημα.';
         }
     }
 
-    createUser(): User {
-        const tempUser: User = new User();
-        if ( (this.authService.getUserRole().some(x => x.authority === 'ROLE_ADMIN')) &&
-             ((this.stageId !== '7') ||
-             (this.authService.getUserProp('email') !== this.currentRequestInfo.requester.email)) ) {
-            tempUser.id = this.authService.getUserProp('id');
-            tempUser.email = this.currentPOI.email;
-            tempUser.firstname = this.currentPOI.firstname;
-            tempUser.lastname = this.currentPOI.lastname;
-        } else {
-            tempUser.id = this.authService.getUserProp('id');
-            tempUser.email = this.authService.getUserProp('email');
-            tempUser.firstname = this.authService.getUserProp('firstname');
-            tempUser.lastname = this.authService.getUserProp('lastname');
-        }
-        return tempUser;
-    }
-
-    getIsDelegateHidden() {
-        if ((this.currentPOI != null) &&
-            (this.currentPOI.email === this.currentStage['user']['email'])) {
-            return false;
-        } else {
-             if (this.currentPOI && this.currentPOI.delegates &&
-                 this.currentPOI.delegates.some(x => x.email === this.currentStage['user']['email'])) {
-
-                return this.currentPOI.delegates.filter(x => x.email === this.currentStage['user']['email'])[0].hidden;
-
-            }
-        }
-        return false;
-    }
-
     /* display full name of the submitted stage's editor */
     getDelegateName() {
-        /* stage 7 can also be completed by the user */
-        if (this.stageId === '7') {
-            /* however, if a delegate has completed the stage, check if his/her name should be hidden */
-            if (this.currentRequestInfo['7'].stagePOIs.some(x => x.delegates.some(y => y.email === this.currentStage['user']['email']))) {
-                if (this.getIsDelegateHidden()) {
-                    return ' (' + this.currentPOI.firstname + ' ' + this.currentPOI.lastname + ')';
-                } else {
-                    return ' (' + this.currentStage['user']['firstname'] + ' ' + this.currentStage['user']['lastname'] + ')';
-                }
-            } else {
-                return ' (' + this.currentStage['user']['firstname'] + ' ' + this.currentStage['user']['lastname'] + ')';
-            }
-
-        /* in stages 4 and 9 the name will always be hidden */
-        } else if ( (this.stageId !== '4') && (this.stageId !== '9') ) {
-
-            /* the name of the Inspection Team member that edited stage8 will only be shown to the POY and the Admins */
-            if ((this.stageId !== '8') ||
-                ((this.stageId === '8') &&
-                 ((this.authService.getUserRole().some(x => x.authority === 'ROLE_ADMIN')) ||
-                  this.currentRequestInfo['4'].stagePOIs.some(x => x.email === this.authService.getUserProp('email'))) )) {
-
-                if ( this.getIsDelegateHidden() ) {
-                    return ' (' + this.currentPOI.firstname + ' ' + this.currentPOI.lastname + ')';
-                } else {
-                    return ' (' + this.currentStage['user']['firstname'] + ' ' + this.currentStage['user']['lastname'] + ')';
-                }
-            }
-
-        }
-    }
-
-    getUserName() {
-        if ( this.currentRequestInfo.requester ) {
-            return this.currentRequestInfo.requester.firstname + ' ' + this.currentRequestInfo.requester.lastname;
-        } else {
-            return '';
-        }
-    }
-
-    createAttachment(): Attachment {
-        const tempAttachment: Attachment = new Attachment(this.uploadedFile.name,
-                                                          this.uploadedFile.type,
-                                                          this.uploadedFile.size,
-                                                          '');
-        /*if (this.uploadedFile) {
-            tempAttachment.filename = this.uploadedFile.name;
-            tempAttachment.mimetype = this.uploadedFile.type;
-            tempAttachment.size = this.uploadedFile.size;
-            tempAttachment.url = '';
-        }*/
-
-        return tempAttachment;
+        return ' (' + this.currentStage['user']['firstname'] + ' ' + this.currentStage['user']['lastname'] + ')';
     }
 
     getCurrentDateString() {
         return this.datePipe.transform(Date.now(), 'dd/MM/yyyy');
+    }
+
+    showRejectionModal() {
+        UIkit.modal('#rejectionModal' + this.stageId).show();
     }
 
 }
@@ -345,13 +289,13 @@ export class Stage3Component extends StageComponent implements OnInit {
 
         super.ngOnInit();
 
-        if (this.stageForm) {
+        if (this.stageForm && !this.stageForm.get('loan').value ) {
             this.stageForm.get('loanSource').disable();
         }
     }
 
-    onLoanToggle (completedLoan: boolean) {
-        if (completedLoan && (this.stageForm !== undefined) ) {
+    onLoanToggle (checkedLoan: boolean) {
+        if (checkedLoan && (this.stageForm !== undefined) ) {
             this.stageForm.get('loanSource').enable();
             this.stageForm.get('loanSource').setValidators([Validators.required]);
             this.stageForm.get('loanSource').updateValueAndValidity();
@@ -387,7 +331,7 @@ export class Stage5aComponent extends StageComponent implements OnInit {
 
     ngOnInit () {
         this.stageFormDefinition = {
-            comment: [''],
+            comment: ['']
         };
         this.stageId = '5a';
 
@@ -406,7 +350,7 @@ export class Stage5bComponent extends StageComponent implements OnInit {
 
     ngOnInit () {
         this.stageFormDefinition = {
-            comment: [''],
+            comment: ['']
         };
         this.stageId = '5b';
 
@@ -462,14 +406,22 @@ export class Stage5bComponent extends StageComponent implements OnInit {
                 newValArray.push(this.currentRequestInfo.supplier);
                 newValArray.push(this.currentRequestInfo.requestedAmount);
                 this.newValues.emit(newValArray);
-                this.approveRequest(approved);
+                if (this.canEditStage) {
+                    this.resubmitPreviousStage();
+                } else {
+                    this.approveRequest(approved);
+                }
 
             } else {
                 this.stageFormError = 'Τα πεδία που σημειώνονται με (*) είναι υποχρεωτικά.';
             }
 
         } else {
-            this.approveRequest(approved);
+            if (this.canEditStage) {
+                this.resubmitPreviousStage();
+            } else {
+                this.approveRequest(approved);
+            }
         }
     }
 
@@ -503,13 +455,13 @@ export class Stage5bComponent extends StageComponent implements OnInit {
 
 @Component ({
     selector: 'stage6-component',
-    templateUrl: './stages-templates/stage6.component.html'
+    templateUrl: './stages-templates/stage6And11.component.html'
 })
 export class Stage6Component extends StageComponent implements OnInit {
 
     ngOnInit () {
         this.stageFormDefinition = {
-            comment: [''],
+            comment: ['']
         };
         this.stageId = '6';
 
@@ -528,13 +480,13 @@ export class Stage7Component extends StageComponent implements OnInit {
 
     ngOnInit () {
         this.stageFormDefinition = {
-            comment: [''],
+            comment: ['']
         };
         this.stageId = '7';
 
         super.ngOnInit();
 
-        if ( this.currentRequestInfo.finalAmount ) {
+        if ( this.currentRequestInfo.finalAmount != null ) {
             this.showExtraFields = true;
             console.log('oldFinalAmount is', this.currentRequestInfo.finalAmount);
         }
@@ -564,14 +516,22 @@ export class Stage7Component extends StageComponent implements OnInit {
                 const newValArray = [];
                 newValArray.push(this.currentRequestInfo.finalAmount);
                 this.newValues.emit(newValArray);
-                this.approveRequest(true);
+                if (this.canEditStage) {
+                    this.resubmitPreviousStage();
+                } else {
+                    this.approveRequest(true);
+                }
 
             } else {
                 this.stageFormError = 'Παρακαλώ συμπληρώστε ένα τελικό ποσό.';
             }
 
         } else {
-            this.approveRequest(true);
+            if (this.canEditStage) {
+                this.resubmitPreviousStage();
+            } else {
+                this.approveRequest(true);
+            }
         }
     }
 
@@ -585,6 +545,23 @@ export class Stage7Component extends StageComponent implements OnInit {
 }
 
 @Component ({
+    selector: 'stage7a-component',
+    templateUrl: './stages-components.html'
+})
+export class Stage7aComponent extends StageComponent implements OnInit {
+
+    ngOnInit () {
+        this.stageFormDefinition = {
+            comment: ['']
+        };
+        this.stageId = '7a';
+
+        super.ngOnInit();
+    }
+}
+
+
+@Component ({
     selector: 'stage8-component',
     templateUrl: './stages-components.html'
 })
@@ -594,7 +571,7 @@ export class Stage8Component extends StageComponent implements OnInit {
         this.stageFormDefinition = {
             checkRegularity: ['', Validators.requiredTrue],
             checkLegality: ['', Validators.requiredTrue],
-            comment: [''],
+            comment: ['']
         };
         this.stageId = '8';
 
@@ -612,7 +589,7 @@ export class Stage9Component extends StageComponent implements OnInit {
         this.stageFormDefinition = {
             checkRegularity: ['', Validators.requiredTrue],
             checkLegality: ['', Validators.requiredTrue],
-            comment: [''],
+            comment: ['']
         };
         this.stageId = '9';
 
@@ -628,7 +605,7 @@ export class Stage10Component extends StageComponent implements OnInit {
 
     ngOnInit () {
         this.stageFormDefinition = {
-            comment: [''],
+            comment: ['']
         };
         this.stageId = '10';
 
@@ -638,13 +615,13 @@ export class Stage10Component extends StageComponent implements OnInit {
 
 @Component ({
     selector: 'stage11-component',
-    templateUrl: './stages-templates/stage11.component.html'
+    templateUrl: './stages-templates/stage6And11.component.html'
 })
 export class Stage11Component extends StageComponent implements OnInit {
 
     ngOnInit () {
         this.stageFormDefinition = {
-            comment: [''],
+            comment: ['']
         };
         this.stageId = '11';
 
@@ -660,7 +637,7 @@ export class Stage12Component extends StageComponent implements OnInit {
 
     ngOnInit () {
         this.stageFormDefinition = {
-            comment: [''],
+            comment: ['']
         };
         this.stageId = '12';
 
@@ -677,7 +654,7 @@ export class Stage13Component extends StageComponent implements OnInit {
 
     ngOnInit () {
         this.stageFormDefinition = {
-            comment: [''],
+            comment: ['']
         };
         this.stageId = '13';
 

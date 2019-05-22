@@ -1,22 +1,13 @@
+import { analiftheiYpoxrewsiDesc, checkFeasibilityDesc, checkLegalityDesc, checkNecessityDesc, checkRegularityDesc,
+         commentDesc, fundsAvailableDesc, loanDesc, loanSourceDesc, FieldDescription, stageTitles } from './stageDescriptions';
+import { Type } from '@angular/core';
 import {
-    analiftheiYpoxrewsiDesc,
-    checkFeasibilityDesc, checkLegalityDesc,
-    checkNecessityDesc, checkRegularityDesc,
-    commentDesc,
-    fundsAvailableDesc, loanDesc, loanSourceDesc,
-    FieldDescription, stageTitles
-} from './stageDescriptions';
-import {Type} from '@angular/core';
-import {PersonOfInterest, Project, User} from './operation';
-import {
-    Stage10Component, Stage11Component, Stage12Component, Stage13Component,
-    Stage2Component,
-    Stage3Component,
-    Stage4Component,
-    Stage5aComponent,
-    Stage5bComponent,
-    Stage6Component, Stage7Component, Stage8Component, Stage9Component
+    Stage10Component, Stage11Component, Stage12Component, Stage13Component, Stage2Component,
+    Stage3Component, Stage4Component, Stage5aComponent, Stage5bComponent, Stage6Component, Stage7aComponent,
+    Stage7Component, Stage8Component, Stage9Component
 } from '../request-stage/stages-components';
+import { Stage10, Stage11, Stage12, Stage13, Stage2, Stage3, Stage4, Stage5a,
+         Stage5b, Stage6, Stage7, Stage7a, Stage8, Stage9 } from './operation';
 
 
 /* Map of the displayed messages according to the stage's outcome (if submitted) */
@@ -35,20 +26,18 @@ export class SubmittedStageResultMap {
 /* Information describing a stage */
 export class StageInfo {
     title: string;                                      // a title
-    prev: string[];                                     // list of the possible ids of the previous stage
-    next: string[];                                     // list of the possible ids of the next stage
+    prev: string[];                                     // list with the id(s) of the previous stage(s)
+    next: string[];                                     // list with the id(s) of the next stage(s)
     stageComponent: Type<any>;                          // the stage-component that corresponds to the stage
     stageFields: FieldDescription [];                   // a list of the stage's fields descriptions
-    stagePOIs: PersonOfInterest[];                      // a list of possible POIs for the stage
-    submittedStageResultMap: SubmittedStageResultMap;   // a map with descriptions of the stage's result (if submitted)
-    showStage: number;                                  // an indicator of the stage's display status
+    submittedStageResultMap: SubmittedStageResultMap;   // a map with the displayed text according to a submitted stage's status
+    showStage: number;                                  // a numeric code indicating if and how the stage should be displayed in the page
 
     constructor(title: string,
                 prev: string[],
                 next: string[],
                 stageComponent: Type<any>,
                 stageFields: FieldDescription [],
-                stagePOIs: PersonOfInterest[],
                 submittedStageResultMap: SubmittedStageResultMap) {
 
         this.title = title;
@@ -56,7 +45,6 @@ export class StageInfo {
         this.next = next;
         this.stageComponent = stageComponent;
         this.stageFields = stageFields;
-        this.stagePOIs = stagePOIs;
         this.submittedStageResultMap = submittedStageResultMap;
     }
 }
@@ -68,19 +56,19 @@ export class RequestInfo {
 
     requestedAmount: string;
     supplier: string;
-    requester: User;
-    travellerEmail: string;
 
     finalAmount: string;
+
+    previousStage: string;
 
     '2': StageInfo;
     '3': StageInfo;
     '4': StageInfo;
-    '5': StageInfo;
     '5a': StageInfo;
     '5b': StageInfo;
     '6': StageInfo;
     '7': StageInfo;
+    '7a': StageInfo;
     '8': StageInfo;
     '9': StageInfo;
     '10': StageInfo;
@@ -88,59 +76,21 @@ export class RequestInfo {
     '12': StageInfo;
     '13': StageInfo;
 
-    constructor(phaseId: string, requestId: string, requester: User, project: Project, travellerEmail?: string) {
+    constructor(phaseId: string, requestId: string) {
 
         this.phaseId = phaseId;
         this.requestId = requestId;
-        this.requester = requester;
-        this.travellerEmail = travellerEmail;
-        this.initiateStagesInfo(project);
-
-        if (travellerEmail) {
-            (this['7']).stagePOIs = [];
-            (this['7']).stagePOIs.push(project.institute.travelManager);
-        }
-
-        /* TODO::if requester or traveller is also diataktis ->
-                 diataktis is the organization viceDirector or organization director */
-        if ( (this.requester.email === project.institute.diataktis.email) ||
-             ((this.travellerEmail != null) && (this.travellerEmail === project.institute.diataktis.email) ) ) {
-            console.log('requester is diataktis!');
-            this['5a'].stagePOIs = [];
-            this['10'].stagePOIs = [];
-            if ( (this.requester.email === project.institute.organization.director.email) ||
-                 ( (this.travellerEmail !== undefined) && (this.travellerEmail === project.institute.organization.director.email) ) ) {
-                this['5a'].stagePOIs.push(project.institute.organization.viceDirector);
-                this['10'].stagePOIs.push(project.institute.organization.viceDirector);
-                // console.log('diataktis is:', project.institute.organization.viceDirector);
-            } else {
-                this['5a'].stagePOIs.push(project.institute.organization.director);
-                this['10'].stagePOIs.push(project.institute.organization.director);
-                // console.log('diataktis is:', project.institute.organization.director);
-            }
-        }
-
-        /*if ((this.requester.email === project.institute.organization.director.email) &&
-            (this.requester.email === project.institute.diataktis.email) ) {
-            console.log('requester is diataktis!');
-            this['5a'].stagePOIs = [];
-            this['5a'].stagePOIs.push(project.institute.organization.viceDirector);
-            console.log(this['5a'].stagePOIs);
-            this['10'].stagePOIs = [];
-            this['10'].stagePOIs.push(project.institute.organization.viceDirector);
-            console.log(this['10'].stagePOIs);
-        }*/
+        this.initiateStagesInfo();
 
     }
 
-    initiateStagesInfo(project: Project) {
+    initiateStagesInfo() {
         this['2'] = new StageInfo(
             stageTitles['2'],
             ['1'],
             ['3'],
             Stage2Component,
             [checkNecessityDesc, checkFeasibilityDesc, commentDesc],
-            [project.scientificCoordinator],
             new SubmittedStageResultMap(
                 'Εγκρίθηκε από τον επιστημονικό υπεύθυνο',
                 'Απορρίφθηκε από τον επιστημονικό υπεύθυνο',
@@ -154,7 +104,6 @@ export class RequestInfo {
             ['4'],
             Stage3Component,
             [analiftheiYpoxrewsiDesc, fundsAvailableDesc, loanDesc, loanSourceDesc, commentDesc],
-            project.operator,
             new SubmittedStageResultMap(
                 'Εγκρίθηκε από τον χειριστή του προγράμματος',
                 'Απορρίφθηκε από τον χειριστή του προγράμματος',
@@ -168,7 +117,6 @@ export class RequestInfo {
             ['5a', '5b', '6'],
             Stage4Component,
             [analiftheiYpoxrewsiDesc, fundsAvailableDesc, commentDesc],
-            [project.institute.organization.poy],
             new SubmittedStageResultMap(
                 'Εγκρίθηκε από τον Προϊστάμενο Οικονομικών Υπηρεσιών',
                 'Απορρίφθηκε από τον Προϊστάμενο Οικονομικών Υπηρεσιών',
@@ -182,7 +130,6 @@ export class RequestInfo {
             ['5b', '6'],
             Stage5aComponent,
             [commentDesc],
-            [project.institute.diataktis], // [project.institute.director], used to be organization.director
             new SubmittedStageResultMap(
                 'Εγκρίθηκε από τον Διατάκτη',
                 'Απορρίφθηκε από τον Διατάκτη',
@@ -196,7 +143,6 @@ export class RequestInfo {
             ['6'],
             Stage5bComponent,
             [commentDesc],
-            [project.institute.organization.dioikitikoSumvoulio],
             new SubmittedStageResultMap(
                 'Εγκρίθηκε από το Διοικητικό Συμβούλιο',
                 'Απορρίφθηκε από το Διοικητικό Συμβούλιο',
@@ -210,7 +156,6 @@ export class RequestInfo {
             [],
             Stage6Component,
             [commentDesc],
-            [project.institute.diaugeia],
             new SubmittedStageResultMap(
                 'Αναρτήθηκε στην ΔΙΑΥΓΕΙΑ',
                 'Απορρίφθηκε πριν αναρτηθεί στην ΔΙΑΥΓΕΙΑ',
@@ -221,24 +166,35 @@ export class RequestInfo {
         this['7'] = new StageInfo(
             stageTitles['7'],
             [],
-            ['8'],
+            ['7a', '8'],
             Stage7Component,
             [commentDesc],
-            [project.institute.suppliesOffice],
             new SubmittedStageResultMap(
-                'Υποβλήθηκε',
+                'Καταχωρήθηκε το συνοδεύτικό υλικό',
                 'Απορρίφθηκε',
                 'Επεστράφη στο προηγούμενο στάδιο'
             )
         );
 
+        this['7a'] = new StageInfo(
+            stageTitles['7a'],
+            ['7'],
+            ['8'],
+            Stage7aComponent,
+            [commentDesc],
+            new SubmittedStageResultMap(
+                'Εγκρίθηκε από το Διοικητικό Συμβούλιο',
+                'Απορρίφθηκε από το Διοικητικό Συμβούλιο',
+                'Επεστράφη στο προηγούμενο στάδιο από το Διοικητικό Συμβούλιο'
+            )
+        );
+
         this['8'] = new StageInfo(
             stageTitles['8'],
-            ['7'],
+            ['7a', '7'],
             ['9'],
             Stage8Component,
             [checkRegularityDesc, checkLegalityDesc, commentDesc],
-            project.institute.organization.inspectionTeam,
             new SubmittedStageResultMap(
                 'Εγκρίθηκε από την Ομάδα Ελέγχου',
                 'Απορρίφθηκε από την Ομάδα Ελέγχου',
@@ -252,7 +208,6 @@ export class RequestInfo {
             ['10'],
             Stage9Component,
             [checkRegularityDesc, checkLegalityDesc, commentDesc],
-            [project.institute.organization.poy],
             new SubmittedStageResultMap(
                 'Εγκρίθηκε από τον Προϊστάμενο Οικονομικών Υπηρεσιών',
                 'Απορρίφθηκε από τον Προϊστάμενο Οικονομικών Υπηρεσιών',
@@ -266,7 +221,6 @@ export class RequestInfo {
             ['11'],
             Stage10Component,
             [commentDesc],
-            [project.institute.diataktis], // [project.institute.director], used to be organization.director
             new SubmittedStageResultMap(
                 'Εγκρίθηκε από τον Διατάκτη',
                 'Απορρίφθηκε από τον Διατάκτη',
@@ -280,7 +234,6 @@ export class RequestInfo {
             ['12'],
             Stage11Component,
             [commentDesc],
-            [project.institute.diaugeia],
             new SubmittedStageResultMap(
                 'Αναρτήθηκε στην ΔΙΑΥΓΕΙΑ',
                 'Απορρίφθηκε πριν αναρτηθεί στην ΔΙΑΥΓΕΙΑ',
@@ -294,7 +247,6 @@ export class RequestInfo {
             ['13'],
             Stage12Component,
             [commentDesc],
-            [project.institute.accountingRegistration],
             new SubmittedStageResultMap(
                 'Εγκρίθηκε από τον Υπεύθυνο Λογιστικής Καταχώρησης',
                 'Απορρίφθηκε από τον Υπεύθυνο Λογιστικής Καταχώρησης',
@@ -308,7 +260,6 @@ export class RequestInfo {
             [],
             Stage13Component,
             [commentDesc],
-            [project.institute.accountingPayment],
             new SubmittedStageResultMap(
                 'Εγκρίθηκε από τον Υπεύθυνο Πληρωμών',
                 'Απορρίφθηκε από τον Υπεύθυνο Πληρωμών',
@@ -316,6 +267,42 @@ export class RequestInfo {
             )
         );
 
+
+    }
+
+    createNewStageObject(stageid: string) {
+        switch (stageid) {
+            case '2':
+                return new Stage2();
+            case '3':
+                return new Stage3();
+            case '4':
+                return new Stage4();
+            case '5a':
+                return new Stage5a();
+            case '5b':
+                return new Stage5b();
+            case '6':
+                return new Stage6();
+            case '7':
+                return new Stage7();
+            case '7a':
+                return new Stage7a();
+            case '8':
+                return new Stage8();
+            case '9':
+                return new Stage9();
+            case '10':
+                return new Stage10();
+            case '11':
+                return new Stage11();
+            case '12':
+                return new Stage12();
+            case '13':
+                return new Stage13();
+            default:
+                return null;
+        }
 
     }
 
