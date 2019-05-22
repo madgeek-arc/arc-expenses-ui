@@ -1,14 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { Project, RequestSummary, User, Vocabulary } from '../domain/operation';
+import { RequestSummary } from '../domain/operation';
 import { ManageRequestsService } from '../services/manage-requests.service';
 import { AuthenticationService } from '../services/authentication.service';
 import { Paging } from '../domain/extraClasses';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
-import { approvalStages, paymentStages, requestTypes, stageTitles } from '../domain/stageDescriptions';
+import { approvalStages, paymentStages, requestTypes, stageTitles, statesList } from '../domain/stageDescriptions';
 import { ManageResourcesService } from '../services/manage-resources.service';
 import { ManageProjectService } from '../services/manage-project.service';
-import { RequestInfo } from '../domain/requestInfoClasses';
 
 @Component({
     selector: 'app-requests',
@@ -29,19 +28,18 @@ export class RequestsComponent implements OnInit {
                    rejected: 'Απορριφθέντα', accepted: 'Ολοκληρωθέντα', cancelled: 'Ακυρωθέντα'};
     stages: string[] = [];
     stagesMap = stageTitles;
-    requestTypeIds = ['regular', 'contract', 'services_contract', 'trip'];
     reqTypes = requestTypes;
-    institutes: Map<string, string> = new Map<string, string>();
-    instituteIds: string[] = [];
-    projects: Vocabulary[] = [];
+    requestTypeIds = ['regular', 'contract', 'services_contract', 'trip'];
+    extraFiltersTranslation = {projectAcronym: 'έργο', institute: 'ινστιτούτο/μονάδα', requester: 'αιτών'};
 
     /* flags */
     isSimpleUser: boolean;
+    editableSelected: boolean;
+    myRequestsSelected: boolean;
     allStatusSelected: boolean;
     allStagesSelected: boolean;
     allPhasesSelected: boolean;
     allTypesSelected: boolean;
-    allInstitutesSelected: boolean;
 
     /* search params and relevant vars */
     phaseId: number;
@@ -49,9 +47,9 @@ export class RequestsComponent implements OnInit {
     statusesChoice: string[] = [];
     stagesChoice: string[] = [];
     typesChoice: string[] = [];
-    institutesChoice: string[] = [];
     order: string;
     orderField: string;
+    extraFilters: Map<string, string>;
     itemsPerPage: number;
     currentPage: number;
     totalPages: number;
@@ -63,7 +61,6 @@ export class RequestsComponent implements OnInit {
     /* search result vars */
     searchResults: Paging<RequestSummary>;
     listOfRequests: RequestSummary[] = [];
-    listOfRowColors: string[] = [];
 
     constructor(private requestService: ManageRequestsService,
                 private resourceService: ManageResourcesService,
@@ -74,22 +71,20 @@ export class RequestsComponent implements OnInit {
                 private fb: FormBuilder) {}
 
     ngOnInit() {
-        this.isSimpleUser = (this.authService.getUserRole().some(x => x.authority === 'ROLE_USER') &&
+        this.isSimpleUser = (this.authService.getUserRole().some(x => x['authority'] === 'ROLE_USER') &&
                              (this.authService.getUserRole().length === 1));
 
-        /* TODO: add when institutes are added */
-        // this.getInstitutes();
         this.readParams();
     }
 
     initializeParams() {
-        this.statusesChoice = ['pending', 'under_review'];
-        this.stagesChoice = ['all'];
-        this.typesChoice = ['all'];
-        this.institutesChoice = ['all'];
+        this.statusesChoice = [ 'pending', 'under_review' ];
+        this.stagesChoice = [ 'all' ];
+        this.typesChoice = [ 'all' ];
+        this.extraFilters = new Map<string, string>();
 
         this.searchTerm = '';
-        this.keywordField = this.fb.group({ keyword: [''] });
+        this.keywordField = this.fb.group({keyword: [ '' ]});
 
         this.phaseId = 0;
         this.stages = approvalStages.concat(paymentStages);
@@ -97,35 +92,41 @@ export class RequestsComponent implements OnInit {
         this.currentPage = 0;
         this.itemsPerPage = 10;
 
-        this.order = 'DESC';
+        this.order = 'DSC';
         this.orderField = 'creation_date';
         this.totalPages = 0;
 
+        this.editableSelected = false;
+        this.myRequestsSelected = false;
+
         this.createSearchUrl();
+
     }
 
     readParams() {
-        this.statusesChoice = ['all'];
-        this.stagesChoice = ['all'];
-        this.typesChoice = ['all'];
-        this.institutesChoice = ['all'];
-
-        this.searchTerm = '';
-        this.keywordField = this.fb.group({ keyword: [''] });
-
-        this.phaseId = 0;
-        this.stages = approvalStages.concat(paymentStages);
-
-        this.currentPage = 0;
-        this.itemsPerPage = 10;
-
-        this.order = 'DESC';
-        this.orderField = 'creation_date';
-        this.totalPages = 0;
-
         this.route.queryParamMap.subscribe(
             params => {
-                // console.log(JSON.stringify(params, null, 2));
+                this.statusesChoice = [ 'pending', 'under_review' ];
+                this.stagesChoice = [ 'all' ];
+                this.typesChoice = [ 'all' ];
+                this.extraFilters = new Map<string, string>();
+
+                this.searchTerm = '';
+                this.keywordField = this.fb.group({keyword: [ '' ]});
+
+                this.phaseId = 0;
+                this.stages = approvalStages.concat(paymentStages);
+
+                this.currentPage = 0;
+                this.itemsPerPage = 10;
+
+                this.order = 'DSC';
+                this.orderField = 'creation_date';
+                this.totalPages = 0;
+
+                this.editableSelected = false;
+                this.myRequestsSelected = false;
+
                 if ( params.has('status') ) { this.statusesChoice = params.getAll('status'); }
                 if ( params.has('stage') ) { this.stagesChoice = params.getAll('stage'); }
                 if ( params.has('phase') && !isNaN(+params.get('phase')) ) {
@@ -145,7 +146,9 @@ export class RequestsComponent implements OnInit {
                     }
                 }
                 if ( params.has('type') ) { this.typesChoice = params.getAll('type'); }
-                if ( params.has('institute') ) { this.institutesChoice = params.getAll('institute'); }
+                if ( params.has('projectAcronym') ) { this.extraFilters.set('projectAcronym', params.get('projectAcronym')); }
+                if ( params.has('institute') ) { this.extraFilters.set('institute', params.get('institute')); }
+                if ( params.has('requester') ) { this.extraFilters.set('requester', params.get('requester')); }
                 if ( params.has('searchTerm') ) {
                     this.searchTerm = params.get('searchTerm');
                     this.keywordField.get('keyword').setValue(this.searchTerm);
@@ -158,11 +161,13 @@ export class RequestsComponent implements OnInit {
                 }
                 if ( params.has('orderField') ) { this.orderField = params.get('orderField'); }
                 if ( params.has('order') ) { this.order = params.get('order'); }
+                if ( params.has('editable') ) { this.editableSelected = (params.get('editable') === 'true'); }
+                if ( params.has('isMine') ) { this.myRequestsSelected = (params.get('isMine') === 'true'); }
+
+                this.initializeFiltersForm();
+                this.getListOfRequests();
             }
         );
-
-        this.initializeFiltersForm();
-        this.getListOfRequests();
     }
 
     initializeFiltersForm() {
@@ -172,7 +177,6 @@ export class RequestsComponent implements OnInit {
             stageChoices: this.createFormArray({stage: [false]}, this.stages.length),
             typeChoices: this.createFormArray({type: [false]}, this.requestTypeIds.length)
         });
-        // instituteChoices: this.createFormArray({institute: [false]}, this.instituteIds.length)
     }
 
     setFormValues() {
@@ -270,15 +274,32 @@ export class RequestsComponent implements OnInit {
         this.showSpinner = true;
         const currentOffset = this.currentPage * this.itemsPerPage;
 
+        let finalStatuses = this.statusesChoice;
+        if ((finalStatuses.length === 1) && (finalStatuses[0] === 'all')) {
+            finalStatuses = statesList;
+        }
+        let finalTypes = this.typesChoice;
+        if ((finalTypes.length === 1) && (finalTypes[0] === 'all')) {
+            finalTypes = this.requestTypeIds;
+        }
+        let finalStages = this.stagesChoice;
+        if ((finalStages.length === 1) && (finalStages[0] === 'all')) {
+            finalStages = this.stages;
+        }
+        const editable = this.editableSelected ? 'true' : 'false';
+        const isMine = this.myRequestsSelected ? 'true' : 'false';
+
         this.requestService.searchAllRequestSummaries(this.searchTerm,
-            this.statusesChoice,
-            this.typesChoice,
-            this.stagesChoice,
-            currentOffset.toString(),
-            this.itemsPerPage.toString(),
-            this.order,
-            this.orderField,
-            this.authService.getUserProp('email')).subscribe(
+                                                      finalStatuses,
+                                                      finalTypes,
+                                                      finalStages,
+                                                      currentOffset.toString(),
+                                                      this.itemsPerPage.toString(),
+                                                      this.order,
+                                                      this.orderField,
+                                                      editable,
+                                                      isMine,
+                                                      this.extraFilters).subscribe(
             res => {
                 if (res) {
                     this.searchResults = res;
@@ -299,6 +320,7 @@ export class RequestsComponent implements OnInit {
                 this.errorMessage = 'Παρουσιάστηκε πρόβλημα με την φόρτωση των αιτημάτων';
                 this.showSpinner = false;
                 this.totalPages = 0;
+                window.scrollTo(1, 1);
             },
             () => {
                 this.showSpinner = false;
@@ -306,12 +328,17 @@ export class RequestsComponent implements OnInit {
                 if (this.listOfRequests.length === 0) {
                     this.noRequests = 'Δεν βρέθηκαν σχετικά αιτήματα.';
                 }
-                this.listOfRequests.forEach( x => this.listOfRowColors.push(this.getTrStyle(x)) );
-                // console.log(this.listOfRowColors.length);
-                // console.log(this.listOfRowColors);
                 this.setFormValues();
+                window.scrollTo(1, 1);
             }
         );
+    }
+
+    getExtraFiltersKeys() {
+        if (this.extraFilters) {
+            return Array.from(this.extraFilters.keys());
+        }
+        return [];
     }
 
     sortBy (category: string) {
@@ -322,13 +349,12 @@ export class RequestsComponent implements OnInit {
             this.orderField = category;
         }
         this.currentPage = 0;
-        // this.getListOfRequests();
         this.createSearchUrl();
     }
 
     toggleOrder() {
         if (this.order === 'ASC') {
-            this.order = 'DESC';
+            this.order = 'DSC';
         } else {
             this.order = 'ASC';
         }
@@ -346,7 +372,6 @@ export class RequestsComponent implements OnInit {
     goToPreviousPage() {
         if (this.currentPage > 0) {
             this.currentPage--;
-            // this.getListOfRequests();
             this.createSearchUrl();
         }
     }
@@ -354,7 +379,6 @@ export class RequestsComponent implements OnInit {
     goToNextPage() {
         if ( (this.currentPage + 1) < this.totalPages) {
             this.currentPage++;
-            // this.getListOfRequests();
             this.createSearchUrl();
         }
     }
@@ -362,7 +386,6 @@ export class RequestsComponent implements OnInit {
     getItemsPerPage(event: any) {
         this.itemsPerPage = event.target.value;
         this.currentPage = 0;
-        // this.getListOfRequests();
         this.createSearchUrl();
     }
 
@@ -380,7 +403,6 @@ export class RequestsComponent implements OnInit {
         this.setAllStageValues(false);
         this.initFormArray('stageChoices', { stage: [false] }, this.stages.length);
         this.currentPage = 0;
-        // this.getListOfRequests();
         this.createSearchUrl();
     }
 
@@ -399,7 +421,6 @@ export class RequestsComponent implements OnInit {
             this.getStageChoices();
             console.log('after getStageChoices list is', JSON.stringify(this.stagesChoice));
             this.currentPage = 0;
-            // this.getListOfRequests();
             this.createSearchUrl();
         }
     }
@@ -408,7 +429,6 @@ export class RequestsComponent implements OnInit {
         this.getStatusChoices();
         console.log('after getStatusChoices list is', JSON.stringify(this.statusesChoice));
         this.currentPage = 0;
-        // this.getListOfRequests();
         this.createSearchUrl();
     }
 
@@ -416,15 +436,20 @@ export class RequestsComponent implements OnInit {
         this.getTypeChoices();
         console.log('after getTypeChoices list is', JSON.stringify(this.typesChoice));
         this.currentPage = 0;
-        // this.getListOfRequests();
         this.createSearchUrl();
     }
 
-    chooseInstitute() {
-        this.getInstituteChoices();
-        console.log('after getInstituteChoices list is', JSON.stringify(this.institutesChoice));
-        this.currentPage = 0;
-        // this.getListOfRequests();
+    addExtraFilter(searchParams: string[]) {
+        if (searchParams.length === 2) {
+            const key = searchParams[ 0 ];
+            const value = searchParams[ 1 ];
+            this.extraFilters.set(key, value);
+            this.createSearchUrl();
+        }
+    }
+
+    removeExtraFilter(key: string) {
+        this.extraFilters.delete(key);
         this.createSearchUrl();
     }
 
@@ -432,7 +457,19 @@ export class RequestsComponent implements OnInit {
         this.searchTerm = this.keywordField.get('keyword').value;
         console.log('this.searchTerm is', this.searchTerm);
         this.currentPage = 0;
-        // this.getListOfRequests();
+        this.createSearchUrl();
+    }
+
+    toggleEditable(event: any) {
+        this.editableSelected = event.target.checked;
+        if (this.editableSelected) {
+            this.statusesChoice = ['pending', 'under_review'];
+        }
+        this.createSearchUrl();
+    }
+
+    toggleIsMine(event: any) {
+        this.myRequestsSelected = event.target.checked;
         this.createSearchUrl();
     }
 
@@ -443,21 +480,18 @@ export class RequestsComponent implements OnInit {
         this.stages = approvalStages.concat(paymentStages);
         this.initFormArray('stageChoices', { stage: [false]}, this.stages.length);
         this.currentPage = 0;
-        // this.getListOfRequests();
         this.createSearchUrl();
     }
 
     toggleSearchAllStages(event: any) {
         this.setAllStageValues(event.target.checked);
         this.currentPage = 0;
-        // this.getListOfRequests();
         this.createSearchUrl();
     }
 
     toggleSearchAllStatuses(event: any) {
         this.setAllStatusValues(event.target.checked);
         this.currentPage = 0;
-        // this.getListOfRequests();
         this.createSearchUrl();
     }
 
@@ -467,18 +501,7 @@ export class RequestsComponent implements OnInit {
         this.typesChoice = [];
         this.typesChoice.push('all');
         this.currentPage = 0;
-        // this.getListOfRequests();
         this.createSearchUrl();
-    }
-
-
-    toggleSearchAllInstitutes(event: any) {
-        this.allInstitutesSelected = event.target.checked;
-        this.setChoices(event.target.checked, 'instituteChoices', 'institute');
-        this.institutesChoice = [];
-        this.institutesChoice.push('all');
-        this.currentPage = 0;
-        this.getListOfRequests();
     }
 
     setChoices(val: boolean, arrayName: string, controlName: string) {
@@ -596,52 +619,6 @@ export class RequestsComponent implements OnInit {
         }
     }
 
-    getInstituteChoices() {
-        this.allInstitutesSelected = null;
-        this.institutesChoice = [];
-        const instituteChoicesIndices = this.getChoicesIndices('instituteChoices', 'institute');
-        if ((instituteChoicesIndices.length === 0) || (instituteChoicesIndices.length === this.instituteIds.length)) {
-            this.allInstitutesSelected = (instituteChoicesIndices.length === this.instituteIds.length);
-            this.institutesChoice.push('all');
-        } else {
-            instituteChoicesIndices.forEach( x => this.institutesChoice.push(this.instituteIds[x]) );
-        }
-    }
-
-
-    getInstitutes() {
-        this.showSpinner = true;
-        this.errorMessage = '';
-        this.projects = [];
-
-        this.projectService.getAllProjectsNames().subscribe(
-            res => this.projects = res,
-            error => {
-                console.log(error);
-                this.showSpinner = false;
-                this.errorMessage = 'Παρουσιάστηκε πρόωλημα με την ανάκτηση των απαραίτητων πληροφοριών.';
-            },
-            () => {
-                this.showSpinner = false;
-                this.errorMessage = '';
-                if ( !this.projects || (this.projects.length === 0) ) {
-                    this.errorMessage = 'Παρουσιάστηκε πρόβλημα με την ανάκτηση των απαραίτητων πληροφοριών.';
-                } else {
-                    this.instituteIds = [];
-                    this.projects.forEach(
-                        x => {
-                            if ( this.instituteIds.indexOf(x.instituteName) === -1 ) {
-                                this.instituteIds.push(x.instituteName);
-                            }
-                        }
-                    );
-                    this.readParams();
-                }
-            }
-        );
-    }
-
-
     getStatusAsString( status: string ) {
         if ( (status === 'pending') || (status === 'under_review') ) {
             return 'σε εξέλιξη';
@@ -654,39 +631,6 @@ export class RequestsComponent implements OnInit {
         }
     }
 
-    getTrStyle(req: RequestSummary) {
-        let travellerEmail = '';
-        if ( req.request.trip ) {
-            travellerEmail = req.request.trip.email;
-        }
-        if (this.getIfUserCanEdit(req.baseInfo.id, req.request.id,
-                                  req.request.user, req.request.project,
-                                  req.baseInfo.stage, req.request.scientificCoordinatorAsDiataktis, travellerEmail)) {
-            return '#f7f7f7';
-        } else {
-            return '';
-        }
-    }
-
-    getIfUserCanEdit(id: string, requestId: string, requester: User, project: Project,
-                     stage: string, scientificCoordinatorAsDiataktis: boolean, travellerEmail?: string) {
-        let newRequestInfo: RequestInfo;
-        if (travellerEmail) {
-            newRequestInfo = new RequestInfo(id, requestId, requester, project, scientificCoordinatorAsDiataktis, travellerEmail);
-        } else {
-            newRequestInfo = new RequestInfo(id, requestId, requester, project, scientificCoordinatorAsDiataktis);
-        }
-
-        return (( this.authService.getUserRole().some(x => x.authority === 'ROLE_ADMIN')) ||
-                ( ((stage === '1') || (stage === '7')) && (this.authService.getUserProp('email') === newRequestInfo.requester.email) ) ||
-                ((stage !== '1') &&
-                 newRequestInfo[stage].stagePOIs.some(
-                        x => ( (x.email === this.authService.getUserProp('email')) ||
-                                         (x.delegates && x.delegates.some(y => y.email === this.authService.getUserProp('email'))) )
-                    )
-                ) );
-    }
-
     createSearchUrl() {
         const url = new URLSearchParams();
 
@@ -695,15 +639,24 @@ export class RequestsComponent implements OnInit {
         this.stagesChoice.forEach( st => url.append('stage', st) );
         url.set('phase', this.phaseId.toString());
         this.typesChoice.forEach( t => url.append('type', t) );
-        // this.institutesChoice.forEach( inst => url.append('institute', inst) );
+        if (this.extraFilters) {
+            this.extraFilters.forEach(
+                (val: string, k: string) => url.set(k, val)
+            );
+        }
         url.set('searchTerm', this.searchTerm);
         url.set('page', this.currentPage.toString());
         url.set('itemsPerPage', this.itemsPerPage.toString());
         url.set('orderField', this.orderField);
         url.set('order', this.order);
 
-        this.router.navigateByUrl(`/requests?${url.toString()}`)
-            .then(() => this.readParams() );
+        const editableValue = (this.editableSelected ? 'true' : 'false');
+        url.set('editable', editableValue);
+
+        const isMineValue = (this.myRequestsSelected ? 'true' : 'false');
+        url.set('isMine', isMineValue);
+
+        this.router.navigateByUrl(`/requests?${url.toString()}`);
     }
 
 }

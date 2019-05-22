@@ -1,17 +1,23 @@
 /* shared constants */
 
-/* NEXT TIME WE EMPTY THE DB REMEMBER TO:
-    CHANGE 'regular' TO 'supply' AND USE supplierSelectionMethod terms in english
-    CHANGE 'accepted' status TO 'completed'
-    ADD english terms as values in supplierSelectionMethops (see supplierSelectionMethodsMap) */
+export const requestTypes = {REGULAR: 'Προμήθεια', TRIP: 'Ταξίδι', CONTRACT: 'Σύμβαση έργου', SERVICES_CONTRACT: 'Σύμβαση υπηρεσίας'};
 
-export const requestTypes = {regular: 'Προμήθεια', trip: 'Ταξίδι', contract: 'Σύμβαση Έργου', services_contract: 'Σύμβαση Υπηρεσίας'};
+export const requesterPositions = {RESEARCHER: 'Ερευνητής-ΕΛΕ',
+                                   COLLABORATIVE_RESEARCHER: 'Συνεργαζόμενος Ερευνητής',
+                                   ADMINISTRATIVE: 'Διοικητικό-Τεχνικό-Βοηθητικό Προσωπικό'};
 
-export const statesList = ['all', 'accepted', 'pending', 'under_review', 'rejected', 'cancelled'];
+export const statesList = ['accepted', 'pending', 'under_review', 'rejected', 'cancelled'];
+export const statusNamesMap = {
+    PENDING: 'βρίσκεται σε εξέλιξη',
+    UNDER_REVIEW: 'βρίσκεται σε εξέλιξη',
+    REJECTED: 'έχει απορριφθεί',
+    ACCEPTED: 'έχει ολοκληρωθεί',
+    CANCELLED: 'έχει ακυρωθεί'
+};
 
 export const supplierSelectionMethods = ['Απ\' ευθείας ανάθεση', 'Έρευνα αγοράς', 'Διαγωνισμός'];
 export const supplierSelectionMethodsMap = {
-    direct: 'Απ\' ευθείας ανάθεση', market_investigation: 'Έρευνα αγοράς', competition: 'Διαγωνισμός' };
+    DIRECT: 'Απ\' ευθείας ανάθεση', MARKET_RESEARCH: 'Έρευνα αγοράς', AWARD_PROCEDURE: 'Διαγωνισμός' };
 
 /* field descriptions for the stages forms */
 export class FieldDescription {
@@ -104,8 +110,7 @@ export class StageDescription {
 /* stages descriptions */
 export const stageIds = ['1', '2', '3', '4', '5a', '5b', '6', '7', '8', '9', '10', '11', '12', '13'];
 export const approvalStages = ['1', '2', '3', '4', '5a', '5b', '6'];
-export const paymentStages = ['7', '8', '9', '10', '11', '12', '13'];
-/*export const stagesIfLowCost = ['1', '2', '3', '4', '5a', 'UploadInvoice', '5b', '8', '6', '12', '13'];*/
+export const paymentStages = ['7', '7a', '8', '9', '10', '11', '12', '13'];
 
 export const stageTitles = {
     '1': 'Υποβολή αιτήματος',
@@ -113,10 +118,10 @@ export const stageTitles = {
     '3': 'Έλεγχος χειριστή έργου',
     '4': 'Βεβαίωση Π.Ο.Υ.',
     '5a': 'Έγκριση Διατάκτη',
-    // 'UploadInvoice': 'Υποβολή τιμολογίου',
     '5b': 'Έγκριση Διοικητικού Συμβουλίου',
     '6': 'Ανάρτηση στην Διαύγεια',
     '7': 'Καταχώρηση συνοδευτικού υλικού',
+    '7a': 'Έλεγχος από Διοικητικό Συμβούλιο',
     '8': 'Έλεγχος από ομάδα ελέγχου',
     '9': 'Έλεγχος από Π.Ο.Υ',
     '10': 'Έλεγχος Διατάκτη',

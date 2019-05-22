@@ -4,6 +4,9 @@
     <!-- STAGE RESULT DISPLAY -->
     <div *ngIf="showStage > 1" class="uk-form-controls">
         <!--<h5>{{ stageTitle }}</h5>-->
+        <div *ngIf="canEditStage" data-html2canvas-ignore>
+            <a class="uk-link" (click)="editStage(true)"><i class="uk-icon" uk-icon="pencil"></i> Επεξεργασία</a>
+        </div>
         <div>
             {{ submittedStageResult }}{{ getDelegateName() }}
             στις {{ currentStage['date'] | date : 'dd-MM-yyyy' }}
@@ -62,14 +65,13 @@
         </div>
 
         <!-- display links to attachments -->
-        <div *ngIf="currentStage['attachments'] && (currentStage['attachments'].length > 0)"
-             class="uk-margin-small-top no-print" data-html2canvas-ignore>
+        <div *ngIf="currentStage['attachments'] && (currentStage.attachments.length > 0)" class="uk-margin-small-top " data-html2canvas-ignore>
             Για λήψη του αρχείου που επιθυμείτε, πατήστε στον αντίστοιχο σύνδεσμο:
-            <span *ngFor="let f of currentStage['attachments']; let i = index">
-                <a class="uk-link uk-width-1-1@l" (click)="linkToFile(i)">
-                  {{ f.filename }}
-                </a>
-                <span *ngIf="currentStage['attachments'].length > i + 1"> |</span>
+            <span *ngFor="let f of currentStage.attachments; let i = index">
+              <a class="uk-link uk-width-1-1@l" (click)="linkToFile(i)">
+                {{ f.filename }}
+              </a>
+              <span *ngIf="currentStage.attachments.length > i + 1"> |</span>
             </span>
         </div>
     </div>
@@ -123,16 +125,22 @@
             <textarea formControlName="comment" class="uk-form-controls uk-textarea" rows="2"></textarea>
         </app-form-field>
 
-        <!--ATTACHMENTS FIELDS-->
-        <app-form-upload-files [uploadedFilenames]="uploadedFilenames" (emitFiles)="getAttachmentsInput($event)" (emitDelete)="removeUploadedFile($event)">
+        <!--ATTACHMENT FIELDS-->
+        <app-form-upload-files [uploadedFilenames]="uploadedFilenames" (emitFiles)="getAttachmentsInput($event)"
+                               (emitDelete)="removeUploadedFile($event)">
         </app-form-upload-files>
 
         <!--BUTTONS-->
-        <button class="uk-button uk-button-primary" (click)="approveRequest(true)">Εγκρίνεται</button>
+        <div *ngIf="!canEditStage">
+            <button class="uk-button uk-button-primary" (click)="approveRequest(true)">Εγκρίνεται</button>
+            <button class="uk-button uk-button-danger" uk-toggle="target: #rejectionModal3">Απορρίπτεται</button>
+            <button class="uk-button uk-button-default" (click)="goBackOneStage()">Επιστροφή στο προηγούμενο στάδιο</button>
+        </div>
 
-        <button class="uk-button uk-button-primary" (click)="approveRequest(false)">Απορρίπτεται</button>
-
-        <button class="uk-button uk-button-primary" (click)="goBackOneStage()">Επιστροφή στο προηγούμενο στάδιο</button>
+        <div *ngIf="canEditStage">
+            <button class="uk-button uk-button-primary" (click)="resubmitPreviousStage()">Αποθήκευση αλλαγών</button>
+            <button class="uk-button uk-button-default" (click)="editStage(false)">Κλείσιμο</button>
+        </div>
 
         <!-- CURRENT DATE DISPLAY -->
         <div>
@@ -142,4 +150,15 @@
     </div>
     <!-- END OF STAGE FORM -->
 
+</div>
+
+<div *ngIf="currentStage" id="rejectionModal3" uk-modal>
+    <div class="uk-modal-dialog uk-modal-body">
+        <h4 class="uk-modal-title uk-h4">Επιβεβαίωση απόρριψης</h4>
+        <div class="uk-modal-body">
+            Είστε βέβαιοι ότι επιθυμείτε να απορρίψετε το αίτημα;
+        </div>
+        <button class="uk-button uk-button-danger uk-margin-small-right uk-modal-close" (click)="approveRequest(false)">Απόρριψη αιτήματος</button>
+        <button class="uk-button uk-button-default uk-modal-close">Κλείσιμο</button>
+    </div>
 </div>

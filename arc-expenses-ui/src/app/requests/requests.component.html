@@ -12,7 +12,7 @@
               <div class="search_box_bg" style="text-align:center">
                 <form [formGroup]="keywordField" class="uk-align-center uk-margin-top">
                   <input class="uk-input uk-width-2-3 uk-search-field"
-                         placeholder="αρ.πρωτοκόλλου, αιτών, χειριστής, υπεύθυνος, έργο, ινστιτούτο" formControlName="keyword">
+                         placeholder="αρ.πρωτοκόλλου, χειριστής, επιστημονικός υπεύθυνος" formControlName="keyword">
                   <button class="uk-button uk-button-secondary" type="submit" (click)="getSearchByKeywordResults()"><i class="fa fa-search"></i> Αναζήτηση</button>
                   <button class="uk-button uk-button-default" (click)="initializeParams()">Καθάρισμα επιλογών</button>
                 </form>
@@ -44,13 +44,30 @@
             <!--<aside-help-content #leftHelperContent [position]="'left'"
                                 [ngClass]="leftHelperContent.isPresent()?'tm-sidebar uk-width-1-4@m uk-first-column':'clear-style'">
             </aside-help-content>-->
-          <!--<div>-->
 
               <!-- FILTERS SIDEMENU -->
             <div *ngIf="filtersForm" [formGroup]="filtersForm"
                  class="uk-card uk-card-body uk-card-default sidemenu uk-margin-bottom">
 
                 <div class="uk-margin-bottom"><h6 class="uk-heading-bullet">Φίλτρα Αναζήτησης</h6></div>
+                <div class="uk-margin-bottom">
+                    <div class="show-options uk-inline">
+                        <div>
+                            <div>
+                                <label class="filterLabel uk-text-bold uk-margin-large-bottom" for="selectEditable">
+                                    <input class="uk-checkbox" type="checkbox" id="selectEditable" [checked]="editableSelected"
+                                           (change)="toggleEditable($event)">&nbsp;&nbsp;Αναμένουν δική μου ενέργεια
+                                </label>
+                            </div>
+                            <div>
+                                <label class="filterLabel uk-text-bold uk-margin-large-bottom" for="selectIsMine">
+                                    <input class="uk-checkbox" type="checkbox" id="selectIsMine" [checked]="myRequestsSelected"
+                                           (change)="toggleIsMine($event)">&nbsp;&nbsp;Δικά μου αιτήματα
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="uk-margin-bottom">
                     <div formArrayName="phases" class="show-options uk-inline">
                         <label class="filterLabel uk-text-bold uk-margin-large-bottom" for="selectAllPhases">
@@ -82,7 +99,7 @@
                                 <label for="type_{{ type_i }}">
                                     <input class="uk-checkbox" type="checkbox" formControlName="type" id="type_{{ type_i }}"
                                            (change)="chooseType()">
-                                    {{ reqTypes[reqtype] }}
+                                    {{ reqTypes[reqtype.toUpperCase()] }}
                                 </label>
                             </div>
                         </div>
@@ -141,27 +158,8 @@
                        </div>
                    </div>
                </div>
-               <!--<div class="uk-margin-bottom">
-                   <div formArrayName="projectChoices" class="show-options uk-inline">
-                       <label class="filterLabel uk-text-bold uk-margin-large-bottom" for="selectAllProjects">
-                           <input class="uk-checkbox" type="checkbox" id="selectAllProjects" [checked]="allProjectsSelected"
-                                  (change)="toggleSearchAllProjects($event)">&nbsp;&nbsp;Στάδιο</label>
-                       <div *ngFor="let proj of projects; let proj_i = index">
-                           <div [formGroupName]="proj_i">
-                               <read-more [maxHeight]="245">
-                                   <label for="proj_{{ proj_i }}">
-                                       <input class="uk-checkbox" type="checkbox" formControlName="project" id="proj_{{ proj_i }}"
-                                              (change)="chooseProject()">
-                                        {{ proj.projectAcronym }} ({{ proj.instituteName }})
-                                   </label>
-                               </read-more>
-                           </div>
-                       </div>
-                   </div>
-               </div>-->
 
            </div>
-          <!--</div>-->
 
               <!-- MIDDLE -->
             <div class="uk-width-expand">
@@ -172,7 +170,18 @@
                         <div uk-spinner="ratio: 2" class="uk-overlay uk-dark"></div>
                     </div>
                     <div *ngIf="searchResults && !showSpinner">
-                        <div class="uk-float-left">A=Ανάληψη, Π=Περαίωση</div>
+                        <div class="uk-float-left">
+                            A=Ανάληψη, Π=Περαίωση
+                            <div class="uk-margin-small-top">
+                                <div *ngFor="let filter of getExtraFiltersKeys()" class="uk-label uk-margin-small-right">
+                                    <span class="uk-margin-small-right">
+                                        {{ extraFiltersTranslation[filter] }}: {{ extraFilters.get(filter) }}</span>
+                                    <span>
+                                        <a class="uk-link uk-position-z-index" uk-icon="icon: close" (click)="removeExtraFilter(filter)"></a>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
                         <div class="uk-grid page-controls uk-flex-right">
                             <div class="uk-margin-bottom ">
                                 <div class="uk-inline">
@@ -228,20 +237,48 @@
                                             <tr>
                                                 <th></th>
                                                 <th>Αρ.Πρωτ./Ειδος</th>
-                                                <th><a (click)="sortBy('request_project_acronym')" title="Ταξινόμηση με βάση το ακρώνυμο του έργου">
+                                                <th><a class="uk-margin-small-right" title="Ταξινόμηση με βάση το ακρώνυμο του έργου"
+                                                       (click)="sortBy('request_project_acronym')">
                                                     Εργο&nbsp;
                                                     <span *ngIf="orderField && (orderField === 'request_project_acronym')"
                                                           [innerHtml]="getOrderSign()"></span>
                                                     </a>
+                                                    <a class="uk-link uk-icon-link" uk-icon="icon: search; ratio: 1"
+                                                       uk-toggle="target: #projectAcronym" title="Αναζήτηση ακρωνύμου"></a>
+                                                    <div class="uk-navbar-dropdown uk-padding-small" style="display: block;" id="projectAcronym" hidden>
+                                                        <dropdown-search [id]="'projectAcronym'"
+                                                                         (emitSearchTerm)="addExtraFilter($event)"></dropdown-search>
+                                                    </div>
+
                                                 </th>
-                                                <th><a (click)="sortBy('request_institute')" title="Ταξινόμηση με βάση το όνομα του Ινστιτούτου ή της Μονάδας" class="uk-margin-large-right">
+                                                <th>
+                                                    <a class="uk-margin-small-right" title="Ταξινόμηση με βάση το όνομα του Ινστιτούτου ή της Μονάδας"
+                                                       (click)="sortBy('request_institute')">
                                                     Ινστιτουτο / Μοναδα
                                                     <span *ngIf="orderField && (orderField === 'request_institute')"
                                                           [innerHtml]="getOrderSign()"></span>
-                                                </a></th>
+                                                    </a>
+                                                    <a class="uk-link uk-icon-link" uk-icon="icon: search; ratio: 1"
+                                                       uk-toggle="target: #institute" title="Αναζήτηση ινστιτούτου/μονάδας"></a>
+                                                    <div class="uk-navbar-dropdown uk-padding-small" style="display: block;" id="institute" hidden>
+                                                        <dropdown-search [id]="'institute'"
+                                                                         (emitSearchTerm)="addExtraFilter($event)"></dropdown-search>
+                                                    </div>
 
-                                                <th>Αιτων</th>
-                                                <th><a (click)="sortBy('creation_date')" title="Ταξινόμηση με βάση την ημερομηνία υποβολής του αιτήματος">
+                                                </th>
+
+                                                <th>
+                                                    Αιτων
+                                                    <a class="uk-link uk-icon-link uk-margin-small-left"
+                                                       uk-icon="icon: search; ratio: 1"
+                                                       uk-toggle="target: #requester" title="Αναζήτηση με το email του αιτούντα"></a>
+                                                    <div class="uk-navbar-dropdown uk-padding-small" style="display: block;" id="requester" hidden>
+                                                        <dropdown-search [id]="'requester'"
+                                                                         (emitSearchTerm)="addExtraFilter($event)"></dropdown-search>
+                                                    </div>
+                                                </th>
+                                                <th><a title="Ταξινόμηση με βάση την ημερομηνία έναρξης της ανάληψης ή της περαίωσης του αιτήματος"
+                                                       (click)="sortBy('creation_date')">
                                                     Ημ/νια&nbsp;
                                                     <span *ngIf="orderField && (orderField === 'creation_date')"
                                                           [innerHtml]="getOrderSign()"></span>
@@ -251,19 +288,19 @@
                                                 <th><span class="uk-margin-right">Κατασταση</span></th>
                                             </tr>
                                             <tr *ngIf="noRequests">
-                                                <td colspan="7" class="uk-alert uk-width-1-1">{{noRequests}}</td>
+                                                <td colspan="8">{{noRequests}}</td>
                                             </tr>
-                                            <tr class="uk-link" *ngFor="let req of listOfRequests; let i = index"
+                                            <tr class="uk-link" *ngFor="let req of listOfRequests"
                                                 routerLink="/requests/{{(req.baseInfo.id).includes('a')? 'request-stage':'request-stage-payment'}}/{{req.baseInfo.id}}"
-                                                title="Μετάβαση στην σελίδα του αιτήματος" [style.backgroundColor]="listOfRowColors[i]">
+                                                title="Μετάβαση στην σελίδα του αιτήματος" [style.backgroundColor]="req.canEdit ? '#f7f7f7' : ''">
                                                 <td>{{ req.baseInfo.id.includes('a') ? 'Α': 'Π' }}</td>
-                                                <td>{{ req.request.id }}<br>{{ reqTypes[req.request.type] }}</td>
-                                                <td>{{ req.request.project.acronym }}</td>
-                                                <td>{{ req.request.project.institute.name }}</td>
-                                                <td>{{ req.request.user.firstname }} {{ req.request.user.lastname }}</td>
+                                                <td>{{ req.baseInfo.requestId }}<br>{{ reqTypes[req.requestType] }}</td>
+                                                <td>{{ req.projectAcronym }}</td>
+                                                <td>{{ req.instituteName }}</td>
+                                                <td>{{ req.requestFullName }}</td>
                                                 <td>{{ req.baseInfo.creationDate | date : 'dd-MM-yyyy' }}</td>
                                                 <td *ngIf="!isSimpleUser">{{ stagesMap[req.baseInfo.stage]}}</td>
-                                                <td>{{ getStatusAsString(req.baseInfo.status) }}</td>
+                                                <td>{{ getStatusAsString(req.baseInfo.status.toLowerCase()) }}</td>
                                             </tr>
                                         </thead>
                                     </table>

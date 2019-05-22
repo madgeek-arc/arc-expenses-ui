@@ -1,6 +1,20 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import {
+    AfterViewInit,
+    Component,
+    ElementRef,
+    EventEmitter,
+    Inject,
+    Input,
+    OnChanges,
+    OnDestroy,
+    OnInit,
+    Output,
+    SimpleChanges
+} from '@angular/core';
 import { FieldDescription } from '../../domain/stageDescriptions';
 import * as uikit from 'uikit';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { DOCUMENT } from '@angular/common';
 
 @Component({
   selector: 'app-form-field',
@@ -101,8 +115,7 @@ export class FormUploadFileComponent implements OnInit {
             </div>
         </div>
         <div class="uk-flex-center">
-            <div *ngFor="let f of uploadedFilenames; let i = index"
-                 class="uk-text-bold uk-padding-small uk-display-inline-block uk-margin-small-right">
+            <div *ngFor="let f of uploadedFilenames; let i = index" class="uk-label uk-margin-small-right">
                 <span class="uk-margin-small-right">{{ f }}</span>
                 <span>
                     <a class="uk-link uk-position-z-index" uk-icon="icon: close" (click)="deleteItem(i)"></a>
@@ -117,8 +130,6 @@ export class FormUploadFileComponent implements OnInit {
 `
 })
 export class FormUploadFilesComponent implements OnInit {
-
-    badFilename: string;
 
     /* the file list is updated and emitted to the parent component after every user action
        (drop - open from explorer - delete one - delete all) */
@@ -150,24 +161,16 @@ export class FormUploadFilesComponent implements OnInit {
 
     loadFilesToUploadedList(files: File[]) {
         for (const f of files) {
-            // check for illegal filename characters
-            /*if ( f.name.match(/[!@#$%^&*()=,?"':;{}|<>\[\]\(\)+`~\/\\]/g) ||
-                 (f.name.indexOf('.') !== f.name.lastIndexOf('.'))) {
-                this.badFilename = f.name;
-                this.badFilename.replace(/&/g, '&amp;')
-                                .replace(/</g, '&lt;')
-                                .replace(/>/g, '&gt;')
-                                .replace(/"/g, '&quot;')
-                                .replace(/'/g, '&#039;');
-                uikit.modal.alert(`<h6 class="uk-modal-title">Μη αποδεκτό όνομα αρχείου<br>(${this.badFilename})</h6>
+            if (this.uploadedFilenames.includes(f.name)) {
+                uikit.modal.alert(`<h6 class="uk-modal-title">Το αρχείο υπάρχει ήδη</h6>
                                    <div class="uk-modal-body">
-                                        <div>Τα ονόματα των αρχείων δεν πρέπει να περιέχουν σύμβολα ή κενά.</div>
-                                        <div>Αποδεκτά σύμβολα είναι μόνο τα: \'-\' και \'_\'.</div>
+                                        <div>Υπάρχει ήδη ένα αρχείο με όνομα ${f.name} στην λίστα.</div>
                                    </div>`);
-            } else {*/
+                break;
+            } else {
                 this.uploadedFilenames.push(f.name);
                 this.uploadedFiles.push(f);
-            /*}*/
+            }
         }
     }
 
@@ -178,14 +181,7 @@ export class FormUploadFilesComponent implements OnInit {
 
     deleteItem(i: number) {
         console.log(`deleting ${this.uploadedFilenames[i]}`);
-        if (this.uploadedFiles && this.uploadedFiles.some(x => x.name === this.uploadedFilenames[i])) {
-            const z = this.uploadedFiles.findIndex(x => x.name === this.uploadedFilenames[i]);
-            this.uploadedFiles.splice(z, 1);
-            console.log(`number of uploaded files is ${this.uploadedFiles.length}`);
-            this.emitFiles.emit(this.uploadedFiles);
-        }
         this.emitDelete.emit(this.uploadedFilenames[i]);
-        console.log(`uploaded filenames are ${this.uploadedFilenames}`);
     }
 
     clearList() {
@@ -196,3 +192,63 @@ export class FormUploadFilesComponent implements OnInit {
 
 
 }
+
+@Component({
+    selector: 'dropdown-search',
+    template: `
+        <form *ngIf="(id != null) && (formgroup != null)" [formGroup]="formgroup">
+
+            <div class="uk-grid-small uk-flex-middle" uk-grid>
+                <div class="uk-width-expand">
+                    <div class="uk-width-1-1">
+                        <input class="uk-search-input" type="search" placeholder="Search..." autofocus
+                               formControlName="searchField">
+                    </div>
+                </div>
+                <div class="uk-width-auto">
+                    <button id="{{id + '_submit'}}" type="submit" class="uk-icon" uk-icon="check" (click)="submitSearch()"></button>
+                    <button id="{{id + '_btn'}}" type="reset" class="uk-icon" uk-icon="close"></button>
+                </div>
+            </div>
+
+        </form>
+    `
+})
+export class DropdownSearchComponent implements OnInit, AfterViewInit {
+    formgroup: FormGroup;
+
+    @Input() id: string;
+    @Output() emitSearchTerm: EventEmitter<string[]> = new EventEmitter<string[]>();
+
+    constructor(private fb: FormBuilder, @Inject(DOCUMENT) private document) {}
+
+    ngOnInit(): void {
+        this.formgroup = this.fb.group({searchField : ['']});
+    }
+
+    ngAfterViewInit(): void {
+        if (this.id) {
+            this.addToggle();
+        }
+    }
+
+    // closes popup search form on submit
+    addToggle() {
+        const btn = document.getElementById(this.id + '_btn');
+        const sbm = document.getElementById(this.id + '_submit');
+        btn.setAttribute('uk-toggle', 'target: #' + this.id);
+        sbm.setAttribute('uk-toggle', 'target: #' + this.id);
+    }
+
+    submitSearch() {
+        console.log(`searchTerm is ${this.formgroup.get('searchField').value}`);
+        this.emitSearchTerm.emit([this.id, this.formgroup.get('searchField').value]);
+        this.formgroup.reset();
+    }
+
+    clearForm() {
+        this.formgroup.reset();
+    }
+
+}
+
