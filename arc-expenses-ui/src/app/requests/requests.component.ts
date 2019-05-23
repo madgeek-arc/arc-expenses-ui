@@ -444,12 +444,14 @@ export class RequestsComponent implements OnInit {
             const key = searchParams[ 0 ];
             const value = searchParams[ 1 ];
             this.extraFilters.set(key, value);
+            this.currentPage = 0;
             this.createSearchUrl();
         }
     }
 
     removeExtraFilter(key: string) {
         this.extraFilters.delete(key);
+        this.currentPage = 0;
         this.createSearchUrl();
     }
 
@@ -465,11 +467,13 @@ export class RequestsComponent implements OnInit {
         if (this.editableSelected) {
             this.statusesChoice = ['pending', 'under_review'];
         }
+        this.currentPage = 0;
         this.createSearchUrl();
     }
 
     toggleIsMine(event: any) {
         this.myRequestsSelected = event.target.checked;
+        this.currentPage = 0;
         this.createSearchUrl();
     }
 
