@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {AuthenticationService} from '../services/authentication.service';
-import {Router} from '@angular/router';
-import { Attachment } from '../domain/operation';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AuthenticationService } from '../services/authentication.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-sign-up',
@@ -43,7 +42,7 @@ export class SignUpComponent implements OnInit {
           email: '',
           receiveEmails: [''],
           immediateEmails: ['']
-      });
+      }, { validator: checkIfNull } );
       this.addUserInfoToForm();
   }
 
@@ -77,6 +76,7 @@ export class SignUpComponent implements OnInit {
         } else {
             this.errorMessage = 'Είναι απαραίτητο να συμπληρώσετε το όνομα και το επίθετό σας στα ελληνικά.';
             this.showSpinner = false;
+            window.scrollTo(1, 1);
         }
     }
 
@@ -109,4 +109,12 @@ export class SignUpComponent implements OnInit {
       );
     }
 
+}
+
+
+export function checkIfNull(c: AbstractControl) {
+    if ( (c.get('name').value === 'null') || (c.get('surname').value === 'null') ) {
+        return 'invalid';
+    }
+    return null;
 }
