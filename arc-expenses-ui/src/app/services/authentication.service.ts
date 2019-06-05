@@ -87,24 +87,16 @@ export class AuthenticationService {
                         if ( (sessionStorage.getItem('userInfo') == null) ||
                              (this.getUserProp('email') === null ) ) {
                             console.log('cant find userInfo in sessionStorage - logging out');
-                            /*this.isLoggedIn = false;
-                            this.removeUserProperties();
-                            deleteCookie('arc_currentUser');
-                            this.router.navigate(['/home']);*/
                             this.logout();
                         }
                     },
                     () => {
                         console.log(`Something went wrong -- I'm logging out!`);
-                        /*this.isLoggedIn = false;
-                        this.removeUserProperties();
-                        deleteCookie('arc_currentUser');
-                        this.router.navigate(['/home']);*/
                         this.logout();
                     }
                 );
             }, 1000 * 60 * 5);
-            /*console.log('email is', this.getUserProp('email'));*/
+
             if ( !sessionStorage.getItem('userInfo') ) {
                 console.log(`session.userInfo wasn't found --> logging in via arc-service!`);
                 this.http.get(this.apiUrl + '/user/getUserInfo', headerOptions).subscribe(
@@ -126,10 +118,6 @@ export class AuthenticationService {
                     error => {
                         console.log('login error or coming back after closing the browser!');
                         console.log(error);
-                        /*this.isLoggedIn = false;
-                        this.removeUserProperties();
-                        deleteCookie('arc_currentUser');
-                        this.router.navigate(['/home']);*/
                         this.loginWithState();
                     },
                     () => {
