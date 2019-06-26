@@ -26,6 +26,10 @@
             <div class=" uk-width-expand@m">
 
               <div *ngIf="errorMessage" class="uk-alert uk-alert-danger">{{ errorMessage }}</div>
+              <div class="uk-alert uk-alert-warning">
+                <i class="fa fa-info-circle"></i>  Αιτήματα για τα έργα που υπάγονται στον Ν4610/2019 υποβάλλονται μέσω της νέας πλατφόρμας
+                <a href="https://n4610.athenarc.gr" target="_blank">https://n4610.athenarc.gr</a>
+              </div>
 
               <div *ngIf="requestType && projects && (projects.length > 0)">
                 <form *ngIf="newRequestForm && currentUser && projects && (projects.length > 0)"
@@ -82,7 +86,7 @@
                           </div>
                         </div>
                         <div class="uk-text-primary uk-text-small">
-                          <i class="fa fa-info-circle"></i>  Για να έχει ο ενδιαφερόμενος πρόσβαση στο αίτημα, το email που συμπληρώνετε θα πρέπει να είναι το ίδιο με αυτό που θα χρησιμοποιήσει για να συνδεθεί στην πλατφόρμα.
+                          <i class="fa fa-info-circle"></i>  Για να έχει ο ενδιαφερόμενος πρόσβαση στο αίτημα, το email που συμπληρώνετε θα πρέπει να είναι έγκυρο email του ΕΚ Αθηνά.
                         </div>
                       </div>
                     </div>
