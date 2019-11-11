@@ -106,7 +106,7 @@ export class AuthenticationService {
                             this.isLoggedIn = true;
                             // TODO: KEEP UNTIL KKARAMAL GETS A REAL ROLE_EXECUTIVE!!
                             if (userInfo['user'] && userInfo['user']['email'] &&
-                                (userInfo['user']['email'] === 'kkaramal@ipet.athena-innovation.gr')) {
+                                (userInfo['user']['email'] === 'kkaramal@athenarc.gr')) {
                                 sessionStorage.setItem('role', '[{"authority":"ROLE_EXECUTIVE"}]');
                             } else {
                                 sessionStorage.setItem('role', JSON.stringify(userInfo['role']));
